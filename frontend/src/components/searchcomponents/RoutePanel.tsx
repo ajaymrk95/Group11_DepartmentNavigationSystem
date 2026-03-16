@@ -1,5 +1,6 @@
 import type { Location } from "../../data/locations"
 import SearchBar from "./SearchBar"
+import locationImage from "../../assets/image.png"
 
 type Props = {
 locations: Location[]
@@ -39,6 +40,81 @@ return ( <div className="
       onSelect={onSelectLocation}
       onFocusSearch={clearSelectedLocation}
     />
+
+    {selectedLocation && (
+
+      <div className="
+        bg-[#e9e4d9]
+        rounded-xl
+        overflow-hidden
+        border border-[#c8c0b0]
+        shadow-xl
+        transition-all duration-200
+        hover:-translate-y-[2px]
+      ">
+
+        <div className="h-48 overflow-hidden">
+          <img
+            src={locationImage}
+            alt="Location"
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-[1.04]"
+          />
+        </div>
+
+        <div className="p-5 space-y-3">
+
+          <h3 className="text-lg font-semibold text-[#1A3263] leading-snug">
+            {selectedLocation.name}
+          </h3>
+
+          <div className="flex gap-4 text-xs font-medium text-[#1A3263]/60">
+            <p>Room {selectedLocation.room}</p>
+
+            {selectedLocation.floor !== undefined && (
+              <p>Floor {selectedLocation.floor}</p>
+            )}
+          </div>
+
+          {selectedLocation.description && (
+            <p className="text-sm text-[#1A3263]/70 leading-relaxed">
+              {selectedLocation.description}
+            </p>
+          )}
+
+          {selectedLocation.tag && (
+
+            <div className="flex flex-wrap gap-2 pt-2">
+
+              {selectedLocation.tag.map(tag => (
+
+                <span
+                  key={tag}
+                  className="
+                    text-xs
+                    font-medium
+                    bg-[#1A3263]/10
+                    text-[#1A3263]
+                    border border-[#1A3263]/10
+                    px-3 py-1
+                    rounded-full
+                    transition-colors duration-200
+                    hover:bg-[#1A3263]/20
+                  "
+                >
+                  {tag}
+                </span>
+
+              ))}
+
+            </div>
+
+          )}
+
+        </div>
+
+      </div>
+
+    )}
 
   </div>
 </div>
