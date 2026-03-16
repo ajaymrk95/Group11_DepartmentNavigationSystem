@@ -1,5 +1,6 @@
 package com.atlas.backend.controller;
 
+import com.atlas.backend.dto.BuildingRequest;
 import com.atlas.backend.entity.Building;
 import com.atlas.backend.service.BuildingService;
 import com.atlas.backend.utils.GeoUtil;
@@ -24,12 +25,13 @@ public class BuildingController {
     // "entries": [[76.5, 11.6], [76.51, 11.61]]
     // }
     @PostMapping
-    public Building create(@RequestBody Map<String, Object> body) throws Exception {
+    public Building create(@RequestBody BuildingRequest body) throws Exception {
         return buildingService.save(
-                body.get("name").toString(),
-                Integer.valueOf(body.get("floors").toString()),
-                body.get("geoJson").toString(),
-                (List<List<Double>>) body.get("entries"));
+            body.getName(),
+            body.getFloors(),
+            body.getGeoJson(),
+            body.getEntries()
+        );
     }
 
     // GET /api/buildings
