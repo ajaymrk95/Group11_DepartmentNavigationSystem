@@ -1,7 +1,7 @@
 export type Location = {
   id: number;
   name: string;
-  room: string;
+  room?: string;
   coords: [number, number];
   type: "building" | "lab" | "connection" | "custom" | "room";
   category?: "indoor" | "outdoor";

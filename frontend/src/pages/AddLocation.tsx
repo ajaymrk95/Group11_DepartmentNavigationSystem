@@ -1,6 +1,6 @@
 import { useState } from "react"
-import AddLocationForm from "../components/admincompnents/AddLocationForm"
-import AddLocationMap from "../components/admincompnents/AddLocationMap"
+import AddLocationForm from "../components/admincomponents/AddLocationForm"
+import AddLocationMap from "../components/admincomponents/AddLocationMap"
 import type { Location } from "../data/locations"
 
 export default function AddLocation() {
