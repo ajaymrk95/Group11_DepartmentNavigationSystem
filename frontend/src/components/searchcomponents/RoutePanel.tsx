@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom"
 import type { Location } from "../../data/locations"
 import SearchBar from "./SearchBar"
 import locationImage from "../../assets/image.png"
@@ -13,6 +14,8 @@ locations,
 selectedLocation,
 onSelectLocation
 }: Props) {
+
+const navigate = useNavigate()
 
 function clearSelectedLocation() {
 onSelectLocation(null)
@@ -117,6 +120,44 @@ return ( <div className="
     )}
 
   </div>
+
+  {/* Navigation Button */}
+  <div className="mt-auto pt-10">
+
+    <button
+      onClick={() => navigate("/")}
+      className="
+        w-full flex items-center justify-between
+        px-6 py-4
+        rounded-full
+        bg-[#e9e4d9]
+        text-[#1A3263]
+        text-sm font-bold tracking-wide
+        shadow-md
+        transition-all duration-200
+        hover:bg-[#f0b35a]
+        hover:shadow-2xl
+        active:scale-[0.96]
+      "
+    >
+
+      Start Navigating
+
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        viewBox="0 0 24 24"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+
+    </button>
+
+  </div>
+
 </div>
 
 
