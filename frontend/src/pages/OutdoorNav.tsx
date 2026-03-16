@@ -1,31 +1,28 @@
 import { useState, useEffect } from "react"
 import MapView from "../components/navcomponents/MapView"
 import RoutePanel from "../components/navcomponents/RoutePanel"
-import { locations,type Location } from "../data/locations"
-import { buildGraph, type Graph } from "../utils/buildGraph"
-import { findNearestNode } from "../utils/findNearestNode"
-import { shortestPath } from "../utils/shortestPath"
+import { locations, type Location } from "../data/locations"
 import LocateButton from "../components/navcomponents/LocateButton"
 import { useCurrentLocation } from "../hooks/useCurrentLocation"
 import { distance } from "../utils/distance"
 
 const DEFAULT_CENTER: [number, number] = [11.3210, 75.9346]
+const BACKEND_URL = "http://localhost:8080/api"
 
 export default function OutdoorNav() {
-  const [graph, setGraph] = useState<Graph | null>(null)
   const [start, setStart] = useState<Location | null>(null)
   const [destination, setDestination] = useState<Location | null>(null)
   const [routeCoords, setRouteCoords] = useState<[number, number][]>([])
   const [distanceText, setDistanceText] = useState("")
   
-  // State to hold the destination clicked directly from the map pins
+  // State for map interactions
   const [clickedDestination, setClickedDestination] = useState<Location | null>(null)
-  
-  // Controls whether the sidebar is visible on mobile
   const [isPanelOpen, setIsPanelOpen] = useState(true)
+  const [center, setCenter] = useState<[number, number]>(DEFAULT_CENTER)
 
   const { location: currentLocation } = useCurrentLocation()
 
+  // Define current location as a selectable option
   const currentLocationOption: Location | null = currentLocation
     ? {
         id: 0, 
@@ -39,44 +36,54 @@ export default function OutdoorNav() {
     ? [currentLocationOption, ...locations]
     : locations
 
-  const [center, setCenter] = useState<[number, number]>(DEFAULT_CENTER)
-
-  useEffect(() => {
-    fetch("/nitc_roads.geojson")
-      .then(r => r.json())
-      .then(data => setGraph(buildGraph(data)))
-  }, [])
-
-  function handleRoute(startLoc: Location, endLoc: Location) {
-    if (!graph) return
-
+  /**
+   * API CALL: Fetch the route from Spring Boot / PostGIS
+   */
+  async function handleRoute(startLoc: Location, endLoc: Location) {
     setStart(startLoc)
     setDestination(endLoc)
 
-    const startId = findNearestNode(graph, startLoc.coords)!
-    const endId = findNearestNode(graph, endLoc.coords)!
+    try {
+      // Build the query params for your NavigationController
+      const query = new URLSearchParams({
+        sLat: startLoc.coords[0].toString(),
+        sLng: startLoc.coords[1].toString(),
+        eLat: endLoc.coords[0].toString(),
+        eLng: endLoc.coords[1].toString(),
+      })
 
-    const pathIds = shortestPath(graph, startId, endId)
-    const coords = pathIds.map(id => graph.get(id)!.coord)
+      const response = await fetch(`${BACKEND_URL}/navigate?${query}`)
+      
+      if (!response.ok) throw new Error("Route not found")
 
-    setRouteCoords(coords)
+      const pathData = await response.json() // Returns Array of {x: lng, y: lat}
 
-    let total = 0
-    for (let i = 0; i < coords.length - 1; i++) {
-      total += distance(coords[i], coords[i + 1])
+      // Format JTS Coordinates (x=lng, y=lat) to Leaflet format [lat, lng]
+      const formatted: [number, number][] = pathData.map((p: any) => [p.y, p.x])
+      setRouteCoords(formatted)
+
+      // Calculate total distance using your utility
+      let totalKm = 0
+      for (let i = 0; i < formatted.length - 1; i++) {
+        totalKm += distance(formatted[i], formatted[i + 1])
+      }
+
+      setDistanceText(
+        totalKm < 1
+          ? Math.round(totalKm * 1000) + " m"
+          : totalKm.toFixed(2) + " km"
+      )
+    } catch (err) {
+      console.error("Navigation Error:", err)
+      setDistanceText("Error calculating route")
+      setRouteCoords([])
     }
-
-    setDistanceText(
-      total < 1
-        ? Math.round(total * 1000) + " m"
-        : total.toFixed(2) + " km"
-    )
   }
 
   return (
     <div className="h-screen w-screen flex bg-slate-100 overflow-hidden font-sans relative">
 
-      {/* SIDEBAR: 30% width on Desktop, Full screen slide-over on Mobile */}
+      {/* SIDEBAR */}
       <div className={`
         absolute md:relative top-0 left-0 h-full w-full md:w-[30%] md:min-w-[350px]
         z-[3000] md:z-10
@@ -87,14 +94,13 @@ export default function OutdoorNav() {
           locations={selectableLocations}
           onRouteRequest={handleRoute}
           onClose={() => setIsPanelOpen(false)} 
-          mapDestination={clickedDestination} // PASSED TO SIDEBAR
+          mapDestination={clickedDestination} 
         />
       </div>
 
-      
       <div className="flex-1 relative h-full w-full">
         
-        {/* Floating Search button for mobile when panel is hidden */}
+        {/* Mobile Search Toggle */}
         {!isPanelOpen && (
           <button 
             onClick={() => setIsPanelOpen(true)}
@@ -104,7 +110,7 @@ export default function OutdoorNav() {
           </button>
         )}
 
-        {/* Distance Indicator */}
+        {/* Distance UI Overlay */}
         <div className="
           absolute top-6 right-6 md:top-6 md:left-1/2 md:-translate-x-1/2
           bg-white px-6 py-3 rounded-full shadow-xl
@@ -118,15 +124,12 @@ export default function OutdoorNav() {
           locations={locations}
           start={start}
           destination={destination}
-          graph={graph}
           routeCoords={routeCoords}
           currentLocation={currentLocation}
-         
           onSetMapDestination={(loc) => {
             setClickedDestination(loc)
             setIsPanelOpen(true) 
           }}
-         
         />
 
         <LocateButton

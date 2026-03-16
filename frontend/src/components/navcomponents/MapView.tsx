@@ -1,7 +1,5 @@
 import "leaflet/dist/leaflet.css"
-
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet"
-import { type Graph } from "../../utils/buildGraph"
 import { type Location } from "../../data/locations"
 import L from "leaflet"
 import MapRecenter from "./MapRecenter"
@@ -11,40 +9,31 @@ type Props = {
   locations: Location[]
   start: Location | null
   destination: Location | null
-  graph: Graph | null
-  routeCoords: [number, number][]
+  routeCoords: [number, number][] // Ensure these are [lat, lng]
   currentLocation?: [number, number] | null
   onSetMapDestination: (loc: Location) => void  
 }
 
-// Default blue for regular buildings
+// Icon Definitions (Keeping your existing colored markers)
 const blueIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
+  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34],
 })
 
-// Green for Start and Destination
 const greenIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
+  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34],
 })
 
-// Red for Current Location
 const redIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
+  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34],
 })
 
-function MapView({ center, locations, start, destination, routeCoords, currentLocation, onSetMapDestination}: Props) {
+function MapView({ center, locations, start, destination, routeCoords, currentLocation, onSetMapDestination }: Props) {
   return (
     <div className="relative h-full w-full">
       <MapContainer 
@@ -58,9 +47,12 @@ function MapView({ center, locations, start, destination, routeCoords, currentLo
           attribution="&copy; OpenStreetMap contributors"
         />
 
+        {/* Render building markers */}
         {locations.map((loc: Location) => {
-          // Hide default blue markers if they are currently selected as start/end
-          if (start?.id === loc.id || destination?.id === loc.id) return null;
+          // Hide blue markers for the specific points that are currently active
+          const isStart = start?.id === loc.id;
+          const isDest = destination?.id === loc.id;
+          if (isStart || isDest) return null;
 
           return (
             <Marker key={loc.id} position={loc.coords} icon={blueIcon}>
@@ -69,45 +61,53 @@ function MapView({ center, locations, start, destination, routeCoords, currentLo
                   <div className="font-bold text-[#1a305b] text-base border-b border-gray-200 pb-2">
                     {loc.name}
                   </div>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => onSetMapDestination(loc)}
-                      className="flex-1 bg-[#fab75a] text-[#1a305b] font-semibold text-xs px-2 py-1.5 rounded shadow-sm hover:bg-[#f9aa3d] transition-colors"
-                    >
-                      Navigate
-                    </button>
-                  </div>
+                  <button 
+                    onClick={() => onSetMapDestination(loc)}
+                    className="bg-[#fab75a] text-[#1a305b] font-semibold text-xs px-2 py-1.5 rounded shadow-sm hover:bg-[#f9aa3d] transition-colors"
+                  >
+                    Set as Destination
+                  </button>
                 </div>
               </Popup>
             </Marker>
           )
         })}
 
-        <MapRecenter center={center} />
-
-        {routeCoords.length > 0 && (
+        {/* Navigation Polyline */}
+        {routeCoords.length > 1 && (
           <Polyline 
             positions={routeCoords} 
-            pathOptions={{ color: '#1a305b', weight: 5, opacity: 0.8 }} 
+            pathOptions={{ 
+              color: '#1a305b', 
+              weight: 6, 
+              opacity: 0.9,
+              lineJoin: 'round' // Makes the corners smooth
+            }} 
           />
         )}
 
+        {/* Start Marker */}
         {start && (
           <Marker position={start.coords} icon={greenIcon}>
             <Popup><span className="font-bold text-green-700">Start: {start.name}</span></Popup>
           </Marker>
         )}
+
+        {/* Destination Marker */}
         {destination && (
           <Marker position={destination.coords} icon={greenIcon}>
-            <Popup><span className="font-bold text-green-700">Dest: {destination.name}</span></Popup>
+            <Popup><span className="font-bold text-green-700">Destination: {destination.name}</span></Popup>
           </Marker>
         )}
 
+        {/* Current Location Marker */}
         {currentLocation && (
           <Marker position={currentLocation} icon={redIcon}>
             <Popup><span className="font-bold text-red-600">You are here</span></Popup>
           </Marker>
         )}
+
+        <MapRecenter center={center} />
       </MapContainer>
     </div>
   )
