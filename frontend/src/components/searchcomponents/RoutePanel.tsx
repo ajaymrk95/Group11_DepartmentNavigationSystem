@@ -4,22 +4,18 @@ import SearchBar from "./SearchBar"
 import locationImage from "../../assets/image.png"
 
 type Props = {
-locations: Location[]
-selectedLocation: Location | null
-onSelectLocation: (location: Location | null) => void
+  locations: Location[]
+  selectedLocation: Location | null
+  onSelectLocation: (location: Location | null) => void
 }
 
-export default function RoutePanel({
-locations,
-selectedLocation,
-onSelectLocation
-}: Props) {
+export default function RoutePanel({locations, selectedLocation, onSelectLocation }: Props) {
 
-const navigate = useNavigate()
+  const navigate = useNavigate()
 
-function clearSelectedLocation() {
-onSelectLocation(null)
-}
+  function clearSelectedLocation() {
+    onSelectLocation(null)
+  }
 
 return ( <div className="
    h-full w-full flex flex-col
@@ -125,7 +121,7 @@ return ( <div className="
   <div className="mt-auto pt-10">
 
     <button
-      onClick={() => navigate("/")}
+      onClick={() => navigate("/outdoor-navigation")}
       className="
         w-full flex items-center justify-between
         px-6 py-4

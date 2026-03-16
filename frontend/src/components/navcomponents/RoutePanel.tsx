@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import type { Location } from "../../data/locations"
 import LocationSearch from "./LocationSearch"
@@ -12,6 +13,8 @@ type Props = {
 export default function RoutePanel({ locations, onRouteRequest, onClose, mapDestination }: Props) {
   const [start, setStart] = useState<Location | null>(null)
   const [end, setEnd] = useState<Location | null>(null)
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (mapDestination) {
@@ -118,7 +121,7 @@ export default function RoutePanel({ locations, onRouteRequest, onClose, mapDest
 
         {start && end && end.category ==='indoor' && (
           <button
-            onClick={() => alert("This will trigger the indoor map view!")}
+            onClick={() => navigate("/indoor-navigation")}
             className="
               w-full mt-3 py-3 rounded-xl shadow-sm
               border-2 border-[#1a305b] text-[#1a305b] font-bold text-base

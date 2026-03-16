@@ -356,7 +356,7 @@ const Dashboard = () => {
         {/* Action Cards */}
         <div className="dns-cards-section">
 
-          <button className="dns-card" onClick={() => navigate("/map")}>
+          <button className="dns-card" onClick={() => navigate("/search-location")}>
             <div className="dns-card-top">
               <svg className="dns-card-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
