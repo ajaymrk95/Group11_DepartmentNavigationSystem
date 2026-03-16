@@ -2,9 +2,9 @@ import { GeoJSON } from "react-leaflet";
 import L from "leaflet";
 import type { Feature } from "geojson";
 import type { FloorData } from "../../types/types.ts";
-import { buildingOutlineStyle, getUnitStyle, getPathStyle } from "../../utils/indoornavigation/mapStyles.ts";
-import { createPOIIcon } from "../../utils/indoornavigation/mapIcons.ts";
-import { onEachOutline, onEachUnit, onEachPath, onEachPOI } from "../../utils/indoornavigation/mapEventHandlers.ts";
+import { buildingOutlineStyle, getUnitStyle, getPathStyle } from "../../utils/indoormap/mapStyles.ts";
+import { createPOIIcon } from "../../utils/indoormap/mapIcons.ts";
+import { onEachOutline, onEachUnit, onEachPath, onEachPOI } from "../../utils/indoormap/mapEventHandlers.ts";
 
 interface MapLayersProps extends FloorData {
     floor: number;

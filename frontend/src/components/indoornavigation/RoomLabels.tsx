@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 import type { GeoJsonObject } from "geojson";
-import { createRoomLabelIcon } from "../../utils/indoornavigation/mapIcons";
+import { createRoomLabelIcon } from "../../utils/indoormap/mapIcons";
 
 interface RoomLabelsProps {
     units: GeoJsonObject | null;
