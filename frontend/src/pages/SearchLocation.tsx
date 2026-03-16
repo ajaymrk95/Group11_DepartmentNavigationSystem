@@ -4,6 +4,7 @@ import RoutePanel from "../components/searchcomponents/RoutePanel"
 import { locations } from "../data/locations"
 
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
+import MapRecenter from "../components/searchcomponents/MapRecenter"
 import "leaflet/dist/leaflet.css"
 
 export default function SearchLocation() {
@@ -25,6 +26,9 @@ export default function SearchLocation() {
           attribution="© OpenStreetMap contributors"
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
+
+        {/* move map when location changes */}
+        <MapRecenter location={selectedLocation} />
 
         {/* marker for selected location */}
         {selectedLocation && (
