@@ -1,10 +1,10 @@
 import { GeoJSON } from "react-leaflet";
 import L from "leaflet";
 import type { Feature } from "geojson";
-import type { FloorData } from "../../types/types.ts";
+import type { FloorData } from "../../types/types";
 import { buildingOutlineStyle, getUnitStyle, getPathStyle } from "../../utils/indoormap/mapStyles.ts";
 import { createPOIIcon } from "../../utils/indoormap/mapIcons.ts";
-import { onEachOutline, onEachUnit, onEachPath, onEachPOI } from "../../utils/indoormap/mapEventHandlers.ts";
+import { onEachUnit, onEachPath, onEachPOI } from "../../utils/indoormap/mapEventHandlers.ts";
 
 interface MapLayersProps extends FloorData {
     floor: number;
@@ -28,7 +28,6 @@ export function MapLayers({ buildingOutline, units, paths, pois, floor }: MapLay
                     key={`outline-${floor}`}
                     data={buildingOutline}
                     style={buildingOutlineStyle}
-                    onEachFeature={onEachOutline}
                 />
             )}
 

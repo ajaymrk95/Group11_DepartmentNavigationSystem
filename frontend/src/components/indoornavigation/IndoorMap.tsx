@@ -5,6 +5,7 @@ import type { GeoJsonObject } from "geojson";
 
 import type { IndoorMapProps } from "../../types/types";
 import { useFloorData } from "../../hooks/useFloorData";
+import { routeStyle } from "../../utils/indoormap/mapStyles";
 import { MapBoundsController } from "./MapBoundsController";
 import { RoomLabels } from "./RoomLabels";
 import FloorToggle from "./FloorToggle";
@@ -12,13 +13,6 @@ import { MapLayers } from "./MapLayers";
 
 const MAP_CENTER: [number, number] = [11.322591, 75.93372];
 
-const ROUTE_STYLE = {
-    color: "#ef4444",
-    weight: 5,
-    dashArray: "10, 6",
-    lineCap: "round" as const,
-    lineJoin: "round" as const,
-};
 
 export function IndoorMap({ route, onDataLoad, headerSlot }: IndoorMapProps) {
     const [floor, setFloor] = useState<number>(1);
@@ -54,8 +48,8 @@ export function IndoorMap({ route, onDataLoad, headerSlot }: IndoorMapProps) {
     return (
         <div className="w-full h-screen flex flex-col bg-gray-100">
             {/* ── Header ──────────────────────────────────────────────── */}
-            <header className="bg-white shadow-md px-4 py-3 z-10 flex items-center justify-between gap-4 flex-wrap shrink-0">
-                <h1 className="text-2xl font-bold text-gray-800 shrink-0">
+            <header className="bg-[#1A3263] shadow-md px-4 py-3 z-10 flex items-center justify-between gap-4 flex-wrap shrink-0">
+                <h1 className="text-3xl font-bold text-[#FAB95B] shrink-0 pr-10">
                     ELHC — Floor {floor}
                 </h1>
 
@@ -97,7 +91,7 @@ export function IndoorMap({ route, onDataLoad, headerSlot }: IndoorMapProps) {
                         <FloorToggle currentFloor={floor} onChange={setFloor} />
 
                         {route && route.length > 0 && (
-                            <Polyline positions={route} pathOptions={ROUTE_STYLE} />
+                            <Polyline positions={route} pathOptions={routeStyle} />
                         )}
                     </MapContainer>
                 </div>

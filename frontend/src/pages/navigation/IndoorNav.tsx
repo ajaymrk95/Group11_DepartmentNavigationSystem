@@ -30,33 +30,37 @@ export function NavigationPage() {
         useNavigation();
 
     const routeControls = (
-        <div className="flex items-center gap-3 flex-wrap">
-            <label className="text-sm text-gray-600 font-medium">From</label>
-            <select
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-                className={selectClass}
-            >
-                {POI_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-            </select>
+        <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex items-center gap-3">
+                <label className="w-9 text-sm sm:w-auto text-[#E8E2DB] font-semibold">From</label>
+                <select
+                    value={from}
+                    onChange={(e) => setFrom(e.target.value)}
+                    className={selectClass}
+                >
+                    {POI_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                </select>
 
-            <span className="text-gray-400">→</span>
+                <span className="px-4 text-gray-400">→</span>
+            </div>
 
-            <label className="text-sm text-gray-600 font-medium">To</label>
-            <select
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-                className={selectClass}
-            >
-                {POI_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-            </select>
+            <div className="flex items-center gap-3">
+                <label className="w-9 text-sm sm:w-auto text-[#E8E2DB] font-semibold">To</label>
+                <select
+                    value={to}
+                    onChange={(e) => setTo(e.target.value)}
+                    className={selectClass}
+                >
+                    {POI_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                </select>
+            </div>
 
             {noRouteFound && (
-                <span className="text-sm text-red-500">No route found</span>
+                <span className="text-sm text-red-500 text-center">No route found</span>
             )}
         </div>
     );

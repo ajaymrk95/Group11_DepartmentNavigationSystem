@@ -11,12 +11,6 @@ function row(label: string, value: string): string {
     return `<div class="mb-1"><strong>${label}:</strong> ${value}</div>`;
 }
 
-export function buildOutlinePopup(props: Record<string, unknown>): string {
-    let body = `<div class="font-bold text-lg mb-2">🏢 Building</div>`;
-    if (props.name) body += row("Name", String(props.name));
-    if (props.floor || props.level) body += row("Floor", String(props.floor ?? props.level));
-    return wrap(body);
-}
 
 export function buildUnitPopup(props: Record<string, unknown>): string {
     const categoryIcons: Record<string, string> = {
@@ -70,10 +64,6 @@ export function buildPOIPopup(props: Record<string, unknown>): string {
 }
 
 // ─── onEachFeature Factories ───────────────────────────────────────────────────
-
-export function onEachOutline(feature: any, layer: L.Layer) {
-    layer.bindPopup(buildOutlinePopup(feature.properties ?? {}));
-}
 
 export function onEachUnit(feature: any, layer: L.Layer) {
     layer.bindPopup(buildUnitPopup(feature.properties ?? {}));
