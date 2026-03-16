@@ -1,6 +1,8 @@
 import { useState } from "react"
 import type { Location } from "../data/locations"
 import RoutePanel from "../components/searchcomponents/RoutePanel"
+import MobileLocationSheet from "../components/searchcomponents/MobileLocationSheet"
+
 import { locations } from "../data/locations"
 
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
@@ -44,6 +46,17 @@ export default function SearchLocation() {
 
       <div className="hidden md:block absolute left-0 top-0 h-full w-[420px] z-50">
         <RoutePanel
+          locations={locations}
+          selectedLocation={selectedLocation}
+          onSelectLocation={setSelectedLocation}
+        />
+      </div>
+
+
+      {/* MOBILE BOTTOM SHEET */}
+
+      <div className="md:hidden">
+        <MobileLocationSheet
           locations={locations}
           selectedLocation={selectedLocation}
           onSelectLocation={setSelectedLocation}
