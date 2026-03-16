@@ -23,7 +23,7 @@ export interface NavigationState {
  */
 export function useNavigation(
     initialFrom = "entry1",
-    initialTo = "102entry1"
+    initialTo = "entry1"
 ): NavigationState {
     const [from, setFrom] = useState(initialFrom);
     const [to, setTo] = useState(initialTo);
