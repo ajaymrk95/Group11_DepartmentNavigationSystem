@@ -15,6 +15,7 @@ export default function App() {
         <Route path="/outdoor-navigation" element={<OutdoorNav/>} />
         <Route path="/add-location" element={<AddLocation />} />
         <Route path="/edit-location" element={<EditLocation />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
       
       </Routes>
     </BrowserRouter>
