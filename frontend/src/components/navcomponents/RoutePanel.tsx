@@ -55,6 +55,8 @@ export default function RoutePanel({ locations, onRouteRequest, onClose, mapDest
               onSelect={setStart}
               iconType="start"
               selectedLoc={start}
+              showQr={true}
+              useQrResult={true}
             />
           </div>
 
@@ -75,6 +77,8 @@ export default function RoutePanel({ locations, onRouteRequest, onClose, mapDest
               onSelect={setEnd}
               iconType="end"
               selectedLoc={end}
+              showQr={false}
+              useQrResult={false}
             />
           </div>
         </div>

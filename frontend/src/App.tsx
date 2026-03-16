@@ -6,6 +6,7 @@ import AddLocation from "./pages/AddLocation"
 import EditLocation from "./pages/EditLocation"
 import SearchLocation from "./pages/SearchLocation"
 import IndoorNavigation from "./pages/navigation/IndoorNav"
+import Scanner from "./components/searchcomponents/Scanner";
 
 
 
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/search-location" element={<SearchLocation />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/indoor-navigation" element={<IndoorNavigation />} />
+        <Route path="/qr-scanner" element={<Scanner />} />
       
       </Routes>
     </BrowserRouter>
