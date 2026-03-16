@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import OutdoorNav from "./pages/OutdoorNav"
 import AddLocation from "./pages/AddLocation"
 import EditLocation from "./pages/EditLocation"
+import IndoorNavigation from "./pages/navigation/IndoorNav"
 
 
 
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/" element={<OutdoorNav/>} />
         <Route path="/add-location" element={<AddLocation />} />
         <Route path="/edit-location" element={<EditLocation />} />
+        <Route path="/indoor-navigation" element={<IndoorNavigation />} />
       
       </Routes>
     </BrowserRouter>
