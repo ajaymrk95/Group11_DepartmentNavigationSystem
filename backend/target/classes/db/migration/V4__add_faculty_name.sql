@@ -1,0 +1,1 @@
+ALTER TABLE rooms ADD COLUMN faculty_name VARCHAR(255);

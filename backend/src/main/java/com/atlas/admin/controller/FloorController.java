@@ -15,12 +15,12 @@ public class FloorController {
     public FloorController(FloorService floorService) { this.floorService = floorService; }
 
     @GetMapping("/buildings/{buildingId}/floors")
-    public ResponseEntity<List<FloorDto>> getByBuilding(@PathVariable String buildingId) {
+    public ResponseEntity<List<FloorDto>> getByBuilding(@PathVariable("buildingId") String buildingId) {
         return ResponseEntity.ok(floorService.getByBuilding(buildingId));
     }
 
     @GetMapping("/floors/{id}")
-    public ResponseEntity<FloorDto> getById(@PathVariable String id) {
+    public ResponseEntity<FloorDto> getById(@PathVariable("id") String id) {
         return ResponseEntity.ok(floorService.getById(id));
     }
 
@@ -30,18 +30,18 @@ public class FloorController {
     }
 
     @PutMapping("/floors/{id}")
-    public ResponseEntity<FloorDto> update(@PathVariable String id, @Valid @RequestBody FloorDto dto) {
+    public ResponseEntity<FloorDto> update(@PathVariable("id") String id, @Valid @RequestBody FloorDto dto) {
         return ResponseEntity.ok(floorService.update(id, dto));
     }
 
     @PatchMapping("/floors/{id}/toggles")
-    public ResponseEntity<FloorDto> updateToggles(@PathVariable String id,
+    public ResponseEntity<FloorDto> updateToggles(@PathVariable("id") String id,
                                                    @RequestBody Map<String, Boolean> toggles) {
         return ResponseEntity.ok(floorService.updatePathToggles(id, toggles));
     }
 
     @DeleteMapping("/floors/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") String id) {
         floorService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -20,7 +20,7 @@ public class BuildingController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BuildingDto> getById(@PathVariable String id) {
+    public ResponseEntity<BuildingDto> getById(@PathVariable("id") String id) {
         return ResponseEntity.ok(buildingService.getById(id));
     }
 
@@ -30,12 +30,12 @@ public class BuildingController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BuildingDto> update(@PathVariable String id, @Valid @RequestBody BuildingDto dto) {
+    public ResponseEntity<BuildingDto> update(@PathVariable("id") String id, @Valid @RequestBody BuildingDto dto) {
         return ResponseEntity.ok(buildingService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") String id) {
         buildingService.delete(id);
         return ResponseEntity.noContent().build();
     }

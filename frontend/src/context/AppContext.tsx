@@ -1,66 +1,169 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Building, Floor, Room, LogEntry } from '../types';
-import { BUILDINGS } from '../data/buildings';
-import { FLOORS } from '../data/floors';
-import { ROOMS } from '../data/rooms';
-import { INITIAL_LOGS } from '../data/logs';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { Building, Floor, Room } from '../types';
 
+/* ─── API CONFIG ─────────────────────────────────── */
+const API = 'http://localhost:8080/api';
+const token = () => localStorage.getItem('atlas_token') ?? '';
+
+async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const res = await fetch(`${API}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token()}`,
+      ...(options.headers ?? {}),
+    },
+  });
+
+  if (res.status === 204) return undefined as T;
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message ?? `Error ${res.status}`);
+
+  return data as T;
+}
+
+/* ─── CONTEXT TYPE ───────────────────────────────── */
 interface AppContextType {
   buildings: Building[];
   floors: Floor[];
   rooms: Room[];
-  logs: LogEntry[];
-  currentAdmin: string;
-  addBuilding: (b: Building) => void;
-  updateBuilding: (b: Building) => void;
-  deleteBuilding: (id: string) => void;
-  addFloor: (f: Floor) => void;
-  updateFloor: (f: Floor) => void;
-  deleteFloor: (id: string) => void;
-  addRoom: (r: Room) => void;
-  updateRoom: (r: Room) => void;
-  deleteRoom: (id: string) => void;
-  addLog: (entry: Omit<LogEntry, 'id' | 'timestamp' | 'admin'>) => void;
+
+  refresh: () => Promise<void>;
+
+  addBuilding: (b: Building) => Promise<void>;
+  updateBuilding: (b: Building) => Promise<void>;
+  deleteBuilding: (id: string) => Promise<void>;
+
+  addFloor: (f: Floor) => Promise<void>;
+  updateFloor: (f: Floor) => Promise<void>;
+  deleteFloor: (id: string) => Promise<void>;
+
+  addRoom: (r: Room) => Promise<void>;
+  updateRoom: (r: Room) => Promise<void>;
+  deleteRoom: (id: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
 
+/* ─── PROVIDER ───────────────────────────────────── */
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [buildings, setBuildings] = useState<Building[]>(BUILDINGS);
-  const [floors, setFloors] = useState<Floor[]>(FLOORS);
-  const [rooms, setRooms] = useState<Room[]>(ROOMS);
-  const [logs, setLogs] = useState<LogEntry[]>(INITIAL_LOGS);
-  const currentAdmin = 'admin@nitc.ac.in';
+  const [buildings, setBuildings] = useState<Building[]>([]);
+  const [floors, setFloors] = useState<Floor[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
 
-  const addLog = (entry: Omit<LogEntry, 'id' | 'timestamp' | 'admin'>) => {
-    const log: LogEntry = {
-      ...entry,
-      id: `log-${Date.now()}`,
-      timestamp: new Date().toISOString(),
-      admin: currentAdmin,
-    };
-    setLogs(prev => [log, ...prev]);
+  /* ─── LOAD ALL DATA ───────────────────────────── */
+  const refresh = async () => {
+    try {
+      const bs = await apiFetch<Building[]>('/buildings');
+      setBuildings(bs);
+
+      const floorArrays = await Promise.all(
+        bs.map(b => apiFetch<Floor[]>(`/buildings/${b.id}/floors`))
+      );
+      const allFloors = floorArrays.flat();
+      setFloors(allFloors);
+
+      const rs = await apiFetch<Room[]>('/rooms');
+      setRooms(rs);
+
+    } catch (e) {
+      console.error("Failed loading data", e);
+    }
   };
 
-  const addBuilding = (b: Building) => { setBuildings(p => [...p, b]); addLog({ action: 'CREATE', entity: 'Building', entityId: b.id, entityName: b.name, details: `Created building ${b.fullName}` }); };
-  const updateBuilding = (b: Building) => { setBuildings(p => p.map(x => x.id === b.id ? b : x)); addLog({ action: 'UPDATE', entity: 'Building', entityId: b.id, entityName: b.name, details: `Updated building ${b.name}` }); };
-  const deleteBuilding = (id: string) => { const b = buildings.find(x => x.id === id); setBuildings(p => p.filter(x => x.id !== id)); if (b) addLog({ action: 'DELETE', entity: 'Building', entityId: id, entityName: b.name, details: `Deleted building ${b.name}` }); };
+  useEffect(() => {
+    refresh();
+  }, []);
 
-  const addFloor = (f: Floor) => { setFloors(p => [...p, f]); addLog({ action: 'CREATE', entity: 'Floor', entityId: f.id, entityName: f.name, details: `Added floor ${f.name}` }); };
-  const updateFloor = (f: Floor) => { setFloors(p => p.map(x => x.id === f.id ? f : x)); addLog({ action: 'UPDATE', entity: 'Floor', entityId: f.id, entityName: f.name, details: `Updated floor ${f.name}` }); };
-  const deleteFloor = (id: string) => { const f = floors.find(x => x.id === id); setFloors(p => p.filter(x => x.id !== id)); if (f) addLog({ action: 'DELETE', entity: 'Floor', entityId: id, entityName: f.name, details: `Deleted floor ${f.name}` }); };
+  /* ─── BUILDING CRUD ───────────────────────────── */
+  const addBuilding = async (b: Building) => {
+    await apiFetch('/buildings', {
+      method: 'POST',
+      body: JSON.stringify(b),
+    });
+    await refresh();
+  };
 
-  const addRoom = (r: Room) => { setRooms(p => [...p, r]); addLog({ action: 'CREATE', entity: 'Room', entityId: r.id, entityName: r.name, details: `Added room ${r.name}` }); };
-  const updateRoom = (r: Room) => { setRooms(p => p.map(x => x.id === r.id ? r : x)); addLog({ action: 'UPDATE', entity: 'Room', entityId: r.id, entityName: r.name, details: `Updated room ${r.name}` }); };
-  const deleteRoom = (id: string) => { const r = rooms.find(x => x.id === id); setRooms(p => p.filter(x => x.id !== id)); if (r) addLog({ action: 'DELETE', entity: 'Room', entityId: id, entityName: r.name, details: `Deleted room ${r.name}` }); };
+  const updateBuilding = async (b: Building) => {
+    await apiFetch(`/buildings/${b.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(b),
+    });
+    await refresh();
+  };
+
+  const deleteBuilding = async (id: string) => {
+    await apiFetch(`/buildings/${id}`, { method: 'DELETE' });
+    await refresh();
+  };
+
+  /* ─── FLOOR CRUD ─────────────────────────────── */
+  const addFloor = async (f: Floor) => {
+    await apiFetch('/floors', {
+      method: 'POST',
+      body: JSON.stringify(f),
+    });
+    await refresh();
+  };
+
+  const updateFloor = async (f: Floor) => {
+    await apiFetch(`/floors/${f.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(f),
+    });
+    await refresh();
+  };
+
+  const deleteFloor = async (id: string) => {
+    await apiFetch(`/floors/${id}`, { method: 'DELETE' });
+    await refresh();
+  };
+
+  /* ─── ROOM CRUD ─────────────────────────────── */
+  const addRoom = async (r: Room) => {
+    await apiFetch('/rooms', {
+      method: 'POST',
+      body: JSON.stringify(r),
+    });
+    await refresh();
+  };
+
+  const updateRoom = async (r: Room) => {
+    await apiFetch(`/rooms/${r.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(r),
+    });
+    await refresh();
+  };
+
+  const deleteRoom = async (id: string) => {
+    await apiFetch(`/rooms/${id}`, { method: 'DELETE' });
+    await refresh();
+  };
 
   return (
-    <AppContext.Provider value={{ buildings, floors, rooms, logs, currentAdmin, addBuilding, updateBuilding, deleteBuilding, addFloor, updateFloor, deleteFloor, addRoom, updateRoom, deleteRoom, addLog }}>
+    <AppContext.Provider value={{
+      buildings,
+      floors,
+      rooms,
+      refresh,
+      addBuilding,
+      updateBuilding,
+      deleteBuilding,
+      addFloor,
+      updateFloor,
+      deleteFloor,
+      addRoom,
+      updateRoom,
+      deleteRoom
+    }}>
       {children}
     </AppContext.Provider>
   );
 }
 
+/* ─── HOOK ─────────────────────────────────────── */
 export function useApp() {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error('useApp must be inside AppProvider');

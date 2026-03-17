@@ -1,16 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import Modal from '../components/Modal';
 import { DoorOpen, Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { Room, RoomCategory } from '../types';
 
-const CATEGORIES: RoomCategory[] = ['classroom', 'lab', 'hall', 'office', 'toilet', 'stairs', 'corridor', 'other'];
+const CATEGORIES: RoomCategory[] = ['classroom', 'lab', 'hall', 'office', 'faculty', 'toilet', 'stairs', 'corridor', 'other'];
 
 const CAT_COLORS: Record<RoomCategory, string> = {
   classroom: 'bg-blue-100 text-blue-700',
   lab: 'bg-purple-100 text-purple-700',
   hall: 'bg-amber/40 text-navy',
   office: 'bg-green-100 text-green-700',
+  faculty: 'bg-rose-100 text-rose-700',
   toilet: 'bg-gray-100 text-gray-600',
   stairs: 'bg-orange-100 text-orange-700',
   corridor: 'bg-teal-100 text-teal-700',
@@ -40,7 +41,8 @@ function RoomForm({
       capacity: undefined,
       description: '',
       accessible: true,
-      featureId: undefined
+      featureId: undefined,
+      facultyName: ''
     }
   );
 
@@ -64,7 +66,8 @@ function RoomForm({
       capacity: form.capacity,
       description: form.description,
       accessible: form.accessible!,
-      featureId: form.featureId
+      featureId: form.featureId,
+      facultyName: (form.category === 'office' || (form.category as string) === 'faculty') ? form.facultyName : undefined
     };
 
     onSave(r);
@@ -209,6 +212,20 @@ function RoomForm({
         />
       </div>
 
+      {(form.category === 'office' || (form.category as string) === 'faculty') && (
+        <div>
+          <label className="text-xs font-body text-steel uppercase tracking-wide mb-1 block">
+            Faculty Name
+          </label>
+          <input
+            className="input-field"
+            value={form.facultyName || ''}
+            onChange={e => set('facultyName', e.target.value)}
+            placeholder="Dr. John Doe"
+          />
+        </div>
+      )}
+
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
@@ -236,26 +253,104 @@ function RoomForm({
   );
 }
 
+const API = 'http://localhost:8080/api';
+const token = () => localStorage.getItem('atlas_token') ?? '';
+
 export default function Rooms() {
 
   const {
     buildings,
-    floors,
-    rooms,
-    addRoom,
-    updateRoom,
-    deleteRoom
+    floors
   } = useApp();
 
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [modal, setModal] = useState<'add' | 'edit' | null>(null);
   const [selected, setSelected] = useState<Room | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<Room | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchRooms = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch(`${API}/rooms`, {
+        headers: {
+          'Authorization': `Bearer ${token()}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to fetch rooms');
+      let data = [];
+      try {
+        data = await res.json();
+      } catch (e) {
+        console.warn('Rooms response was not valid JSON', e);
+      }
+      setRooms(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRooms();
+  }, []);
+
+  const addRoom = async (r: Room) => {
+    try {
+      const res = await fetch(`${API}/rooms`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token()}` 
+        },
+        body: JSON.stringify(r)
+      });
+      if (!res.ok) throw new Error('Failed to add room');
+      fetchRooms();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const updateRoom = async (r: Room) => {
+    try {
+      const res = await fetch(`${API}/rooms/${r.id}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token()}`
+        },
+        body: JSON.stringify(r)
+      });
+      if (!res.ok) throw new Error('Failed to update room');
+      fetchRooms();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const deleteRoom = async (id: string) => {
+    try {
+      const res = await fetch(`${API}/rooms/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token()}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to delete room');
+      fetchRooms();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
 
   const [search, setSearch] = useState('');
   const [filterBuilding, setFilterBuilding] = useState('all');
   const [filterCat, setFilterCat] = useState('all');
 
-  const filtered = rooms.filter(r => {
+  const filtered = (rooms || []).filter(r => {
 
     if (filterBuilding !== 'all' && r.buildingId !== filterBuilding)
       return false;
@@ -399,6 +494,7 @@ export default function Rooms() {
 
                     <td className="px-4 py-3 text-sm font-body text-navy">
                       {room.name}
+                      {room.facultyName && <span className="block text-xs text-steel">({room.facultyName})</span>}
                     </td>
 
                     <td className="px-4 py-3 text-xs font-body text-steel">

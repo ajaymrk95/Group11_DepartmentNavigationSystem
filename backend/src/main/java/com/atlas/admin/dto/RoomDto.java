@@ -19,6 +19,7 @@ public class RoomDto {
     private String description;
     private Boolean accessible;
     private Integer featureId;
+    private String facultyName;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
@@ -45,6 +46,8 @@ public class RoomDto {
     public void setAccessible(Boolean accessible) { this.accessible = accessible; }
     public Integer getFeatureId() { return featureId; }
     public void setFeatureId(Integer featureId) { this.featureId = featureId; }
+    public String getFacultyName() { return facultyName; }
+    public void setFacultyName(String facultyName) { this.facultyName = facultyName; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }

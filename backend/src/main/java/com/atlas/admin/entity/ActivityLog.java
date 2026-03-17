@@ -2,6 +2,8 @@ package com.atlas.admin.entity;
 
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
+import org.hibernate.annotations.JdbcTypeCode;//frome here new
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "activity_logs")
@@ -11,8 +13,20 @@ public class ActivityLog {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
     @Column(name = "admin_email", nullable = false) private String adminEmail;
-    @Enumerated(EnumType.STRING) @Column(columnDefinition = "log_action") private LogAction action;
-    @Enumerated(EnumType.STRING) @Column(columnDefinition = "log_entity") private LogEntity entity;
+    //@Enumerated(EnumType.STRING) @Column(columnDefinition = "log_action") private LogAction action;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)   // ✅ ADD THIS LINE
+    @Column(columnDefinition = "log_action")
+    private LogAction action;
+
+    //@Enumerated(EnumType.STRING) @Column(columnDefinition = "log_entity") private LogEntity entity;
+    
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)   // ✅ ADD THIS LINE
+    @Column(columnDefinition = "log_entity")
+    private LogEntity entity;
+    
     @Column(name = "entity_id") private String entityId;
     @Column(name = "entity_name") private String entityName;
     private String details;

@@ -20,8 +20,12 @@ public class LogService {
         this.logRepo = logRepo;
     }
 
-    // REQUIRES_NEW: log writes always get their own transaction
-    // so a log failure never rolls back the caller's transaction
+    /**
+     * REQUIRES_NEW = runs in its own separate transaction.
+     * If logging fails for any reason, it CANNOT roll back
+     * the caller's transaction (floor save, room save, etc).
+     * The try/catch ensures a log failure is silently swallowed.
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void log(LogAction action, LogEntity entity,
                     String entityId, String entityName, String details) {
@@ -41,8 +45,9 @@ public class LogService {
             log.setDetails(details);
             log.setCreatedAt(OffsetDateTime.now());
             logRepo.save(log);
+
         } catch (Exception e) {
-            // Logging must never break business operations
+            // Log write must NEVER break the main operation
             System.err.println("[LogService] Failed to write log: " + e.getMessage());
         }
     }

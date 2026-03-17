@@ -1,6 +1,8 @@
 package com.atlas.admin.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -13,12 +15,16 @@ public class Room {
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "floor_id", nullable = false) private Floor floor;
     @Column(name = "room_no") private String roomNo;
     @Column(nullable = false) private String name;
-    @Enumerated(EnumType.STRING) @Column(columnDefinition = "room_category") private RoomCategory category;
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(columnDefinition = "room_category")
+    private RoomCategory category;
     private Integer level;
     private Integer capacity;
     private String description;
     private Boolean accessible;
     @Column(name = "feature_id") private Integer featureId;
+    @Column(name = "faculty_name") private String facultyName;
     @Column(name = "created_at", updatable = false) private OffsetDateTime createdAt;
     @Column(name = "updated_at") private OffsetDateTime updatedAt;
 
@@ -45,6 +51,8 @@ public class Room {
     public void setAccessible(Boolean accessible) { this.accessible = accessible; }
     public Integer getFeatureId() { return featureId; }
     public void setFeatureId(Integer featureId) { this.featureId = featureId; }
+    public String getFacultyName() { return facultyName; }
+    public void setFacultyName(String facultyName) { this.facultyName = facultyName; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
     public OffsetDateTime getUpdatedAt() { return updatedAt; }

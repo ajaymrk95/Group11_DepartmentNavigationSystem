@@ -1,5 +1,5 @@
 export interface Building {
-  id: string;
+  id?: string;
   code: string;
   name: string;
   fullName: string;
@@ -7,9 +7,12 @@ export interface Building {
   location: string;
   yearBuilt: number;
   totalFloors: number;
-  coordinates: [number, number];
+  coordinates?: [number, number];   // Frontend friendly field
+  longitude?: number;               // Backend mapping
+  latitude?: number;                // Backend mapping
   description: string;
-  outline: object | null;
+  outline?: object | null;          // Frontend friendly field
+  outlineGeoJson?: object | null;   // Backend mapping
 }
 
 export interface Floor {
@@ -24,7 +27,7 @@ export interface Floor {
   pathToggles: Record<string, boolean>;
 }
 
-export type RoomCategory = 'classroom' | 'lab' | 'hall' | 'office' | 'toilet' | 'stairs' | 'corridor' | 'other';
+export type RoomCategory = 'classroom' | 'lab' | 'hall' | 'office' | 'faculty' | 'toilet' | 'stairs' | 'corridor' | 'other';
 
 export interface Room {
   id: string;
@@ -38,6 +41,7 @@ export interface Room {
   description?: string;
   accessible: boolean;
   featureId?: number;
+  facultyName?: string;
 }
 
 export interface LogEntry {

@@ -1,16 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import Modal from '../components/Modal';
 import { Building2, Plus, Pencil, Trash2, MapPin, Calendar, Layers } from 'lucide-react';
 import { Building } from '../types';
 
-function BuildingForm({ initial, onSave, onClose }: { initial?: Building; onSave: (b: Building) => void; onClose: () => void }) {
+function BuildingForm({ initial, onSave, onClose }: { initial?: Building | any; onSave: (b: any) => void; onClose: () => void }) {
+  // Try to use backend fields if they exist, otherwise fallback to frontend array
+  const initialCoordinates =
+    initial?.longitude && initial?.latitude 
+      ? [initial.longitude, initial.latitude] as [number, number]
+      : initial?.coordinates || [75.9340, 11.3225];
+
+  const initialOutline = initial?.outlineGeoJson || initial?.outline;
+
   const [form, setForm] = useState<Partial<Building>>(initial || {
     code: '', name: '', fullName: '', institute: 'National Institute of Technology Calicut',
     location: 'NIT Campus, Calicut, Kerala - 673601', yearBuilt: 2000, totalFloors: 1,
-    coordinates: [75.9340, 11.3225], description: '', outline: null
+    coordinates: initialCoordinates, description: '', outline: null
   });
-  const [outlineJson, setOutlineJson] = useState(initial?.outline ? JSON.stringify(initial.outline, null, 2) : '');
+  const [outlineJson, setOutlineJson] = useState(initialOutline ? JSON.stringify(initialOutline, null, 2) : '');
   const [jsonError, setJsonError] = useState('');
 
   const set = (k: keyof Building, v: unknown) => setForm(p => ({ ...p, [k]: v }));
@@ -24,16 +32,17 @@ function BuildingForm({ initial, onSave, onClose }: { initial?: Building; onSave
       try { outline = JSON.parse(outlineJson); setJsonError(''); }
       catch { setJsonError('Invalid JSON for outline'); return; }
     }
-    const b: Building = {
+    const b: any = {
       id: initial?.id || form.code!.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(),
       code: form.code!, name: form.name!, fullName: form.fullName!,
       institute: form.institute || 'National Institute of Technology Calicut',
       location: form.location || 'NIT Campus, Calicut, Kerala - 673601',
       yearBuilt: form.yearBuilt ?? 2000,
       totalFloors: form.totalFloors ?? 1,
-      coordinates: form.coordinates || [75.9340, 11.3225],
+      longitude: form.coordinates?.[0] ?? 75.9340,
+      latitude: form.coordinates?.[1] ?? 11.3225,
       description: form.description || '',
-      outline
+      outlineGeoJson: outline
     };
     onSave(b);
     onClose();
@@ -113,11 +122,88 @@ function BuildingForm({ initial, onSave, onClose }: { initial?: Building; onSave
   );
 }
 
+const API = 'http://localhost:8080/api';
+const token = () => localStorage.getItem('atlas_token') ?? '';
+
 export default function Buildings() {
-  const { buildings, floors, rooms, addBuilding, updateBuilding, deleteBuilding } = useApp();
+  const { floors, rooms } = useApp();
+  const [buildings, setBuildings] = useState<Building[]>([]);
   const [modal, setModal] = useState<'add' | 'edit' | null>(null);
-  const [selected, setSelected] = useState<Building | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<Building | null>(null);
+  const [selected, setSelected] = useState<Building | any | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<Building | any | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchBuildings = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch(`${API}/buildings`, {
+        headers: {
+          'Authorization': `Bearer ${token()}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to fetch buildings');
+      const data = await res.json();
+      setBuildings(data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBuildings();
+  }, []);
+
+  const addBuilding = async (b: any) => {
+    try {
+      const res = await fetch(`${API}/buildings`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token()}` 
+        },
+        body: JSON.stringify(b)
+      });
+      if (!res.ok) throw new Error('Failed to add building');
+      fetchBuildings();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const updateBuilding = async (b: any) => {
+    try {
+      const res = await fetch(`${API}/buildings/${b.id}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token()}`
+        },
+        body: JSON.stringify(b)
+      });
+      if (!res.ok) throw new Error('Failed to update building');
+      fetchBuildings();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const deleteBuilding = async (id: string) => {
+    try {
+      const res = await fetch(`${API}/buildings/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token()}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to delete building');
+      fetchBuildings();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
 
   const handleEdit = (b: Building) => {
     setSelected(b);
@@ -187,7 +273,7 @@ export default function Buildings() {
                   <div className="text-right text-xs font-body text-steel mr-2">
                     <p><span className="font-medium text-navy">{bFloors.length}</span> floors mapped</p>
                     <p><span className="font-medium text-navy">{bRooms.length}</span> rooms assigned</p>
-                    <p className="text-xs mt-0.5">{b.outline ? '✓ Outline set' : '⚠ No outline'}</p>
+                    <p className="text-xs mt-0.5">{((b as any).outlineGeoJson || b.outline) ? '✓ Outline set' : '⚠ No outline'}</p>
                   </div>
                   <button
                     onClick={() => handleEdit(b)}

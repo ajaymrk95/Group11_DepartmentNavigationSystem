@@ -1,6 +1,6 @@
-import { useApp } from '../context/AppContext';
-import { ScrollText, Building2, Layers, DoorOpen, MapPin, User } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { LogEntry } from '../types';
+import { ScrollText, Building2, Layers, DoorOpen, MapPin, User, LucideIcon } from 'lucide-react';
 
 const ACTION_COLORS: Record<string, string> = {
   CREATE: 'bg-green-100 text-green-700',
@@ -10,7 +10,7 @@ const ACTION_COLORS: Record<string, string> = {
   LOGOUT: 'bg-gray-100 text-gray-600',
 };
 
-const ENTITY_ICONS: Record<string, React.FC<{ size: number; className?: string }>> = {
+const ENTITY_ICONS: Record<string, LucideIcon> = {
   Building: Building2,
   Floor: Layers,
   Room: DoorOpen,
@@ -19,10 +19,33 @@ const ENTITY_ICONS: Record<string, React.FC<{ size: number; className?: string }
   Auth: User,
 };
 
+const API = 'http://localhost:8080/api';
+const token = () => localStorage.getItem('atlas_token') ?? '';
+
 export default function Logs() {
-  const { logs } = useApp();
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filterAction, setFilterAction] = useState('all');
   const [filterEntity, setFilterEntity] = useState('all');
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const res = await fetch(`${API}/logs`, {
+          headers: { 'Authorization': `Bearer ${token()}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setLogs(data);
+        }
+      } catch (err) {
+        console.error('Failed to load logs', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLogs();
+  }, []);
 
   const filtered = logs.filter(l => {
     if (filterAction !== 'all' && l.action !== filterAction) return false;
@@ -57,7 +80,11 @@ export default function Logs() {
 
       <div className="card overflow-hidden">
         <div className="divide-y divide-cream">
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-12 text-steel font-body text-sm">
+              Loading activity logs...
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="text-center py-12 text-steel font-body text-sm">
               <ScrollText size={28} className="mx-auto mb-2 opacity-30" />
               No log entries found

@@ -53,6 +53,7 @@ public class RoomService {
         r.setDescription(dto.getDescription());
         r.setAccessible(dto.getAccessible() != null ? dto.getAccessible() : true);
         r.setFeatureId(dto.getFeatureId());
+        r.setFacultyName(dto.getFacultyName());
         r.setCreatedAt(OffsetDateTime.now());
         r.setUpdatedAt(OffsetDateTime.now());
         Room saved = roomRepo.save(r);
@@ -70,7 +71,7 @@ public class RoomService {
         r.setRoomNo(dto.getRoomNo()); r.setName(dto.getName()); r.setCategory(dto.getCategory());
         r.setLevel(dto.getLevel()); r.setCapacity(dto.getCapacity());
         r.setDescription(dto.getDescription()); r.setAccessible(dto.getAccessible());
-        r.setFeatureId(dto.getFeatureId()); r.setUpdatedAt(OffsetDateTime.now());
+        r.setFeatureId(dto.getFeatureId()); r.setFacultyName(dto.getFacultyName()); r.setUpdatedAt(OffsetDateTime.now());
         Room saved = roomRepo.save(r);
         logService.log(LogAction.UPDATE, LogEntity.Room, id, r.getName(), "Updated room: " + id);
         return toDto(saved);
@@ -87,7 +88,7 @@ public class RoomService {
         dto.setId(r.getId()); dto.setBuildingId(r.getBuilding().getId()); dto.setFloorId(r.getFloor().getId());
         dto.setRoomNo(r.getRoomNo()); dto.setName(r.getName()); dto.setCategory(r.getCategory());
         dto.setLevel(r.getLevel()); dto.setCapacity(r.getCapacity()); dto.setDescription(r.getDescription());
-        dto.setAccessible(r.getAccessible()); dto.setFeatureId(r.getFeatureId());
+        dto.setAccessible(r.getAccessible()); dto.setFeatureId(r.getFeatureId()); dto.setFacultyName(r.getFacultyName());
         dto.setCreatedAt(r.getCreatedAt()); dto.setUpdatedAt(r.getUpdatedAt());
         return dto;
     }
