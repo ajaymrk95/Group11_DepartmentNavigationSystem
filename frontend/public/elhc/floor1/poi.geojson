@@ -1,0 +1,20 @@
+{
+"type": "FeatureCollection",
+"name": "elhc_poi_1",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "id": null, "type": "entry", "access": "y", "name": "entry1" }, "geometry": { "type": "Point", "coordinates": [ 75.93378046507857, 11.322578632641815 ] } },
+{ "type": "Feature", "properties": { "id": null, "type": "entry", "access": "y", "name": "entry2" }, "geometry": { "type": "Point", "coordinates": [ 75.93376671406152, 11.322481568901631 ] } },
+{ "type": "Feature", "properties": { "id": null, "type": "entry", "access": "y", "name": "entry3" }, "geometry": { "type": "Point", "coordinates": [ 75.933876289880232, 11.322599508716866 ] } },
+{ "type": "Feature", "properties": { "id": null, "type": "rentry", "access": "y", "name": "102entry1" }, "geometry": { "type": "Point", "coordinates": [ 75.933742992462726, 11.322603489219018 ] } },
+{ "type": "Feature", "properties": { "id": null, "type": "rentry", "access": "y", "name": "103entry1" }, "geometry": { "type": "Point", "coordinates": [ 75.933752414035396, 11.322614082761781 ] } },
+{ "type": "Feature", "properties": { "id": null, "type": "rentry", "access": "y", "name": "102entry2" }, "geometry": { "type": "Point", "coordinates": [ 75.933711195805998, 11.322551795107497 ] } },
+{ "type": "Feature", "properties": { "id": null, "type": "rentry", "access": "y", "name": "103entry2" }, "geometry": { "type": "Point", "coordinates": [ 75.933800837180939, 11.322647614531974 ] } },
+{ "type": "Feature", "properties": { "id": null, "type": "rentry", "access": "y", "name": "101entry1" }, "geometry": { "type": "Point", "coordinates": [ 75.933648872129098, 11.322543007196384 ] } },
+{ "type": "Feature", "properties": { "id": null, "type": "rentry", "access": "y", "name": "101entry2" }, "geometry": { "type": "Point", "coordinates": [ 75.933747241910197, 11.322460503083013 ] } },
+{ "type": "Feature", "properties": { "id": null, "type": "rentry", "access": "y", "name": "104entry2" }, "geometry": { "type": "Point", "coordinates": [ 75.933797655040351, 11.322708701895094 ] } },
+{ "type": "Feature", "properties": { "id": null, "type": "rentry", "access": "y", "name": "104entry1" }, "geometry": { "type": "Point", "coordinates": [ 75.933895910867193, 11.322620136144565 ] } },
+{ "type": "Feature", "properties": { "id": null, "type": "rentry", "access": "y", "name": "girltoilet" }, "geometry": { "type": "Point", "coordinates": [ 75.933579737545784, 11.322545040214768 ] } },
+{ "type": "Feature", "properties": { "id": null, "type": "rentry", "access": "y", "name": "boystoilet " }, "geometry": { "type": "Point", "coordinates": [ 75.933793660350318, 11.322783460254193 ] } }
+]
+}

@@ -1,3 +1,4 @@
+import { useNavigate, useLocation } from "react-router-dom"
 import { useState, useEffect } from "react"
 import type { Location } from "../../data/locations"
 
@@ -7,11 +8,16 @@ type Props = {
   onSelect: (loc: Location | null) => void
   iconType?: "start" | "end"
   selectedLoc: Location | null
+  showQr?: boolean
+  useQrResult?: boolean
 }
 
-export default function LocationSearch({ label, locations, onSelect, iconType = "start", selectedLoc }: Props) {
+export default function LocationSearch({ label, locations, onSelect, iconType = "start", selectedLoc, showQr = false, useQrResult = false }: Props) {
   const [query, setQuery] = useState("")
   const [open, setOpen] = useState(false)
+
+  const navigate = useNavigate()
+  const location = useLocation()   // added
 
   useEffect(() => {
     if (selectedLoc) {
@@ -20,6 +26,27 @@ export default function LocationSearch({ label, locations, onSelect, iconType = 
       setQuery("")
     }
   }, [selectedLoc])
+
+  // added: handle QR scan result
+  useEffect(() => {
+    if (!useQrResult) return
+  
+    const qrValue = location.state?.qrData
+    if (!qrValue) return
+  
+    const match = locations.find(
+      loc => loc.name.toLowerCase() === qrValue.toLowerCase()
+    )
+  
+    if (match) {
+      setQuery(match.name)
+      onSelect(match)
+    } else {
+      setQuery(qrValue)
+    }
+  
+    navigate(location.pathname, { replace: true })   // clear router state
+  }, [location.state, locations, onSelect, useQrResult])
 
   const filtered = locations.filter(loc =>
     loc.name.toLowerCase().includes(query.toLowerCase())
@@ -59,6 +86,18 @@ export default function LocationSearch({ label, locations, onSelect, iconType = 
             focus:outline-none
           "
         />
+
+        {showQr && (
+          <button
+            type="button"
+            className="ml-2 flex-shrink-0 text-[#1a305b] hover:text-[#547792]"
+            onClick={() => navigate("/qr-scanner")}
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 3h6v2H5v4H3V3zm16 0h-6v2h4v4h2V3zM3 21h6v-2H5v-4H3v6zm18-6h-2v4h-4v2h6v-6zM7 7h4v4H7V7zm6 0h4v4h-4V7zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z"/>
+            </svg>
+          </button>
+        )}
       </div>
 
       {open && query && (
