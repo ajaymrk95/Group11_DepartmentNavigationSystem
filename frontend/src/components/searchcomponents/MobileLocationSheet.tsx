@@ -29,7 +29,7 @@ const startY = useRef(0)
 const startHeight = useRef(0)
 
 function goToNavigate() {
-navigate("/")
+navigate("/outdoor-navigation")
 }
 
 function setSheetHeight(h: number) {
