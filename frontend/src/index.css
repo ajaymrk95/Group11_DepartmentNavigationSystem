@@ -1,1 +1,53 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #E8E2DB;
+    color: #1A3263;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-navy text-cream px-4 py-2 rounded font-body font-medium text-sm hover:bg-steel transition-colors;
+  }
+  .btn-secondary {
+    @apply border border-navy text-navy px-4 py-2 rounded font-body font-medium text-sm hover:bg-navy hover:text-cream transition-colors;
+  }
+  .btn-danger {
+    @apply bg-red-600 text-white px-4 py-2 rounded font-body font-medium text-sm hover:bg-red-700 transition-colors;
+  }
+  .input-field {
+    @apply w-full border border-steel/40 rounded px-3 py-2 text-sm bg-white/70 focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy/20 font-body;
+  }
+  .card {
+    @apply bg-white/80 rounded-xl border border-cream shadow-sm;
+  }
+}
+
+.leaflet-container {
+  font-family: 'DM Sans', sans-serif !important;
+  border-radius: 0.75rem;
+}
+
+.map-clickable {
+  cursor: pointer;
+}
+
+/* Remove browser focus outline on leaflet shapes */
+.leaflet-interactive:focus {
+  outline: none !important;
+}
+
+/* Remove SVG focus outline */
+.leaflet-interactive {
+  outline: none !important;
+}
+
+/* Remove blue/black box when clicking paths */
+.leaflet-pane svg path:focus {
+  outline: none !important;
+}

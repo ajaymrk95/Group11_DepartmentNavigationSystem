@@ -1,0 +1,56 @@
+import { Building } from '../types';
+
+export const BUILDINGS: Building[] = [
+  {
+    id: 'elhc',
+    code: 'ELHC',
+    name: 'ELHC',
+    fullName: 'Electronics & Hardware Complex',
+    institute: 'National Institute of Technology Calicut',
+    location: 'NIT Campus, Calicut, Kerala - 673601',
+    yearBuilt: 2005,
+    totalFloors: 3,
+    coordinates: [75.93370, 11.32258],
+    description: 'Houses the departments of Electronics & Communication Engineering and related labs. Multi-floor academic building with classrooms, labs, and faculty offices.',
+    outline: {
+      type: "FeatureCollection",
+      name: "building_elhc",
+      features: [
+        {
+          type: "Feature",
+          properties: { id: 1, name: "ELHC" },
+          geometry: {
+            type: "MultiPolygon",
+            coordinates: [[[[75.93353059422526,11.322568336195328],[75.93356947649869,11.322534446839239],[75.933597977036712,11.322509606085463],[75.933577819785427,11.322487582291158],[75.933583003078596,11.322449181825242],[75.933679469924058,11.322364474896901],[75.933758619684482,11.322450960382797],[75.933777664533949,11.322471770335225],[75.93376671406152,11.322481568901631],[75.93372496771984,11.322518923844081],[75.93378046507857,11.322578632641815],[75.933834536778662,11.32263680758223],[75.933876289880232,11.322599508716866],[75.93388795349459,11.322589089380301],[75.933907267667195,11.322609899360417],[75.933974269724189,11.322682090454347],[75.933969374391765,11.32272783214799],[75.933889753249133,11.322798562345062],[75.93384713506066,11.322792350512087],[75.933824962084259,11.322769197315262],[75.93380027490177,11.322790311394915],[75.933762978536521,11.322822209662538],[75.933730110327488,11.322786302062037],[75.933701370665162,11.322754904779835],[75.933649030785006,11.322697724906824],[75.933593465715504,11.322637021591081],[75.933566167605704,11.322607199149445],[75.93353059422526,11.322568336195328]]]]
+          }
+        }
+      ]
+    }
+  },
+  {
+    id: 'ltc',
+    code: 'LTC',
+    name: 'Lecture Theatre Complex',
+    fullName: 'Lecture Theatre Complex',
+    institute: 'National Institute of Technology Calicut',
+    location: 'NIT Campus, Calicut, Kerala - 673601',
+    yearBuilt: 1998,
+    totalFloors: 2,
+    coordinates: [75.93450, 11.32180],
+    description: 'Main lecture complex hosting large auditoriums and seminar halls for the institute.',
+    outline: null
+  },
+  {
+    id: 'main-block',
+    code: 'MB',
+    name: 'Main Block',
+    fullName: 'Administrative & Academic Main Block',
+    institute: 'National Institute of Technology Calicut',
+    location: 'NIT Campus, Calicut, Kerala - 673601',
+    yearBuilt: 1961,
+    totalFloors: 4,
+    coordinates: [75.93500, 11.32300],
+    description: 'The iconic main administrative block housing the Director\'s office, academic sections, and core departments.',
+    outline: null
+  }
+];
