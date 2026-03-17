@@ -11,17 +11,19 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String roomNo;
-    private Integer floor;
+    private String roomNo; // can be null (e.g. toilets)
+    private Integer level; // floor level
+    private String category; // "classroom", "toilet", etc.
+    private String name; // display name
+    private Boolean navigable; // nullable
 
     @ManyToOne
     @JoinColumn(name = "building_id")
     private Building building;
 
-    @Column(columnDefinition = "geometry(Geometry)")
+    @Column(columnDefinition = "geometry(MultiPolygon, 4326)")
     private Geometry geom;
 
-    // --- Getters and Setters ---
     public Long getId() {
         return id;
     }
@@ -38,12 +40,36 @@ public class Room {
         this.roomNo = roomNo;
     }
 
-    public Integer getFloor() {
-        return floor;
+    public Integer getLevel() {
+        return level;
     }
 
-    public void setFloor(Integer floor) {
-        this.floor = floor;
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Boolean getNavigable() {
+        return navigable;
+    }
+
+    public void setNavigable(Boolean navigable) {
+        this.navigable = navigable;
     }
 
     public Building getBuilding() {
