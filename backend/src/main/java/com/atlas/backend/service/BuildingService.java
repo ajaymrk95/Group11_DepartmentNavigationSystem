@@ -3,6 +3,8 @@ package com.atlas.backend.service;
 import com.atlas.backend.entity.Building;
 import com.atlas.backend.repository.BuildingRepository;
 import com.atlas.backend.utils.GeoUtil;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -15,12 +17,12 @@ public class BuildingService {
 
     public Building save(String name,
             Integer floors,
-            String geoJson,
+            JsonNode geoJson,
             List<List<Double>> entries) throws Exception {
         Building b = new Building();
         b.setName(name);
         b.setFloors(floors);
-        b.setGeom(GeoUtil.fromGeoJson(geoJson));
+        b.setGeom(GeoUtil.fromGeoJson(geoJson.toString()));
         b.setEntries(GeoUtil.toMultiPoint(entries));
         return buildingRepository.save(b);
     }
@@ -31,5 +33,10 @@ public class BuildingService {
 
     public List<Building> findAll() {
         return buildingRepository.findAll();
+    }
+
+    public Building findByName(String name) {
+        return buildingRepository.findByNameIgnoreCase(name)
+                .orElseThrow(() -> new RuntimeException("Building not found: " + name));
     }
 }

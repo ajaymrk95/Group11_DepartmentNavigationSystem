@@ -1,11 +1,12 @@
 package com.atlas.backend.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 
 public class BuildingRequest {
     private String name;
     private Integer floors;
-    private String geoJson;
+    private JsonNode geoJson; // ← change from String to JsonNode
     private List<List<Double>> entries;
 
     public String getName() {
@@ -24,11 +25,11 @@ public class BuildingRequest {
         this.floors = floors;
     }
 
-    public String getGeoJson() {
+    public JsonNode getGeoJson() {
         return geoJson;
     }
 
-    public void setGeoJson(String geoJson) {
+    public void setGeoJson(JsonNode geoJson) {
         this.geoJson = geoJson;
     }
 

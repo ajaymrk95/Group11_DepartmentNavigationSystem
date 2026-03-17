@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/buildings")
@@ -17,37 +19,47 @@ public class BuildingController {
     @Autowired
     private BuildingService buildingService;
 
-    // POST /api/buildings
-    // Body: {
-    // "name": "Block A",
-    // "floors": 3,
-    // "geoJson": "{...}",
-    // "entries": [[76.5, 11.6], [76.51, 11.61]]
-    // }
     @PostMapping
-    public Building create(@RequestBody BuildingRequest body) throws Exception {
-        return buildingService.save(
+    public Map<String, Object> create(@RequestBody BuildingRequest body) throws Exception {
+        Building b = buildingService.save(
             body.getName(),
             body.getFloors(),
             body.getGeoJson(),
             body.getEntries()
         );
+        return toMap(b);
     }
 
-    // GET /api/buildings
     @GetMapping
-    public List<Building> getAll() {
-        return buildingService.findAll();
+    public List<Map<String, Object>> getAll() {
+        return buildingService.findAll()
+            .stream()
+            .map(this::toMap)
+            .collect(Collectors.toList());
     }
 
-    // GET /api/buildings/nearby?lat=11.6&lng=76.5&meters=500
+    @GetMapping("/search")
+    public Map<String, Object> searchByName(@RequestParam String name) {
+        return toMap(buildingService.findByName(name));
+    }
+
     @GetMapping("/nearby")
-    public List<String> getNearby(@RequestParam double lat,
-            @RequestParam double lng,
-            @RequestParam double meters) {
+    public List<Map<String, Object>> getNearby(@RequestParam double lat,
+                                                @RequestParam double lng,
+                                                @RequestParam double meters) {
         return buildingService.findNearby(lat, lng, meters)
-                .stream()
-                .map(b -> GeoUtil.toGeoJson(b.getGeom()))
-                .toList();
+            .stream()
+            .map(this::toMap)
+            .collect(Collectors.toList());
+    }
+
+    private Map<String, Object> toMap(Building b) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", b.getId());
+        map.put("name", b.getName());
+        map.put("floors", b.getFloors());
+        map.put("geom", b.getGeom() != null ? GeoUtil.toGeoJson(b.getGeom()) : null);
+        map.put("entries", b.getEntries() != null ? GeoUtil.toGeoJson(b.getEntries()) : null);
+        return map;
     }
 }
