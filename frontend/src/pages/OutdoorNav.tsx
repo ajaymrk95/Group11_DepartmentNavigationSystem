@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import MapView from "../components/navcomponents/MapView"
 import RoutePanel from "../components/navcomponents/RoutePanel"
-import { locations,type Location } from "../data/locations"
+import type { Location } from "../data/locations"
 import { buildGraph, type Graph } from "../utils/buildGraph"
 import { findNearestNode } from "../utils/findNearestNode"
 import { shortestPath } from "../utils/shortestPath"
@@ -23,6 +23,36 @@ export default function OutdoorNav() {
   
   // Controls whether the sidebar is visible on mobile
   const [isPanelOpen, setIsPanelOpen] = useState(true)
+
+  //New state for backend locations
+  const [locations, setLocations] = useState<Location[]>([])
+
+  useEffect(() => {
+    async function fetchLocations() {
+      try {
+        const res = await fetch("http://localhost:8080/locations")
+        const data = await res.json()
+
+        const mapped = data.map((loc: any) => ({
+          id: loc.id,
+          name: loc.name,
+          room: loc.room,
+          type: loc.type,
+          category: loc.category,
+          description: loc.description,
+          coords: [loc.latitude, loc.longitude],
+          tag: loc.tag || [],
+          floor: loc.floor,
+        }))
+
+        setLocations(mapped)
+      } catch (err) {
+        console.error("Failed to fetch locations", err)
+      }
+    }
+
+    fetchLocations()
+  }, [])
 
   const { location: currentLocation } = useCurrentLocation()
 

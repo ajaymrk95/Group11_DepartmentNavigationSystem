@@ -34,19 +34,26 @@ export default function LocationSearch({ label, locations, onSelect, iconType = 
     const qrValue = location.state?.qrData
     if (!qrValue) return
   
+    if (locations.length === 0) return
+  
+    const normalizedQr = qrValue.toLowerCase().trim()
+  
     const match = locations.find(
-      loc => loc.name.toLowerCase() === qrValue.toLowerCase()
+      loc => loc.name.toLowerCase().trim() === normalizedQr
     )
   
-    if (match) {
-      setQuery(match.name)
-      onSelect(match)
-    } else {
-      setQuery(qrValue)
+    if (!match) {
+      console.error("QR location not found in DB:", qrValue)
+      return
     }
   
-    navigate(location.pathname, { replace: true })   // clear router state
-  }, [location.state, locations, onSelect, useQrResult])
+    onSelect(match)
+    setQuery(match.name)
+    setOpen(false)
+  
+    navigate(location.pathname, { replace: true })
+  
+  }, [location.state, locations])
 
   const filtered = locations.filter(loc =>
     loc.name.toLowerCase().includes(query.toLowerCase())
