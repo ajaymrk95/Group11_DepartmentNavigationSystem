@@ -1,11 +1,10 @@
 package com.atlas.backend.service;
 
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 
-import com.atlas.backend.dto.LocationDTO;
 import com.atlas.backend.entity.Location;
+import com.atlas.backend.dto.LocationDTO;
 import com.atlas.backend.repository.LocationRepository;
 
 @Service
@@ -17,45 +16,31 @@ public class LocationService {
         this.repository = repository;
     }
 
-    // 🔹 GET ALL (unchanged logic, but now mapped)
-    public List<LocationDTO> getAllLocations() {
-        return repository.findAll()
-                .stream()
-                .map(this::mapToDTO)
-                .toList();
-    }
+    public List<LocationDTO> searchLocations(String query){
 
-    // 🔹 SEARCH (FIXED — now consistent)
-    public List<LocationDTO> searchLocations(String query) {
-
-        if (query == null || query.trim().isEmpty()) {
-            return getAllLocations();
+        if(query == null || query.trim().isEmpty()){
+            return List.of();
         }
 
-        String q = query.trim().toLowerCase();
+        String q = query.trim();
 
-        return repository.findAll()
-                .stream()
-                .filter(loc ->
-                    (loc.getName() != null && loc.getName().toLowerCase().contains(q)) ||
-                    (loc.getRoom() != null && loc.getRoom().toLowerCase().contains(q)) ||
-                    (loc.getDescription() != null && loc.getDescription().toLowerCase().contains(q)) ||
-                    (loc.getTag() != null && loc.getTag().stream()
-                            .anyMatch(tag -> tag.toLowerCase().contains(q)))
-                )
-                .map(this::mapToDTO)
-                .toList();
+        List<Location> res = repository.searchLocations(q);
+
+        return res.stream().map(this::mapToDTO).toList();
+
     }
 
-    // 🔹 ENTITY → DTO mapping (IMPORTANT)
-    private LocationDTO mapToDTO(Location loc) {
+    public List<LocationDTO> getAllLocations(){
+        return repository.findAll().stream().map(this::mapToDTO).toList();
+    }
 
+    private LocationDTO mapToDTO(Location loc){
         Double lat = null;
-        Double lng = null;
+        Double lon = null;
 
-        if (loc.getCoords() != null) {
-            lat = loc.getCoords().getY(); // latitude
-            lng = loc.getCoords().getX(); // longitude
+        if(loc.getCoords() != null) {
+            lat = loc.getCoords().getY();
+            lon = loc.getCoords().getX();
         }
 
         return new LocationDTO(
@@ -66,9 +51,10 @@ public class LocationService {
             loc.getCategory(),
             loc.getDescription(),
             lat,
-            lng,
+            lon,
             loc.getTag(),
             loc.getFloor()
         );
     }
+    
 }

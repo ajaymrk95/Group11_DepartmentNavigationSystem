@@ -1,71 +1,96 @@
 import { useState } from "react";
-import { searchLocations } from "../../utils/searchLocation";
 import type { Location } from "../../data/locations";
 import SearchResults from "./SearchResults";
 
 type Props = {
-locations: Location[];
-onSelect: (location: Location) => void;
-onFocusSearch?: () => void;
+  onSelect: (location: Location) => void;
+  onFocusSearch?: () => void;
 };
 
 const filters = [
-"Faculty",
-"Labs",
-"Classrooms",
-"Toilets",
-"Offices",
-"Indoor",
-"Outdoor",
+  "Faculty",
+  "Labs",
+  "Classrooms",
+  "Toilets",
+  "Offices",
+  "Indoor",
+  "Outdoor",
 ];
 
 export default function SearchBar({
-locations,
-onSelect,
-onFocusSearch,
+  onSelect,
+  onFocusSearch,
 }: Props) {
 
-const [query, setQuery] = useState("");
-const [results, setResults] = useState<Location[]>([]);
-const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<Location[]>([]);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
-function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
-const value = e.target.value;
-setQuery(value);
-
-
-if (value.trim() === "") {
-  setResults([]);
-  return;
-}
-
-const matches = searchLocations(value, locations);
-setResults(matches);
+  async function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+    setQuery(value);
 
 
-}
+    if (value.trim() === "") {
+      setResults([]);
+      return;
+    }
 
-function handleFilter(filter: string) {
-onFocusSearch?.();
+    try {
+      const res = await fetch(`http://localhost:8080/locations/search?q=${value}`);
+      const data = await res.json();
 
+      const mapped = data.map((loc : any ) => ({
+        id : loc.id,
+        name : loc.name,
+        room : loc.room,
+        type : loc.type,
+        category : loc.category,
+        description : loc.description,
+        coords: [loc.latitude, loc.longitude] as [number, number],
+        tag: loc.tag || [],
+        floor : loc.floor,
+      }));
 
-setActiveFilter(filter);
+      setResults(mapped);
+    } catch (err) {
+        console.error("Search failed:", err);
+    }
+  }
 
-const matches = locations.filter(
-  (loc) => loc.tag && loc.tag.includes(filter)
-);
+  async function handleFilter(filter: string) {
+    onFocusSearch?.();
+    setActiveFilter(filter);
 
-setResults(matches);
+    try {
+      const res = await fetch(`http://localhost:8080/locations/search?q=${filter}`);
+      const data = await res.json();
 
+      const mapped = data.map((loc: any) => ({
+        id: loc.id,
+        name: loc.name,
+        room: loc.room,
+        type: loc.type,
+        category: loc.category,
+        description: loc.description,
+        coords: [loc.latitude, loc.longitude] as [number, number],
+        tag: loc.tag || [],
+        floor: loc.floor,
+      }));
 
-}
+      setResults(mapped);
+    } catch (err) {
+      console.error("Filtering failed: ", err);
+    }
 
-function handleSelect(loc: Location) {
-setQuery(loc.name);
-setResults([]);
-setActiveFilter(null);
-onSelect(loc);
-}
+  }
+
+  function handleSelect(loc: Location) {
+    setQuery(loc.name);
+    setResults([]);
+    setActiveFilter(null);
+    onSelect(loc);
+  }
 
 return ( <div className="
    bg-[#E8E2DB]

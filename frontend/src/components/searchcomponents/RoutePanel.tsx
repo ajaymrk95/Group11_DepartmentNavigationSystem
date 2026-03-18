@@ -4,12 +4,11 @@ import SearchBar from "./SearchBar"
 import locationImage from "../../assets/image.png"
 
 type Props = {
-  locations: Location[]
   selectedLocation: Location | null
   onSelectLocation: (location: Location | null) => void
 }
 
-export default function RoutePanel({locations, selectedLocation, onSelectLocation }: Props) {
+export default function RoutePanel({selectedLocation, onSelectLocation }: Props) {
 
   const navigate = useNavigate()
 
@@ -35,7 +34,6 @@ return ( <div className="
   <div className="flex flex-col gap-6">
 
     <SearchBar
-      locations={locations}
       onSelect={onSelectLocation}
       onFocusSearch={clearSelectedLocation}
     />

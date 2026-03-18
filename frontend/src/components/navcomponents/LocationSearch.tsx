@@ -1,10 +1,10 @@
 import { useNavigate, useLocation } from "react-router-dom"
 import { useState, useEffect } from "react"
 import type { Location } from "../../data/locations"
+import { useCurrentLocation } from "../../hooks/useCurrentLocation"
 
 type Props = {
   label: string
-  locations: Location[]
   onSelect: (loc: Location | null) => void
   iconType?: "start" | "end"
   selectedLoc: Location | null
@@ -12,12 +12,28 @@ type Props = {
   useQrResult?: boolean
 }
 
-export default function LocationSearch({ label, locations, onSelect, iconType = "start", selectedLoc, showQr = false, useQrResult = false }: Props) {
+export default function LocationSearch({ label, onSelect, iconType = "start", selectedLoc, showQr = false, useQrResult = false }: Props) {
   const [query, setQuery] = useState("")
   const [open, setOpen] = useState(false)
+  const [results, setResults] = useState<Location[]>([]);
 
   const navigate = useNavigate()
   const location = useLocation()   // added
+
+  const { location: currentCoords } = useCurrentLocation();
+  const myLocation: Location | null = currentCoords
+  ? {
+      id: -1,
+      name: "My Location",
+      room: "",
+      type: "custom",   // ⚠️ must exist in your enum
+      category: "outdoor",
+      description: "Your current position",
+      coords: currentCoords,
+      tag: [],
+      floor: 0,
+    }
+  : null;
 
   useEffect(() => {
     if (selectedLoc) {
@@ -34,30 +50,46 @@ export default function LocationSearch({ label, locations, onSelect, iconType = 
     const qrValue = location.state?.qrData
     if (!qrValue) return
   
-    if (locations.length === 0) return
-  
-    const normalizedQr = qrValue.toLowerCase().trim()
-  
-    const match = locations.find(
-      loc => loc.name.toLowerCase().trim() === normalizedQr
-    )
-  
-    if (!match) {
-      console.error("QR location not found in DB:", qrValue)
-      return
-    }
-  
-    onSelect(match)
-    setQuery(match.name)
-    setOpen(false)
-  
-    navigate(location.pathname, { replace: true })
-  
-  }, [location.state, locations])
+    async function handleQr() {
+      try {
+        const res = await fetch(`http://localhost:8080/locations/search?q=${encodeURIComponent(qrValue)}`)
+        const data = await res.json();
+        
+        if (!data.length) {
+          console.error("QR location not found:", qrValue)
+          return
+        }
 
-  const filtered = locations.filter(loc =>
-    loc.name.toLowerCase().includes(query.toLowerCase())
-  )
+        const loc = data[0];
+
+        const mapped: Location = {
+          id: loc.id,
+          name: loc.name,
+          room: loc.room,
+          type: loc.type,
+          category: loc.category,
+          description: loc.description,
+          coords: [loc.latitude, loc.longitude] as [number, number],
+          tag: loc.tag || [],
+          floor: loc.floor,
+        };
+
+        onSelect(mapped);
+        setQuery(mapped.name);
+        setOpen(false);
+
+        navigate(location.pathname, { replace: true });
+
+      } catch (err) {
+        console.error("QR scanning failed: ", err)
+      }
+
+    }
+
+    handleQr();
+  
+  }, [location.state, useQrResult])
+
 
   return (
     <div className="relative w-full">
@@ -80,11 +112,37 @@ export default function LocationSearch({ label, locations, onSelect, iconType = 
         <input
           value={query}
           placeholder={label}
-          onChange={(e) => {
-            setQuery(e.target.value)
-            setOpen(true)
-            if (e.target.value === "") {
-              onSelect(null)
+          onChange={async (e) => {
+            const value = e.target.value;
+            setQuery(value);
+            setOpen(true);
+            
+            if(value.trim() === ""){
+              setResults([]);
+              onSelect(null);
+              return;
+            }
+            
+            try {
+              const res = await fetch(`http://localhost:8080/locations/search?q=${encodeURIComponent(value)}`)
+              const data = await res.json();
+
+              const mapped: Location[] = data.map((loc: any) => ({
+                id: loc.id,
+                name: loc.name,
+                room: loc.room,
+                type: loc.type,
+                category: loc.category,
+                description: loc.description,
+                coords: [loc.latitude, loc.longitude],
+                tag: loc.tag || [],
+                floor: loc.floor,
+              }));
+          
+              setResults(mapped);
+
+            } catch (err) {
+              console.error("Search failed:", err);
             }
           }}
           className="
@@ -114,7 +172,7 @@ export default function LocationSearch({ label, locations, onSelect, iconType = 
           rounded-xl shadow-2xl
           max-h-60 overflow-y-auto z-[9999]
         ">
-          {filtered.map(loc => (
+          {[...(myLocation ? [myLocation] : []), ...results].map(loc => (
             <div
               key={loc.id}
               className="px-5 py-3 text-base text-[#1a305b] cursor-pointer hover:bg-[#e9e4d9] transition-colors border-b border-gray-100 last:border-0"
@@ -128,7 +186,7 @@ export default function LocationSearch({ label, locations, onSelect, iconType = 
             </div>
           ))}
 
-          {filtered.length === 0 && (
+          {results.length === 0 && !myLocation && (
             <div className="px-5 py-3 text-base text-[#547792]/70 italic">
               No locations found
             </div>

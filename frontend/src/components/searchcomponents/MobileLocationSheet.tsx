@@ -5,105 +5,97 @@ import { useNavigate } from "react-router-dom"
 import locationImage from "../../assets/image.png"
 
 type Props = {
-locations: Location[]
-selectedLocation: Location | null
-onSelectLocation: (location: Location | null) => void
+  selectedLocation: Location | null
+  onSelectLocation: (location: Location | null) => void
 }
 
 export default function MobileLocationSheet({
-locations,
-selectedLocation,
-onSelectLocation
+  selectedLocation,
+  onSelectLocation
 }: Props) {
 
-const sheetRef = useRef<HTMLDivElement>(null)
-const navigate = useNavigate()
+  const sheetRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
 
-const screenHeight = window.innerHeight
-const MIN_HEIGHT = 30
-const HALF = screenHeight * 0.45
-const FULL = screenHeight
+  const screenHeight = window.innerHeight
+  const MIN_HEIGHT = 30
+  const HALF = screenHeight * 0.45
+  const FULL = screenHeight
 
-const [height, setHeight] = useState(MIN_HEIGHT)
-const startY = useRef(0)
-const startHeight = useRef(0)
+  const [height, setHeight] = useState(MIN_HEIGHT)
+  const startY = useRef(0)
+  const startHeight = useRef(0)
 
-function goToNavigate() {
-navigate("/outdoor-navigation")
-}
+  function goToNavigate() {
+    navigate("/outdoor-navigation")
+  }
 
-function setSheetHeight(h: number) {
-if (!sheetRef.current) return
-sheetRef.current.style.height = `${h}px`
-}
+  function setSheetHeight(h: number) {
+    if (!sheetRef.current) return
+    sheetRef.current.style.height = `${h}px`
+  }
 
-function openSearch() {
-setHeight(FULL)
-setSheetHeight(FULL)
-onSelectLocation(null)
-}
+  function openSearch() {
+    setHeight(FULL)
+    setSheetHeight(FULL)
+    onSelectLocation(null)
+  }
 
-function handleSearchFocus() {
-setHeight(FULL)
-setSheetHeight(FULL)
-onSelectLocation(null)
-}
+  function handleSearchFocus() {
+    setHeight(FULL)
+    setSheetHeight(FULL)
+    onSelectLocation(null)
+  }
 
-function handleSelect(location: Location) {
-onSelectLocation(location)
-setHeight(HALF)
-setSheetHeight(HALF)
-}
+  function handleSelect(location: Location) {
+    onSelectLocation(location)
+    setHeight(HALF)
+    setSheetHeight(HALF)
+  }
 
-function startDrag(clientY: number) {
-startY.current = clientY
-startHeight.current = sheetRef.current?.offsetHeight || MIN_HEIGHT
-
-
-window.addEventListener("touchmove", onTouchMove)
-window.addEventListener("touchend", stopDrag)
-window.addEventListener("mousemove", onMouseMove)
-window.addEventListener("mouseup", stopDrag)
+  function startDrag(clientY: number) {
+    startY.current = clientY
+    startHeight.current = sheetRef.current?.offsetHeight || MIN_HEIGHT
 
 
-}
+    window.addEventListener("touchmove", onTouchMove)
+    window.addEventListener("touchend", stopDrag)
+    window.addEventListener("mousemove", onMouseMove)
+    window.addEventListener("mouseup", stopDrag)
+  }
 
-function onTouchStart(e: React.TouchEvent) {
-startDrag(e.touches[0].clientY)
-}
+  function onTouchStart(e: React.TouchEvent) {
+    startDrag(e.touches[0].clientY)
+  }
 
-function onMouseDown(e: React.MouseEvent) {
-startDrag(e.clientY)
-}
+  function onMouseDown(e: React.MouseEvent) {
+    startDrag(e.clientY)
+  }
 
-function updateHeight(clientY: number) {
-const delta = startY.current - clientY
-let newHeight = startHeight.current + delta
-
-
-if (newHeight < MIN_HEIGHT) newHeight = MIN_HEIGHT
-if (newHeight > FULL) newHeight = FULL
-
-setSheetHeight(newHeight)
+  function updateHeight(clientY: number) {
+    const delta = startY.current - clientY
+    let newHeight = startHeight.current + delta
 
 
-}
+    if (newHeight < MIN_HEIGHT) newHeight = MIN_HEIGHT
+    if (newHeight > FULL) newHeight = FULL
 
-function onTouchMove(e: TouchEvent) { updateHeight(e.touches[0].clientY) }
-function onMouseMove(e: MouseEvent) { updateHeight(e.clientY) }
+    setSheetHeight(newHeight)
+  }
 
-function stopDrag() {
-const currentHeight = sheetRef.current?.offsetHeight || MIN_HEIGHT
-setHeight(currentHeight)
+  function onTouchMove(e: TouchEvent) { updateHeight(e.touches[0].clientY) }
+  function onMouseMove(e: MouseEvent) { updateHeight(e.clientY) }
 
-
-window.removeEventListener("touchmove", onTouchMove)
-window.removeEventListener("touchend", stopDrag)
-window.removeEventListener("mousemove", onMouseMove)
-window.removeEventListener("mouseup", stopDrag)
+  function stopDrag() {
+    const currentHeight = sheetRef.current?.offsetHeight || MIN_HEIGHT
+    setHeight(currentHeight)
 
 
-}
+    window.removeEventListener("touchmove", onTouchMove)
+    window.removeEventListener("touchend", stopDrag)
+    window.removeEventListener("mousemove", onMouseMove)
+    window.removeEventListener("mouseup", stopDrag)
+  }
 
 return (
 <> <div className="fixed top-4 right-4 z-30 flex items-center gap-2">
@@ -176,7 +168,6 @@ return (
       </p>
 
       <SearchBar
-        locations={locations}
         onSelect={handleSelect}
         onFocusSearch={handleSearchFocus}
       />

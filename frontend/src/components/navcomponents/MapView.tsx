@@ -6,9 +6,10 @@ import { type Location } from "../../data/locations"
 import L from "leaflet"
 import MapRecenter from "./MapRecenter"
 
+import { useState, useEffect } from "react" 
+
 type Props = {
   center: [number, number]
-  locations: Location[]
   start: Location | null
   destination: Location | null
   graph: Graph | null
@@ -44,7 +45,30 @@ const redIcon = new L.Icon({
   popupAnchor: [1, -34],
 })
 
-function MapView({ center, locations, start, destination, routeCoords, currentLocation, onSetMapDestination}: Props) {
+function MapView({ center, start, destination, routeCoords, currentLocation, onSetMapDestination}: Props) {
+
+  const [locations, setLocations] = useState<Location[]>([])
+  
+  useEffect(() => {
+    fetch("http://localhost:8080/locations")
+      .then(res => res.json())
+      .then(data => {
+        const mapped: Location[] = data.map((loc: any) => ({
+          id: loc.id,
+          name: loc.name,
+          room: loc.room,
+          type: loc.type,
+          category: loc.category,
+          description: loc.description,
+          coords: [loc.latitude, loc.longitude] as [number, number],
+          tag: loc.tag || [],
+          floor: loc.floor,
+        }))
+        setLocations(mapped)
+      })
+      .catch(err => console.error("Failed to load locations:", err))
+  }, [])
+
   return (
     <div className="relative h-full w-full">
       <MapContainer 

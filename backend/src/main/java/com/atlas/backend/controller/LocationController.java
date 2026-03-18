@@ -15,20 +15,18 @@ import com.atlas.backend.service.LocationService;
 @RequestMapping("/locations")
 @CrossOrigin
 public class LocationController {
-
     private final LocationService service;
-
-    public LocationController(LocationService service) {
+    public LocationController(LocationService service){
         this.service = service;
     }
 
-    @GetMapping
-    public List<LocationDTO> getAllLocations() {
-        return service.getAllLocations();
+    @GetMapping("/search")
+    public List<LocationDTO> searchLocations(@RequestParam String q){
+        return service.searchLocations(q);
     }
 
-    @GetMapping("/search")
-    public List<LocationDTO> searchLocations(@RequestParam(required = false) String q) {
-        return service.searchLocations(q);
+    @GetMapping
+    public List<LocationDTO> getAllLocations(){
+        return service.getAllLocations();
     }
 }

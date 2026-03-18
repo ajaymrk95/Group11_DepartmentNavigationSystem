@@ -6,8 +6,9 @@ import { buildGraph, type Graph } from "../utils/buildGraph"
 import { findNearestNode } from "../utils/findNearestNode"
 import { shortestPath } from "../utils/shortestPath"
 import LocateButton from "../components/navcomponents/LocateButton"
-import { useCurrentLocation } from "../hooks/useCurrentLocation"
 import { distance } from "../utils/distance"
+import { useCurrentLocation } from "../hooks/useCurrentLocation"
+
 
 const DEFAULT_CENTER: [number, number] = [11.3210, 75.9346]
 
@@ -24,50 +25,8 @@ export default function OutdoorNav() {
   // Controls whether the sidebar is visible on mobile
   const [isPanelOpen, setIsPanelOpen] = useState(true)
 
-  //New state for backend locations
-  const [locations, setLocations] = useState<Location[]>([])
+  const { location: currentLocation } = useCurrentLocation();
 
-  useEffect(() => {
-    async function fetchLocations() {
-      try {
-        const res = await fetch("http://localhost:8080/locations")
-        const data = await res.json()
-
-        const mapped = data.map((loc: any) => ({
-          id: loc.id,
-          name: loc.name,
-          room: loc.room,
-          type: loc.type,
-          category: loc.category,
-          description: loc.description,
-          coords: [loc.latitude, loc.longitude],
-          tag: loc.tag || [],
-          floor: loc.floor,
-        }))
-
-        setLocations(mapped)
-      } catch (err) {
-        console.error("Failed to fetch locations", err)
-      }
-    }
-
-    fetchLocations()
-  }, [])
-
-  const { location: currentLocation } = useCurrentLocation()
-
-  const currentLocationOption: Location | null = currentLocation
-    ? {
-        id: 0, 
-        name: "My Current Location",
-        coords: currentLocation,
-        type: "custom"
-      }
-    : null
-
-  const selectableLocations: Location[] = currentLocationOption
-    ? [currentLocationOption, ...locations]
-    : locations
 
   const [center, setCenter] = useState<[number, number]>(DEFAULT_CENTER)
 
@@ -114,7 +73,6 @@ export default function OutdoorNav() {
         ${isPanelOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}>
         <RoutePanel
-          locations={selectableLocations}
           onRouteRequest={handleRoute}
           onClose={() => setIsPanelOpen(false)} 
           mapDestination={clickedDestination} // PASSED TO SIDEBAR
@@ -145,12 +103,10 @@ export default function OutdoorNav() {
 
         <MapView
           center={center}
-          locations={locations}
           start={start}
           destination={destination}
           graph={graph}
           routeCoords={routeCoords}
-          currentLocation={currentLocation}
          
           onSetMapDestination={(loc) => {
             setClickedDestination(loc)

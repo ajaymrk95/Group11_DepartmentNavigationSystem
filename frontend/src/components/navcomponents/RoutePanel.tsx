@@ -4,13 +4,12 @@ import type { Location } from "../../data/locations"
 import LocationSearch from "./LocationSearch"
 
 type Props = {
-  locations: Location[]
   onRouteRequest: (start: Location, end: Location) => void
   onClose: () => void
   mapDestination?: Location | null
 }
 
-export default function RoutePanel({ locations, onRouteRequest, onClose, mapDestination }: Props) {
+export default function RoutePanel({ onRouteRequest, onClose, mapDestination }: Props) {
   const [start, setStart] = useState<Location | null>(null)
   const [end, setEnd] = useState<Location | null>(null)
 
@@ -51,7 +50,6 @@ export default function RoutePanel({ locations, onRouteRequest, onClose, mapDest
           <div className="relative z-20">
             <LocationSearch
               label="Choose starting point..."
-              locations={locations}
               onSelect={setStart}
               iconType="start"
               selectedLoc={start}
@@ -73,7 +71,6 @@ export default function RoutePanel({ locations, onRouteRequest, onClose, mapDest
           <div className="relative z-10 pt-2">
             <LocationSearch
               label="Choose destination..."
-              locations={locations}
               onSelect={setEnd}
               iconType="end"
               selectedLoc={end}
