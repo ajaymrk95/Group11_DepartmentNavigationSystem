@@ -41,7 +41,7 @@ public class RoomService {
     // Bulk import from FeatureCollection
     public List<Room> bulkImport(RoomBulkRequest req) throws Exception {
         Building building = buildingRepository.findById(req.getBuildingId()).orElseThrow();
-        JsonNode root = objectMapper.readTree(req.getFeatureCollection());
+        JsonNode root = req.getFeatureCollection().get("features");
         JsonNode features = root.get("features");
 
         List<Room> saved = new ArrayList<>();

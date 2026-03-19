@@ -1,8 +1,10 @@
 package com.atlas.backend.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public class RoomBulkRequest {
     private Long buildingId;
-    private String featureCollection;
+    private JsonNode featureCollection; // ← JsonNode not String
 
     public Long getBuildingId() {
         return buildingId;
@@ -12,11 +14,11 @@ public class RoomBulkRequest {
         this.buildingId = buildingId;
     }
 
-    public String getFeatureCollection() {
+    public JsonNode getFeatureCollection() {
         return featureCollection;
     }
 
-    public void setFeatureCollection(String featureCollection) {
+    public void setFeatureCollection(JsonNode featureCollection) {
         this.featureCollection = featureCollection;
     }
 }
