@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
-import java.util.Optional;
 
 public interface BuildingRepository extends JpaRepository<Building, Long> {
 
@@ -22,5 +21,11 @@ public interface BuildingRepository extends JpaRepository<Building, Long> {
             @Param("lng") double lng,
             @Param("meters") double meters);
 
-    Optional<Building> findByNameIgnoreCase(String name);
+    // Search by name OR tag - used for the search bar
+    @Query(value = """
+            SELECT * FROM buildings
+            WHERE LOWER(name) LIKE LOWER(CONCAT('%', :query, '%'))
+            OR LOWER(:query) = ANY(SELECT LOWER(t) FROM unnest(tags) t)
+            """, nativeQuery = true)
+    List<Building> search(@Param("query") String query);
 }

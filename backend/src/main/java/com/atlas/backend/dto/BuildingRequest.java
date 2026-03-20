@@ -5,8 +5,11 @@ import java.util.List;
 
 public class BuildingRequest {
     private String name;
+    private String description;
     private Integer floors;
-    private JsonNode geoJson; // ← change from String to JsonNode
+    private Boolean isAccessible;
+    private String[] tags;
+    private JsonNode geoJson;
     private List<List<Double>> entries;
 
     public String getName() {
@@ -17,12 +20,36 @@ public class BuildingRequest {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public Integer getFloors() {
         return floors;
     }
 
     public void setFloors(Integer floors) {
         this.floors = floors;
+    }
+
+    public Boolean getIsAccessible() {
+        return isAccessible;
+    }
+
+    public void setIsAccessible(Boolean isAccessible) {
+        this.isAccessible = isAccessible;
+    }
+
+    public String[] getTags() {
+        return tags;
+    }
+
+    public void setTags(String[] tags) {
+        this.tags = tags;
     }
 
     public JsonNode getGeoJson() {
