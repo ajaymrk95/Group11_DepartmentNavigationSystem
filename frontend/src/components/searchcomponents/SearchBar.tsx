@@ -1,6 +1,8 @@
 import { useState } from "react";
-import type { Location } from "../../data/locations";
+import type { Location } from "../../types/types";
 import SearchResults from "./SearchResults";
+
+import { defaultDescription } from "../../types/types";
 
 type Props = {
   onSelect: (location: Location) => void;
@@ -43,10 +45,9 @@ export default function SearchBar({
       const mapped = data.map((loc : any ) => ({
         id : loc.id,
         name : loc.name,
-        room : loc.room,
         type : loc.type,
         category : loc.category,
-        description : loc.description,
+        description : defaultDescription,
         coords: [loc.latitude, loc.longitude] as [number, number],
         tag: loc.tag || [],
         floor : loc.floor,
@@ -66,16 +67,15 @@ export default function SearchBar({
       const res = await fetch(`http://localhost:8080/locations/search?q=${filter}`);
       const data = await res.json();
 
-      const mapped = data.map((loc: any) => ({
-        id: loc.id,
-        name: loc.name,
-        room: loc.room,
-        type: loc.type,
-        category: loc.category,
-        description: loc.description,
+      const mapped = data.map((loc : any ) => ({
+        id : loc.id,
+        name : loc.name,
+        type : loc.type,
+        category : loc.category,
+        description : defaultDescription,
         coords: [loc.latitude, loc.longitude] as [number, number],
         tag: loc.tag || [],
-        floor: loc.floor,
+        floor : loc.floor,
       }));
 
       setResults(mapped);

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
-import type { Location } from "../../data/locations"
+import type { Location } from "../../type/locations"
 import LocationSearch from "./LocationSearch"
 
 type Props = {

@@ -1,4 +1,4 @@
-import type { Location } from "../../data/locations"
+import type { Location } from "../../types/types"
 
 type Props = {
 results: Location[]
@@ -37,8 +37,20 @@ return ( <ul className="
       "
     >
 
-      <div className="font-medium text-[#1a305b]">
-        {loc.name}
+      {/* Top row */}
+      <div className="flex justify-between items-center">
+        <h3 className="font-semibold text-[#1a305b] text-md">
+        {loc.name.toUpperCase()}
+        </h3>
+
+        <span className={`
+          text-xs px-2 py-1 rounded-full
+          ${loc.category === "INDOOR"
+            ? "bg-blue-100 text-blue-700"
+            : "bg-green-100 text-blue-700"}
+        `}>
+          {loc.category.toUpperCase()}
+        </span>
       </div>
 
       {loc.tag && (

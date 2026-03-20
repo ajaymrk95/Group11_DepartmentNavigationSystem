@@ -2,7 +2,7 @@ import "leaflet/dist/leaflet.css"
 
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet"
 import { type Graph } from "../../utils/buildGraph"
-import { type Location } from "../../data/locations"
+import { type Location } from "../../types/types"
 import L from "leaflet"
 import MapRecenter from "./MapRecenter"
 

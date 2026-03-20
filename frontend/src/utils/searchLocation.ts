@@ -1,4 +1,4 @@
-import type { Location } from "../data/locations";
+import type { Location } from "../type/locations";
 
 export function searchLocations(query: string, locations: Location[]): Location[] {
     const q = query.toLowerCase();

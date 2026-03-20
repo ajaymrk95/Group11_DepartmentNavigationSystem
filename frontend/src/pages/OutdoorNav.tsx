@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import MapView from "../components/navcomponents/MapView"
 import RoutePanel from "../components/navcomponents/RoutePanel"
-import type { Location } from "../data/locations"
+import type { Location } from "../type/locations"
 import { buildGraph, type Graph } from "../utils/buildGraph"
 import { findNearestNode } from "../utils/findNearestNode"
 import { shortestPath } from "../utils/shortestPath"

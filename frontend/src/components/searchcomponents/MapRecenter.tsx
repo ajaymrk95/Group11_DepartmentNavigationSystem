@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { useMap } from "react-leaflet"
-import type { Location } from "../../data/locations"
+import type { Location } from "../../type/locations"
 
 type Props = {
   location: Location | null

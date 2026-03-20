@@ -1,5 +1,5 @@
 import { useState } from "react"
-import type { Location } from "../data/locations"
+import type { Location } from "../types/types"
 import RoutePanel from "../components/searchcomponents/RoutePanel"
 import MobileLocationSheet from "../components/searchcomponents/MobileLocationSheet"
 
