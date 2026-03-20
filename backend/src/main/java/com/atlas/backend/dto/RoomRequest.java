@@ -1,13 +1,20 @@
 package com.atlas.backend.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import java.util.List;
+
 public class RoomRequest {
+
     private Long buildingId;
     private String roomNo;
-    private Integer level;
+    private Integer floor;
     private String category;
     private String name;
-    private Boolean navigable;
-    private String geoJson;
+    private Boolean isAccessible;
+    private String description;
+    private String[] tags;
+    private JsonNode geoJson;
+    private List<List<Double>> entries;
 
     public Long getBuildingId() {
         return buildingId;
@@ -25,12 +32,12 @@ public class RoomRequest {
         this.roomNo = roomNo;
     }
 
-    public Integer getLevel() {
-        return level;
+    public Integer getFloor() {
+        return floor;
     }
 
-    public void setLevel(Integer level) {
-        this.level = level;
+    public void setFloor(Integer floor) {
+        this.floor = floor;
     }
 
     public String getCategory() {
@@ -49,19 +56,43 @@ public class RoomRequest {
         this.name = name;
     }
 
-    public Boolean getNavigable() {
-        return navigable;
+    public Boolean getIsAccessible() {
+        return isAccessible;
     }
 
-    public void setNavigable(Boolean navigable) {
-        this.navigable = navigable;
+    public void setIsAccessible(Boolean isAccessible) {
+        this.isAccessible = isAccessible;
     }
 
-    public String getGeoJson() {
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String[] getTags() {
+        return tags;
+    }
+
+    public void setTags(String[] tags) {
+        this.tags = tags;
+    }
+
+    public JsonNode getGeoJson() {
         return geoJson;
     }
 
-    public void setGeoJson(String geoJson) {
+    public void setGeoJson(JsonNode geoJson) {
         this.geoJson = geoJson;
+    }
+
+    public List<List<Double>> getEntries() {
+        return entries;
+    }
+
+    public void setEntries(List<List<Double>> entries) {
+        this.entries = entries;
     }
 }

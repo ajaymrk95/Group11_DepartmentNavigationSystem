@@ -1,6 +1,8 @@
 package com.atlas.backend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Geometry;
 
 @Entity
@@ -11,11 +13,20 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String roomNo; // can be null (e.g. toilets)
-    private Integer level; // floor level
-    private String category; // "classroom", "toilet", etc.
-    private String name; // display name
-    private Boolean navigable; // nullable
+    private String roomNo;
+    private Integer floor;
+    private String category;
+    private String name;
+
+    @Column(columnDefinition = "boolean default true")
+    private Boolean isAccessible = true;
+
+    @Column(columnDefinition = "text")
+    private String description;
+
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(columnDefinition = "text[]")
+    private String[] tags;
 
     @ManyToOne
     @JoinColumn(name = "building_id")
@@ -23,6 +34,9 @@ public class Room {
 
     @Column(columnDefinition = "geometry(MultiPolygon, 4326)")
     private Geometry geom;
+
+    @Column(columnDefinition = "geometry(MultiPoint, 4326)")
+    private Geometry entries;
 
     public Long getId() {
         return id;
@@ -40,12 +54,12 @@ public class Room {
         this.roomNo = roomNo;
     }
 
-    public Integer getLevel() {
-        return level;
+    public Integer getFloor() {
+        return floor;
     }
 
-    public void setLevel(Integer level) {
-        this.level = level;
+    public void setFloor(Integer floor) {
+        this.floor = floor;
     }
 
     public String getCategory() {
@@ -64,12 +78,28 @@ public class Room {
         this.name = name;
     }
 
-    public Boolean getNavigable() {
-        return navigable;
+    public Boolean getIsAccessible() {
+        return isAccessible;
     }
 
-    public void setNavigable(Boolean navigable) {
-        this.navigable = navigable;
+    public void setIsAccessible(Boolean isAccessible) {
+        this.isAccessible = isAccessible;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String[] getTags() {
+        return tags;
+    }
+
+    public void setTags(String[] tags) {
+        this.tags = tags;
     }
 
     public Building getBuilding() {
@@ -86,5 +116,13 @@ public class Room {
 
     public void setGeom(Geometry geom) {
         this.geom = geom;
+    }
+
+    public Geometry getEntries() {
+        return entries;
+    }
+
+    public void setEntries(Geometry entries) {
+        this.entries = entries;
     }
 }
