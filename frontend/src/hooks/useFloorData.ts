@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { FloorData } from "../types/types";
+import type { GeoJsonObject } from "geojson";
 
+const BASE_URL = "http://localhost:8080/api";
 
 export function useFloorData(floor: number, building: string) {
     const [data, setData] = useState<FloorData>({
@@ -18,7 +20,7 @@ export function useFloorData(floor: number, building: string) {
         setError(null);
 
         const urls = {
-            outline: `${BASE_PATH}/outline.geojson`,
+            outline: `${BASE_URL}/buildings/search?q=${building}`,
             units: `${BASE_PATH}/units.geojson`,
             paths: `${BASE_PATH}/paths.geojson`,
             pois: `${BASE_PATH}/poi.geojson`,
@@ -30,7 +32,29 @@ export function useFloorData(floor: number, building: string) {
             fetch(urls.paths).then((res) => res.json()),
             fetch(urls.pois).then((res) => res.json()),
         ])
-            .then(([buildingOutline, units, paths, pois]) => {
+            .then(([buildingResults, units, paths, pois]) => {
+                const found = buildingResults[0];
+
+                if (!found) throw new Error(`Building "${building}" not found`);
+
+                // sanitize: convert geom string → GeoJSON FeatureCollection
+                const buildingOutline = {
+                    type: "FeatureCollection",
+                    features: [
+                        {
+                            type: "Feature",
+                            properties: {
+                                id: found.id,
+                                name: found.name,
+                                floors: found.floors,
+                                isAccessible: found.isAccessible,
+                                tags: found.tags,
+                            },
+                            geometry: JSON.parse(found.geom),
+                        },
+                    ],
+                } as GeoJsonObject;
+
                 setData({ buildingOutline, units, paths, pois });
                 setLoading(false);
             })
