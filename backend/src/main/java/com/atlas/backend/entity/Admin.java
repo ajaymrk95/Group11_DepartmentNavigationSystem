@@ -1,4 +1,4 @@
-package com.atlas.backend.model;
+package com.atlas.backend.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
