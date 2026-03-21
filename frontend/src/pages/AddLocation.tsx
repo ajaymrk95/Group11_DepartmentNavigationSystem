@@ -1,7 +1,7 @@
 import { useState } from "react"
 import AddLocationForm from "../components/admincomponents/AddLocationForm"
 import AddLocationMap from "../components/admincomponents/AddLocationMap"
-import type { Location } from "../data/locations"
+import type { Location } from "../types/types"
 
 export default function AddLocation() {
   const [isPanelOpen, setIsPanelOpen] = useState(true)

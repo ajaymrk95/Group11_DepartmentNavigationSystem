@@ -1,15 +1,14 @@
 import { useNavigate } from "react-router-dom"
-import type { Location } from "../../data/locations"
+import type { Location } from "../../types/types"
 import SearchBar from "./SearchBar"
 import locationImage from "../../assets/image.png"
 
 type Props = {
-  locations: Location[]
   selectedLocation: Location | null
   onSelectLocation: (location: Location | null) => void
 }
 
-export default function RoutePanel({locations, selectedLocation, onSelectLocation }: Props) {
+export default function RoutePanel({selectedLocation, onSelectLocation }: Props) {
 
   const navigate = useNavigate()
 
@@ -35,7 +34,6 @@ return ( <div className="
   <div className="flex flex-col gap-6">
 
     <SearchBar
-      locations={locations}
       onSelect={onSelectLocation}
       onFocusSearch={clearSelectedLocation}
     />
@@ -62,17 +60,34 @@ return ( <div className="
 
         <div className="p-5 space-y-3">
 
-          <h3 className="text-lg font-semibold text-[#1A3263] leading-snug">
-            {selectedLocation.name}
-          </h3>
+          <div className="flex justify-between items-center">
+            <h3 className="font-semibold text-[#1a305b] text-md">
+            {selectedLocation.name.toUpperCase()}
+            </h3>
 
-          <div className="flex gap-4 text-xs font-medium text-[#1A3263]/60">
+            <span
+              className="
+                px-2.5 py-0.5
+                text-sm
+                rounded-full
+                bg-[#f0b35a]
+                border border-[#f0b35a]
+                text-[#1a305b]
+                font-medium
+              "
+            >
+              {selectedLocation.category?.toUpperCase()}
+            </span>
+          </div>
+
+          {selectedLocation.category === "INDOOR" && (<div className="flex gap-4 text-xs font-medium text-[#1A3263]/60">
             <p>Room {selectedLocation.room}</p>
 
             {selectedLocation.floor !== undefined && (
               <p>Floor {selectedLocation.floor}</p>
             )}
           </div>
+          )}
 
           {selectedLocation.description && (
             <p className="text-sm text-[#1A3263]/70 leading-relaxed">

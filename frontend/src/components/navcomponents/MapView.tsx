@@ -2,13 +2,14 @@ import "leaflet/dist/leaflet.css"
 
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet"
 import { type Graph } from "../../utils/buildGraph"
-import { type Location } from "../../data/locations"
+import { type Location } from "../../types/types"
 import L from "leaflet"
 import MapRecenter from "./MapRecenter"
 
+import { useState, useEffect } from "react" 
+
 type Props = {
   center: [number, number]
-  locations: Location[]
   start: Location | null
   destination: Location | null
   graph: Graph | null
@@ -44,7 +45,32 @@ const redIcon = new L.Icon({
   popupAnchor: [1, -34],
 })
 
-function MapView({ center, locations, start, destination, routeCoords, currentLocation, onSetMapDestination}: Props) {
+function MapView({ center, start, destination, routeCoords, currentLocation, onSetMapDestination}: Props) {
+
+  const [locations, setLocations] = useState<Location[]>([])
+  
+  useEffect(() => {
+    fetch("http://localhost:8080/locations")
+      .then(res => res.json())
+      .then(data => {
+        const mapped: Location[] = data
+        .filter((loc: any) => loc.latitude != null && loc.longitude != null)
+        .map((loc: any) => ({
+            id: loc.id,
+            name: loc.name,
+            room: loc.room ?? null,
+            category: loc.category ?? null,
+            description: loc.description ?? null,
+            latitude: loc.latitude,
+            longitude: loc.longitude,
+            tag: loc.tag || [],
+            floor: loc.floor ?? null,
+        }))
+        setLocations(mapped)
+      })
+      .catch(err => console.error("Failed to load locations:", err))
+  }, [])
+
   return (
     <div className="relative h-full w-full">
       <MapContainer 
@@ -63,7 +89,7 @@ function MapView({ center, locations, start, destination, routeCoords, currentLo
           if (start?.id === loc.id || destination?.id === loc.id) return null;
 
           return (
-            <Marker key={loc.id} position={loc.coords} icon={blueIcon}>
+            <Marker key={loc.id} position={[loc.latitude!, loc.longitude!]} icon={blueIcon}>
               <Popup>
                 <div className="flex flex-col gap-3 min-w-[140px] p-1">
                   <div className="font-bold text-[#1a305b] text-base border-b border-gray-200 pb-2">
@@ -93,12 +119,12 @@ function MapView({ center, locations, start, destination, routeCoords, currentLo
         )}
 
         {start && (
-          <Marker position={start.coords} icon={greenIcon}>
+          <Marker position={[start.latitude!, start.longitude!]} icon={greenIcon}>
             <Popup><span className="font-bold text-green-700">Start: {start.name}</span></Popup>
           </Marker>
         )}
         {destination && (
-          <Marker position={destination.coords} icon={greenIcon}>
+          <Marker position={[destination.latitude!, destination.longitude!]} icon={greenIcon}>
             <Popup><span className="font-bold text-green-700">Dest: {destination.name}</span></Popup>
           </Marker>
         )}
