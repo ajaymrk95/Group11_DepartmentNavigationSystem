@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import MapView from "../components/navcomponents/MapView"
 import RoutePanel from "../components/navcomponents/RoutePanel"
-import type { Location } from "../type/locations"
+import type { Location } from "../types/types"
 import { buildGraph, type Graph } from "../utils/buildGraph"
 import { findNearestNode } from "../utils/findNearestNode"
 import { shortestPath } from "../utils/shortestPath"
@@ -42,8 +42,8 @@ export default function OutdoorNav() {
     setStart(startLoc)
     setDestination(endLoc)
 
-    const startId = findNearestNode(graph, startLoc.coords)!
-    const endId = findNearestNode(graph, endLoc.coords)!
+    const startId = findNearestNode(graph, [startLoc.latitude!, startLoc.longitude!])!
+    const endId = findNearestNode(graph, [endLoc.latitude!, endLoc.longitude!])!
 
     const pathIds = shortestPath(graph, startId, endId)
     const coords = pathIds.map(id => graph.get(id)!.coord)
@@ -107,7 +107,7 @@ export default function OutdoorNav() {
           destination={destination}
           graph={graph}
           routeCoords={routeCoords}
-         
+          currentLocation={currentLocation}
           onSetMapDestination={(loc) => {
             setClickedDestination(loc)
             setIsPanelOpen(true) 

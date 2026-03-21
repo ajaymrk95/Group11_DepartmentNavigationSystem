@@ -53,16 +53,18 @@ function MapView({ center, start, destination, routeCoords, currentLocation, onS
     fetch("http://localhost:8080/locations")
       .then(res => res.json())
       .then(data => {
-        const mapped: Location[] = data.map((loc: any) => ({
-          id: loc.id,
-          name: loc.name,
-          room: loc.room,
-          type: loc.type,
-          category: loc.category,
-          description: loc.description,
-          coords: [loc.latitude, loc.longitude] as [number, number],
-          tag: loc.tag || [],
-          floor: loc.floor,
+        const mapped: Location[] = data
+        .filter((loc: any) => loc.latitude != null && loc.longitude != null)
+        .map((loc: any) => ({
+            id: loc.id,
+            name: loc.name,
+            room: loc.room ?? null,
+            category: loc.category ?? null,
+            description: loc.description ?? null,
+            latitude: loc.latitude,
+            longitude: loc.longitude,
+            tag: loc.tag || [],
+            floor: loc.floor ?? null,
         }))
         setLocations(mapped)
       })
@@ -87,7 +89,7 @@ function MapView({ center, start, destination, routeCoords, currentLocation, onS
           if (start?.id === loc.id || destination?.id === loc.id) return null;
 
           return (
-            <Marker key={loc.id} position={loc.coords} icon={blueIcon}>
+            <Marker key={loc.id} position={[loc.latitude!, loc.longitude!]} icon={blueIcon}>
               <Popup>
                 <div className="flex flex-col gap-3 min-w-[140px] p-1">
                   <div className="font-bold text-[#1a305b] text-base border-b border-gray-200 pb-2">
@@ -117,12 +119,12 @@ function MapView({ center, start, destination, routeCoords, currentLocation, onS
         )}
 
         {start && (
-          <Marker position={start.coords} icon={greenIcon}>
+          <Marker position={[start.latitude!, start.longitude!]} icon={greenIcon}>
             <Popup><span className="font-bold text-green-700">Start: {start.name}</span></Popup>
           </Marker>
         )}
         {destination && (
-          <Marker position={destination.coords} icon={greenIcon}>
+          <Marker position={[destination.latitude!, destination.longitude!]} icon={greenIcon}>
             <Popup><span className="font-bold text-green-700">Dest: {destination.name}</span></Popup>
           </Marker>
         )}

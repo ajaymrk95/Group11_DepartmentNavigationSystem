@@ -76,17 +76,59 @@ function Scanner() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#0d1a35",
+        backgroundColor: "#E8E2DB",
         fontFamily: "'Segoe UI', sans-serif",
         gap: "20px",
+        position: "relative",
       }}
     >
+      {/* Back button */}
+      <button
+        onClick={() => navigate("/outdoor-navigation")}
+        style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          backgroundColor: "#1A3263",
+          border: "1px solid #547792",
+          borderRadius: "10px",
+          padding: "10px 16px",
+          color: "#E8E2DB",
+          fontSize: "14px",
+          fontWeight: 500,
+          cursor: "pointer",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
+          transition: "background-color 0.2s, border-color 0.2s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = "#22407a";
+          e.currentTarget.style.borderColor = "#FAB95B";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = "#1A3263";
+          e.currentTarget.style.borderColor = "#547792";
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M15.5 5l-7 7 7 7"
+            stroke="#FAB95B"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        Manual Entry
+      </button>
+
       {/* Viewfinder */}
       <div
         id="reader"
         style={{
-          width: "min(75vw, 700px)",
-          height: "min(calc(min(85vh, 1000px) * 9 / 16), 90vh)",
+          width: "min(85vw, 500px)",
           overflow: "hidden",
           borderRadius: "16px",
           border: "2px solid #547792",

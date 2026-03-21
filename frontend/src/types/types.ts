@@ -29,16 +29,11 @@ export interface IndoorMapProps {
 export type Location = {
     id: number;
     name: string;
-    type: "building" | "lab" | "room" | "custom";
-    category: "INDOOR" | "OUTDOOR";
-    coords: [number, number];
-    parentLocationName?: string;
-    floor?: number;
-    room?: string;
-    tag?: string[];
-    description?: string;
-  }
-
-// descriptionMap.ts
-// description.ts
-export const defaultDescription = "Lorem ipsum dolor sit amet consectetur adipiscing elit quisque faucibus ex sapien vitae pellentesque sem placerat in id cursus mi.";
+    category: string | null;
+    room: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    tag: string[];
+    floor: number | null;
+    description: string | null;
+}

@@ -22,10 +22,10 @@ return ( <ul className="
  ">
 
 
-  {results.map((loc) => (
+  {results.map((loc, index) => (
 
     <li
-      key={loc.id}
+      key={index}
       onClick={() => onSelect(loc)}
       className="
         px-4 py-3
@@ -49,7 +49,7 @@ return ( <ul className="
             ? "bg-blue-100 text-blue-700"
             : "bg-green-100 text-blue-700"}
         `}>
-          {loc.category.toUpperCase()}
+          {loc.category != null && loc.category.toUpperCase()}
         </span>
       </div>
 

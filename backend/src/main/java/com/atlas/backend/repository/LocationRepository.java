@@ -11,27 +11,50 @@ import com.atlas.backend.entity.Location;
 
 public interface LocationRepository extends JpaRepository<Location, Long> {
 
-    @Query(value = """
-        SELECT 
-            l.id,
-            l.name,
-            ST_Y(ST_PointOnSurface(l.entries)) AS lat,
-            ST_X(ST_PointOnSurface(l.entries)) AS lng,
-            ARRAY_AGG(t.tag) AS tags,
-            l.floors
-        FROM buildings l
-        LEFT JOIN building_tag t ON l.id = t.building_id
-        WHERE l.id IN (
-            SELECT b.id
-            FROM buildings b
-            LEFT JOIN building_tag bt ON b.id = bt.building_id
-            WHERE 
-                LOWER(b.name) LIKE LOWER(CONCAT('%', :q, '%')) OR
-                LOWER(bt.tag) LIKE LOWER(CONCAT('%', :q, '%'))
+@Query(value = """
+    SELECT 
+        r.id,
+        r.name,
+        r.room_no,
+        r.category,
+        r.floor,
+        r.description,
+        r.tags,
+        ST_Y(ST_GeometryN(r.entries, 1)) AS lat,
+        ST_X(ST_GeometryN(r.entries, 1)) AS lng
+    FROM rooms r
+    WHERE 
+        LOWER(r.name) LIKE LOWER(CONCAT('%', :q, '%')) OR
+        LOWER(r.room_no) LIKE LOWER(CONCAT('%', :q, '%')) OR
+        EXISTS (
+            SELECT 1 
+            FROM unnest(r.tags) AS tag
+            WHERE LOWER(tag) LIKE LOWER(CONCAT('%', :q, '%'))
         )
-        GROUP BY l.id, l.name, l.entries, l.floors
-        """, nativeQuery = true)
-    List<Object[]> searchOutdoorLocations(@Param("q") String q);
+    """, nativeQuery = true)
+List<Object[]> searchRooms(@Param("q") String q);
+
+@Query(value = """
+    SELECT 
+        b.id,
+        b.name,
+        NULL AS room_no,
+        NULL AS category,
+        b.floors,
+        b.description,
+        b.tags,
+        ST_Y(ST_GeometryN(b.entries, 1)) AS lat,
+        ST_X(ST_GeometryN(b.entries, 1)) AS lng
+    FROM buildings b
+    WHERE 
+        LOWER(b.name) LIKE LOWER(CONCAT('%', :q, '%')) OR
+        EXISTS (
+            SELECT 1 
+            FROM unnest(b.tags) AS tag
+            WHERE LOWER(tag) LIKE LOWER(CONCAT('%', :q, '%'))
+        )
+    """, nativeQuery = true)
+List<Object[]> searchBuildings(@Param("q") String q);
 
     @Query(value = """
     SELECT le.entrances

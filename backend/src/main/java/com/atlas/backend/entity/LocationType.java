@@ -5,5 +5,5 @@ public enum LocationType {
     LAB,
     CONNECTION,
     CUSTOM,
-    ROOM
+    ROOM,
 }

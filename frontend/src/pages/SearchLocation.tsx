@@ -28,10 +28,10 @@ export default function SearchLocation() {
 
         <MapRecenter location={selectedLocation} />
 
-        {selectedLocation && (
-          <Marker position={selectedLocation.coords}>
-            <Popup>{selectedLocation.name}</Popup>
-          </Marker>
+        {selectedLocation && selectedLocation.latitude != null && selectedLocation.longitude != null && (
+            <Marker position={[selectedLocation.latitude, selectedLocation.longitude]}>
+                <Popup>{selectedLocation.name}</Popup>
+            </Marker>
         )}
 
       </MapContainer>
