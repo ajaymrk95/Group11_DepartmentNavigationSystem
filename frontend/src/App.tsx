@@ -3,7 +3,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminLogin from "./pages/AdminLogin";
 import OutdoorNav from "./pages/OutdoorNav"
 import AddLocation from "./pages/AddLocation"
-import EditLocation from "./pages/EditLocation"
+// import EditLocation from "./pages/EditLocation"
 import SearchLocation from "./pages/SearchLocation"
 import IndoorNavigation from "./pages/navigation/IndoorNav"
 import Scanner from "./components/searchcomponents/Scanner";
@@ -17,7 +17,7 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/outdoor-navigation" element={<OutdoorNav/>} />
         <Route path="/add-location" element={<AddLocation />} />
-        <Route path="/edit-location" element={<EditLocation />} />
+        {/* <Route path="/edit-location" element={<EditLocation />} /> */}
         <Route path="/search-location" element={<SearchLocation />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/indoor-navigation" element={<IndoorNavigation />} />

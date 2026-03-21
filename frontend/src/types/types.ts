@@ -25,3 +25,15 @@ export interface IndoorMapProps {
     /** Slot for extra UI rendered inside the header (e.g. route controls) */
     headerSlot?: React.ReactNode;
 }
+
+export type Location = {
+    id: number;
+    name: string;
+    category: string | null;
+    room: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    tag: string[];
+    floor: number | null;
+    description: string | null;
+}

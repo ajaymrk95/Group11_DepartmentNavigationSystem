@@ -1,9 +1,7 @@
 import { useState } from "react"
-import type { Location } from "../data/locations"
+import type { Location } from "../types/types"
 import RoutePanel from "../components/searchcomponents/RoutePanel"
 import MobileLocationSheet from "../components/searchcomponents/MobileLocationSheet"
-
-import { locations } from "../data/locations"
 
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 import MapRecenter from "../components/searchcomponents/MapRecenter"
@@ -17,7 +15,6 @@ export default function SearchLocation() {
     <div className="h-screen w-screen relative">
 
       {/* MAP */}
-
       <MapContainer
         center={[11.3215, 75.9339]}
         zoom={16}
@@ -26,38 +23,30 @@ export default function SearchLocation() {
 
         <TileLayer
           attribution="© OpenStreetMap contributors"
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* move map when location changes */}
         <MapRecenter location={selectedLocation} />
 
-        {/* marker for selected location */}
-        {selectedLocation && (
-          <Marker position={selectedLocation.coords}>
-            <Popup>{selectedLocation.name}</Popup>
-          </Marker>
+        {selectedLocation && selectedLocation.latitude != null && selectedLocation.longitude != null && (
+            <Marker position={[selectedLocation.latitude, selectedLocation.longitude]}>
+                <Popup>{selectedLocation.name}</Popup>
+            </Marker>
         )}
 
       </MapContainer>
 
-
       {/* DESKTOP PANEL */}
-
       <div className="hidden md:block absolute left-0 top-0 h-full w-[420px] z-50">
         <RoutePanel
-          locations={locations}
           selectedLocation={selectedLocation}
           onSelectLocation={setSelectedLocation}
         />
       </div>
 
-
-      {/* MOBILE BOTTOM SHEET */}
-
+      {/* MOBILE */}
       <div className="md:hidden">
         <MobileLocationSheet
-          locations={locations}
           selectedLocation={selectedLocation}
           onSelectLocation={setSelectedLocation}
         />
