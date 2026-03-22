@@ -49,6 +49,25 @@ export interface MapBoundsControllerProps {
     geojsonData: GeoJsonObject[];
 }
 
+
+export interface BuildingData {
+    id: number;
+    name: string;
+    floors: number;
+    isAccessible: boolean;
+    tags: string[];
+    outline: GeoJsonObject;
+}
+
+export interface FloorLayerData {
+    units: GeoJsonObject | null;
+    paths: GeoJsonObject | null;
+    pois: GeoJsonObject | null;
+    loading: boolean;
+    error: string | null;
+}
+
+
 export type Location = {
     id: number;
     name: string;

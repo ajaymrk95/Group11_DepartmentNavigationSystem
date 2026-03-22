@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import type { GeoJsonObject } from "geojson";
 
 import type { IndoorMapProps } from "../../types/types";
+import { useBuildingData } from "../../hooks/useBuildingData";
 import { useFloorData } from "../../hooks/useFloorData";
 import { routeStyle } from "../../utils/indoormap/mapStyles";
 import { MapBoundsController } from "./MapBoundsController";
@@ -16,16 +17,27 @@ const MAP_CENTER: [number, number] = [11.322591, 75.93372];
 export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapProps) {
     if (!building) return null;
 
-    const [floor, setFloor] = useState<number>(floorNo ? floorNo : 1);
+    const [floor, setFloor] = useState<number>(floorNo ?? 1);
 
-    const { buildingOutline, units, paths, pois, loading, error } =
-        useFloorData(floor, building);
+    const { data: buildingData, loading: buildingLoading, error: buildingError } =
+        useBuildingData(building);
+
+    const { units, paths, pois, loading: floorLoading, error: floorError } =
+        useFloorData(buildingData?.id ?? null, floor, building);
+
+    const loading = buildingLoading || floorLoading;
+    const error = buildingError || floorError;
 
     useEffect(() => {
-        if (!loading && !error) {
-            onDataLoad?.({ buildingOutline, units, paths, pois });
+        if (!loading && !error && buildingData) {
+            onDataLoad?.({
+                buildingOutline: buildingData.outline,
+                units,
+                paths,
+                pois,
+            });
         }
-    }, [buildingOutline, units, paths, pois, loading, error, onDataLoad]);
+    }, [buildingData, units, paths, pois, loading, error, onDataLoad]);
 
     if (loading) {
         return (
@@ -43,7 +55,7 @@ export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapPro
         );
     }
 
-    const allLayers = [buildingOutline, units, paths, pois].filter(
+    const allLayers = [buildingData?.outline, units, paths, pois].filter(
         Boolean
     ) as GeoJsonObject[];
 
@@ -66,7 +78,7 @@ export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapPro
                 />
                 <MapLayers
                     floor={floor}
-                    buildingOutline={buildingOutline}
+                    buildingOutline={buildingData?.outline ?? null}
                     units={units}
                     paths={paths}
                     pois={pois}

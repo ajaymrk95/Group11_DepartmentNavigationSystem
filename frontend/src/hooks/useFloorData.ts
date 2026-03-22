@@ -1,65 +1,39 @@
 import { useEffect, useState } from "react";
-import type { FloorData } from "../types/types";
-import type { GeoJsonObject } from "geojson";
+import type { FloorLayerData } from "../types/types";
 
 const BASE_URL = "http://localhost:8080/api";
 
-export function useFloorData(floor: number, building: string) {
-    const [data, setData] = useState<FloorData>({
-        buildingOutline: null,
+
+
+export function useFloorData(buildingId: number | null, floor: number, building: string) {
+    const [data, setData] = useState<FloorLayerData>({
         units: null,
         paths: null,
         pois: null,
+        loading: true,
+        error: null,
     });
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
     const BASE_PATH = `/${building}/floor${floor}`;
 
     useEffect(() => {
-        setLoading(true);
-        setError(null);
+        if (!buildingId) return;
 
-        // First fetch building to get its id
-        fetch(`${BASE_URL}/buildings/search?q=${encodeURIComponent(building)}`)
-            .then((res) => res.json())
-            .then((buildingResults) => {
-                const found = buildingResults[0];
-                if (!found) throw new Error(`Building "${building}" not found`);
+        setData((prev) => ({ ...prev, loading: true, error: null }));
 
-                const buildingOutline = {
-                    type: "FeatureCollection",
-                    features: [
-                        {
-                            type: "Feature",
-                            properties: {
-                                id: found.id,
-                                name: found.name,
-                                floors: found.floors,
-                                isAccessible: found.isAccessible,
-                                tags: found.tags,
-                            },
-                            geometry: JSON.parse(found.geom),
-                        },
-                    ],
-                } as GeoJsonObject;
-
-                // Fetch units from API, paths and pois from local files
-                return Promise.all([
-                    fetch(`${BASE_URL}/rooms?buildingId=${found.id}&floor=${floor}`).then((res) => res.json()),
-                    fetch(`${BASE_PATH}/paths.geojson`).then((res) => res.json()),
-                    fetch(`${BASE_PATH}/poi.geojson`).then((res) => res.json()),
-                ]).then(([units, paths, pois]) => {
-                    setData({ buildingOutline, units, paths, pois });
-                    setLoading(false);
-                });
+        Promise.all([
+            fetch(`${BASE_URL}/rooms?buildingId=${buildingId}&floor=${floor}`).then((res) => res.json()),
+            fetch(`${BASE_PATH}/paths.geojson`).then((res) => res.ok ? res.json() : null),
+            fetch(`${BASE_PATH}/poi.geojson`).then((res) => res.ok ? res.json() : null),
+        ])
+            .then(([units, paths, pois]) => {
+                setData({ units, paths, pois, loading: false, error: null });
             })
             .catch((err) => {
-                console.error("Error loading GeoJSON:", err);
-                setError("Failed to load floor data.");
-                setLoading(false);
+                console.error("Error loading floor data:", err);
+                setData((prev) => ({ ...prev, loading: false, error: "Failed to load floor data." }));
             });
-    }, [floor, building]);
+    }, [buildingId, floor]); // only re-fetches when floor or buildingId changes
 
-    return { ...data, loading, error };
+    return data;
 }
