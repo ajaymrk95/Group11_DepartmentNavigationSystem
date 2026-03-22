@@ -57,6 +57,10 @@ public class BuildingController {
                 .collect(Collectors.toList());
     }
 
+    // Use the below function to update the access and sync with rooms
+    // id : building id, isAccessible: bool true/false
+    // buildingService.updateAccess(id, isAccessible);
+
     private Map<String, Object> toMap(Building b) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", b.getId());
