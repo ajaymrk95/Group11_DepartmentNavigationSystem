@@ -3,7 +3,7 @@ package com.atlas.backend.service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
-
+import com.atlas.backend.annotation.Auditable;
 import org.springframework.stereotype.Service;
 
 import com.atlas.backend.dto.LocationDTO;
@@ -85,5 +85,7 @@ public class LocationService {
             loc.getDescription()      // add description
         );
     }
+
+    
     
 }

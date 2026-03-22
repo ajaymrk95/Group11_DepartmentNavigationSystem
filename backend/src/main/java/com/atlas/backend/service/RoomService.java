@@ -1,16 +1,16 @@
 package com.atlas.backend.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.atlas.backend.annotation.Auditable;
 import com.atlas.backend.dto.RoomRequest;
 import com.atlas.backend.entity.Building;
 import com.atlas.backend.entity.Room;
 import com.atlas.backend.repository.BuildingRepository;
 import com.atlas.backend.repository.RoomRepository;
 import com.atlas.backend.utils.GeoUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class RoomService {
@@ -21,6 +21,7 @@ public class RoomService {
     @Autowired
     private BuildingRepository buildingRepository;
 
+    @Auditable(action = "CREATE", entityType = "Room")
     public Room save(RoomRequest req) throws Exception {
         Building building = buildingRepository.findById(req.getBuildingId()).orElseThrow();
         Room r = new Room();
