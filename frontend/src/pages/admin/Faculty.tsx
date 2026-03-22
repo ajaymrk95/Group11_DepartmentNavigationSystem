@@ -234,7 +234,9 @@ export default function Faculty() {
     try {
       const res = await fetch("http://localhost:8080/api/rooms/all");
       if (res.ok) setRooms(await res.json());
-    } catch {}
+    } catch {
+      setError("Could not load faculty records.");
+    }
   }
 
   async function fetchAll() {
@@ -617,6 +619,7 @@ export default function Faculty() {
                 {deleting ? "Deleting…" : "Delete"}
               </button>
             </div>
+
           </div>
         </div>
       )}
