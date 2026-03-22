@@ -45,4 +45,10 @@ public class RoomService {
     public List<Room> findAll() {
         return roomRepository.findAll();
     }
+
+    public Room updateAccess(Long id, Boolean isAccessible) {
+        Room r = roomRepository.findById(id).orElseThrow();
+        r.setIsAccessible(isAccessible);
+        return roomRepository.save(r);
+    }
 }

@@ -52,6 +52,13 @@ public class RoomController {
         return featureCollection;
     }
 
+    // PATCH /api/rooms/1/access?isAccessible=false
+    @PatchMapping("/{id}/access")
+    public Map<String, Object> toggleAccess(@PathVariable Long id,
+                                            @RequestParam Boolean isAccessible) {
+        return toRoomFeature(roomService.updateAccess(id, isAccessible));
+    }
+
     // Flat summary for dropdown use (no geometry)
     private Map<String, Object> toRoomSummary(Room r) {
         Map<String, Object> map = new HashMap<>();
