@@ -85,7 +85,11 @@ export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapPro
                 />
                 <RoomLabels key={`labels-${floor}`} units={units} />
                 <MapBoundsController geojsonData={allLayers} />
-                <FloorToggle currentFloor={floor} onChange={setFloor} />
+                <FloorToggle
+                    currentFloor={floor}
+                    onChange={setFloor}
+                    floors={buildingData?.floors ?? 1}
+                />
                 {route && route.length > 0 && (
                     <Polyline positions={route} pathOptions={routeStyle} />
                 )}

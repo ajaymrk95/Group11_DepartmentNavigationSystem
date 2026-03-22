@@ -39,6 +39,7 @@ export interface RouteControlsProps {
 export interface FloorToggleProps {
     currentFloor: number;
     onChange: (floor: number) => void;
+    floors: number;
 }
 
 export interface MapLayersProps extends FloorData {

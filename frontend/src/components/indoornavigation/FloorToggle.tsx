@@ -4,16 +4,12 @@ import { useEffect, useState } from "react";
 import L from "leaflet";
 import type { FloorToggleProps } from "../../types/types";
 
-const FLOORS: number[] = [2, 1];
-
-/**
- * Renders the floor toggle as a Leaflet topright control so it sits
- * physically inside the map canvas rather than in the header.
- */
-export function FloorToggle({ currentFloor, onChange }: FloorToggleProps) {
+export function FloorToggle({ currentFloor, onChange, floors }: FloorToggleProps) {
     const map = useMap();
-    // Track the DOM node Leaflet gives us so React can portal into it
     const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
+
+    // Generate floor array from total floors e.g. 3 → [3, 2, 1]
+    const FLOORS = Array.from({ length: floors }, (_, i) => floors - i);
 
     useEffect(() => {
         const Control = L.Control.extend({
@@ -28,7 +24,6 @@ export function FloorToggle({ currentFloor, onChange }: FloorToggleProps) {
                 setMountNode(null);
             },
         });
-
         const control = new Control({ position: "topright" });
         control.addTo(map);
         return () => { control.remove(); };
@@ -43,9 +38,9 @@ export function FloorToggle({ currentFloor, onChange }: FloorToggleProps) {
                     key={floor}
                     onClick={() => onChange(floor)}
                     aria-pressed={currentFloor === floor}
-                    className={`w-8 h-8 text-sm text-[#1A3263] font-bold transition-colors duration-200 ${currentFloor === floor
-                        ? "bg-[#1A3263] text-white"
-                        : "bg-white text-gray-800 hover:bg-gray-100"
+                    className={`w-8 h-8 text-sm font-bold transition-colors duration-200 border-b-2 border-[#1A3263] last:border-b-0 ${currentFloor === floor
+                            ? "bg-[#1A3263] text-white"
+                            : "bg-white text-[#1A3263] hover:bg-gray-100"
                         }`}
                 >
                     {floor}
