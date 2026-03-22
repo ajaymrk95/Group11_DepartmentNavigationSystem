@@ -62,4 +62,20 @@ public class BuildingService {
         return b;
     }
 
+    @Auditable(action = "UPDATE", entityType = "Building")
+public Building update(Long id, String name, String description, Integer floors,
+        Boolean isAccessible, String[] tags, JsonNode geoJson,
+        List<List<Double>> entries) throws Exception {
+    Building b = buildingRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Building not found: " + id));
+    b.setName(name);
+    if (description != null) b.setDescription(description);
+    if (floors      != null) b.setFloors(floors);
+    if (isAccessible!= null) b.setIsAccessible(isAccessible);
+    if (tags        != null) b.setTags(tags);
+    if (geoJson     != null) b.setGeom(GeoUtil.fromGeoJson(geoJson.toString()));
+    if (entries     != null) b.setEntries(GeoUtil.toMultiPoint(entries));
+    return buildingRepository.save(b);
+}
+
 }

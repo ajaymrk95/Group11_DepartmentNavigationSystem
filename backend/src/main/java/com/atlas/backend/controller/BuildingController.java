@@ -57,9 +57,27 @@ public class BuildingController {
                 .collect(Collectors.toList());
     }
 
+
     // Use the below function to update the access and sync with rooms
     // id : building id, isAccessible: bool true/false
     // buildingService.updateAccess(id, isAccessible);
+
+@PutMapping("/{id}")
+public Map<String, Object> update(@PathVariable Long id,
+        @RequestBody BuildingRequest body) throws Exception {
+    Building b = buildingService.update(
+            id, body.getName(), body.getDescription(),
+            body.getFloors(), body.getIsAccessible(),
+            body.getTags(), body.getGeoJson(), body.getEntries());
+    return toMap(b);
+}
+
+@PatchMapping("/{id}/accessible")
+public Map<String, Object> updateAccess(@PathVariable Long id,
+        @RequestBody Map<String, Boolean> body) {
+    Building b = buildingService.updateAccess(id, body.get("isAccessible"));
+    return toMap(b);
+}
 
     private Map<String, Object> toMap(Building b) {
         Map<String, Object> map = new HashMap<>();
