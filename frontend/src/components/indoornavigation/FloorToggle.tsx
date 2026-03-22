@@ -2,13 +2,9 @@ import { createPortal } from "react-dom";
 import { useMap } from "react-leaflet";
 import { useEffect, useState } from "react";
 import L from "leaflet";
+import type { FloorToggleProps } from "../../types/types";
 
 const FLOORS: number[] = [2, 1];
-
-interface FloorToggleProps {
-    currentFloor: number;
-    onChange: (floor: number) => void;
-}
 
 /**
  * Renders the floor toggle as a Leaflet topright control so it sits

@@ -36,6 +36,19 @@ export interface RouteControlsProps {
     setTo: (value: string) => void;
 }
 
+export interface FloorToggleProps {
+    currentFloor: number;
+    onChange: (floor: number) => void;
+}
+
+export interface MapLayersProps extends FloorData {
+    floor: number;
+}
+
+export interface MapBoundsControllerProps {
+    geojsonData: GeoJsonObject[];
+}
+
 export type Location = {
     id: number;
     name: string;
