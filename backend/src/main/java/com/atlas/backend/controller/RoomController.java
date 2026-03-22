@@ -1,5 +1,7 @@
 package com.atlas.backend.controller;
 
+import org.springframework.http.ResponseEntity;
+import com.atlas.backend.dto.RoomSummaryResponse;
 import com.atlas.backend.dto.RoomRequest;
 import com.atlas.backend.entity.Room;
 import com.atlas.backend.service.RoomService;
@@ -85,5 +87,33 @@ public class RoomController {
                 : null);
 
         return feature;
+    }
+
+    @GetMapping("/admin")
+    public List<RoomSummaryResponse> getAllRoomsForAdmin() {
+        return roomService.getAllRoomSummaries();
+    }
+
+    @PatchMapping("/{id}/accessible")
+    public ResponseEntity<Map<String, Object>> updateAccessible(
+            @PathVariable Long id,
+            @RequestBody Map<String, Boolean> body) {
+        Boolean accessible = body.get("accessible");
+        if (accessible == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "accessible field is required"));
+        }
+        roomService.updateAccessible(id, accessible);
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("id", id);
+        response.put("accessible", accessible);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> update(@PathVariable Long id,
+        @RequestBody RoomRequest body) throws Exception {
+        Room r = roomService.update(id, body);
+        return ResponseEntity.ok(toRoomFeature(r));
     }
 }

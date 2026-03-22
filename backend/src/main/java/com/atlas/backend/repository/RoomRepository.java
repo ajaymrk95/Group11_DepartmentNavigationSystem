@@ -1,5 +1,6 @@
 package com.atlas.backend.repository;
 
+import com.atlas.backend.dto.RoomSummaryResponse;
 import com.atlas.backend.entity.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -45,4 +46,16 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
         """)
     void updateAccessibilityByBuildingId(@Param("buildingId") Long buildingId,
                                         @Param("isAccessible") Boolean isAccessible);
+
+    @Query("""
+        SELECT new com.atlas.backend.dto.RoomSummaryResponse(
+            r.id, r.name, r.roomNo, r.category,
+            r.floor, r.isAccessible, r.description,
+            r.tags, r.building.id, r.building.name
+        )
+        FROM Room r
+        LEFT JOIN r.building b
+        ORDER BY r.building.id, r.floor, r.roomNo
+    """)
+    List<RoomSummaryResponse> findAllRoomSummaries();
 }
