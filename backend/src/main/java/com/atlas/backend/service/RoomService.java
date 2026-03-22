@@ -9,6 +9,7 @@ import com.atlas.backend.repository.RoomRepository;
 import com.atlas.backend.utils.GeoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -39,5 +40,9 @@ public class RoomService {
 
     public List<Room> findByFloor(Long buildingId, Integer floor) {
         return roomRepository.findByBuildingIdAndFloor(buildingId, floor);
+    }
+
+    public List<Room> findAll() {
+        return roomRepository.findAll();
     }
 }
