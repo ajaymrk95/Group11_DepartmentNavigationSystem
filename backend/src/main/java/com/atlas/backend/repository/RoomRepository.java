@@ -4,6 +4,8 @@ import com.atlas.backend.entity.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.jpa.repository.Modifying;
 import java.util.List;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
@@ -33,4 +35,14 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             """, nativeQuery = true)
     List<Room> findRoomsInsideBuilding(@Param("buildingId") Long buildingId,
             @Param("floor") Integer floor);
+
+    @Modifying
+    @Transactional
+    @Query("""
+        UPDATE Room r
+        SET r.isAccessible = :isAccessible
+        WHERE r.building.id = :buildingId
+        """)
+    void updateAccessibilityByBuildingId(@Param("buildingId") Long buildingId,
+                                        @Param("isAccessible") Boolean isAccessible);
 }

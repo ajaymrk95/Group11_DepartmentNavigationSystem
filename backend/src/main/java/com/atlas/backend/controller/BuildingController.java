@@ -57,6 +57,13 @@ public class BuildingController {
                 .collect(Collectors.toList());
     }
 
+    // PATCH /api/buildings/11/access?isAccessible=false
+    @PatchMapping("/{id}/access")
+    public Map<String, Object> toggleAccess(@PathVariable Long id,
+            @RequestParam Boolean isAccessible) {
+        return toMap(buildingService.updateAccess(id, isAccessible));
+    }
+
     private Map<String, Object> toMap(Building b) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", b.getId());
