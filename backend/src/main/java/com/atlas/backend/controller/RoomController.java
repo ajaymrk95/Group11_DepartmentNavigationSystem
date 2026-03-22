@@ -28,6 +28,15 @@ public class RoomController {
         return toRoomFeature(r);
     }
 
+    // GET /api/rooms/all — returns all rooms as a flat list for dropdowns
+    @GetMapping("/all")
+    public List<Map<String, Object>> getAllRooms() {
+        return roomService.findAll()
+                .stream()
+                .map(this::toRoomSummary)
+                .collect(Collectors.toList());
+    }
+
     // GET /api/rooms?buildingId=1&floor=1
     @GetMapping
     public Map<String, Object> getFloorRooms(@RequestParam Long buildingId,
@@ -43,6 +52,19 @@ public class RoomController {
         featureCollection.put("features", features);
 
         return featureCollection;
+    }
+
+    // Flat summary for dropdown use (no geometry)
+    private Map<String, Object> toRoomSummary(Room r) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", r.getId());
+        map.put("roomNo", r.getRoomNo());
+        map.put("name", r.getName());
+        map.put("floor", r.getFloor());
+        map.put("category", r.getCategory());
+        map.put("buildingId", r.getBuilding() != null ? r.getBuilding().getId() : null);
+        map.put("buildingName", r.getBuilding() != null ? r.getBuilding().getName() : null);
+        return map;
     }
 
     private Map<String, Object> toRoomFeature(Room r) {

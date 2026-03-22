@@ -26,7 +26,7 @@ public class LocationController {
     }
 
     @GetMapping
-    public List<LocationDTO> getAllLocations(){
+    public List<LocationDTO> getAllLocations(){ 
         return service.getAllLocations();
     }
 }
