@@ -19,8 +19,6 @@ export function useFloorData(floor: number, building: string) {
     useEffect(() => {
         setLoading(true);
         setError(null);
-        console.log(building);
-        console.log(floor);
 
         // First fetch building to get its id
         fetch(`${BASE_URL}/buildings/search?q=${encodeURIComponent(building)}`)
@@ -46,26 +44,15 @@ export function useFloorData(floor: number, building: string) {
                     ],
                 } as GeoJsonObject;
 
-                console.log(BASE_PATH);
-
-                // Then fetch units, paths, pois in parallel using buildingId
+                // Fetch units from API, paths and pois from local files
                 return Promise.all([
-                    fetch(`${BASE_URL}/rooms?buildingId=${found.id}&floor=${floor}`)
-                        .then((res) => res.json()),
-                    fetch(`${BASE_PATH}/paths.geojson`)
-                        .then((res) => {
-                            console.log("paths status:", res.status);
-                            return res.json();
-                        }),
-                    fetch(`${BASE_PATH}/poi.geojson`)
-                        .then((res) => {
-                            console.log("poi status:", res.status);
-                            return res.json();  
-                        }),
+                    fetch(`${BASE_URL}/rooms?buildingId=${found.id}&floor=${floor}`).then((res) => res.json()),
+                    fetch(`${BASE_PATH}/paths.geojson`).then((res) => res.json()),
+                    fetch(`${BASE_PATH}/poi.geojson`).then((res) => res.json()),
                 ]).then(([units, paths, pois]) => {
                     setData({ buildingOutline, units, paths, pois });
                     setLoading(false);
-                  });
+                });
             })
             .catch((err) => {
                 console.error("Error loading GeoJSON:", err);
