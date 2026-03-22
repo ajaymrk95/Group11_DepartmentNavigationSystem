@@ -11,7 +11,7 @@ interface LogEntry {
   timestamp: string;
 }
 
-const PAGE_SIZE    = 15;
+const PAGE_SIZE    = 12;
 const ACTIONS      = ["All", "CREATE", "UPDATE", "DELETE"];
 const ENTITY_TYPES = ["All", "Building", "Room", "Faculty", "Location"];
 

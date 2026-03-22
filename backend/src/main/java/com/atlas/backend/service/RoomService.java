@@ -47,13 +47,14 @@ public class RoomService {
         return roomRepository.findAllRoomSummaries();
     }
 
-    public void updateAccessible(Long id, Boolean accessible) {
-        Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Room not found with id: " + id));
-        room.setIsAccessible(accessible);
-        roomRepository.save(room);
-    }
-
+   @Auditable(action = "UPDATE", entityType = "Room")
+public Room updateAccessible(Long id, Boolean accessible) {
+    Room room = roomRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Room not found with id: " + id));
+    room.setIsAccessible(accessible);
+    return roomRepository.save(room);  // ← return the saved entity
+}
+     @Auditable(action = "UPDATE", entityType = "Room")
     public Room update(Long id, RoomRequest body) throws Exception {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found with id: " + id));
