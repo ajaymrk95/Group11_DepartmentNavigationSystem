@@ -33,7 +33,9 @@ const AdminLogin = () => {
       });
 
       if (response.ok) {
-        navigate("/admin/dashboard");
+        // store a flag or token so AdminLayout knows user is authenticated
+         localStorage.setItem('token', 'authenticated');
+          navigate("/admin/dashboard");
       } else {
         const message = await response.text();
         setError(message || "Invalid username or password.");
