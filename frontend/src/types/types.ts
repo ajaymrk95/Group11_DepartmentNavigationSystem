@@ -28,6 +28,14 @@ export interface IndoorMapProps {
     headerSlot?: React.ReactNode;
 }
 
+export interface RouteControlsProps {
+    from: string;
+    to: string;
+    noRouteFound: boolean;
+    setFrom: (value: string) => void;
+    setTo: (value: string) => void;
+}
+
 export type Location = {
     id: number;
     name: string;
