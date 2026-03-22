@@ -1,19 +1,13 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import MapView from "../components/navcomponents/MapView"
 import RoutePanel from "../components/navcomponents/RoutePanel"
 import type { Location } from "../types/types"
-import { buildGraph, type Graph } from "../utils/buildGraph"
-import { findNearestNode } from "../utils/findNearestNode"
-import { shortestPath } from "../utils/shortestPath"
 import LocateButton from "../components/navcomponents/LocateButton"
-import { distance } from "../utils/distance"
 import { useCurrentLocation } from "../hooks/useCurrentLocation"
-
 
 const DEFAULT_CENTER: [number, number] = [11.3210, 75.9346]
 
 export default function OutdoorNav() {
-  const [graph, setGraph] = useState<Graph | null>(null)
   const [start, setStart] = useState<Location | null>(null)
   const [destination, setDestination] = useState<Location | null>(null)
   const [routeCoords, setRouteCoords] = useState<[number, number][]>([])
@@ -25,41 +19,43 @@ export default function OutdoorNav() {
   // Controls whether the sidebar is visible on mobile
   const [isPanelOpen, setIsPanelOpen] = useState(true)
 
-  const { location: currentLocation } = useCurrentLocation();
-
+  const { location: currentLocation } = useCurrentLocation()
 
   const [center, setCenter] = useState<[number, number]>(DEFAULT_CENTER)
 
-  useEffect(() => {
-    fetch("/nitc_roads.geojson")
-      .then(r => r.json())
-      .then(data => setGraph(buildGraph(data)))
-  }, [])
-
-  function handleRoute(startLoc: Location, endLoc: Location) {
-    if (!graph) return
-
+  async function handleRoute(startLoc: Location, endLoc: Location) {
     setStart(startLoc)
     setDestination(endLoc)
+    
+    // Switch distance text to indicate loading
+    setDistanceText("Calculating route...")
 
-    const startId = findNearestNode(graph, [startLoc.latitude!, startLoc.longitude!])!
-    const endId = findNearestNode(graph, [endLoc.latitude!, endLoc.longitude!])!
+    try {
+      const url = `http://localhost:8080/api/routes/navigate?startLat=${startLoc.latitude}&startLng=${startLoc.longitude}&endLat=${endLoc.latitude}&endLng=${endLoc.longitude}`
+      const res = await fetch(url)
 
-    const pathIds = shortestPath(graph, startId, endId)
-    const coords = pathIds.map(id => graph.get(id)!.coord)
+      if (!res.ok) {
+        throw new Error("Route not found. Make sure points are accessible.")
+      }
 
-    setRouteCoords(coords)
+      const route = await res.json()
+      
+      // route.coordinates return [lng, lat], we need [lat, lng] for Leaflet Polyline
+      const latLngCoords = route.coordinates.map((coord: number[]) => [coord[1], coord[0]] as [number, number])
+      
+      setRouteCoords(latLngCoords)
 
-    let total = 0
-    for (let i = 0; i < coords.length - 1; i++) {
-      total += distance(coords[i], coords[i + 1])
+      const distMeters = route.properties.distanceMeters
+      setDistanceText(
+        distMeters < 1000
+          ? Math.round(distMeters) + " m"
+          : (distMeters / 1000).toFixed(2) + " km"
+      )
+    } catch (err: any) {
+      console.error(err)
+      setDistanceText("Error calculating route")
+      setRouteCoords([])
     }
-
-    setDistanceText(
-      total < 1
-        ? Math.round(total * 1000) + " m"
-        : total.toFixed(2) + " km"
-    )
   }
 
   return (
@@ -105,7 +101,6 @@ export default function OutdoorNav() {
           center={center}
           start={start}
           destination={destination}
-          graph={graph}
           routeCoords={routeCoords}
           currentLocation={currentLocation}
           onSetMapDestination={(loc) => {

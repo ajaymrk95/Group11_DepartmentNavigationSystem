@@ -1,7 +1,6 @@
 import "leaflet/dist/leaflet.css"
 
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet"
-import { type Graph } from "../../utils/buildGraph"
 import { type Location } from "../../types/types"
 import L from "leaflet"
 import MapRecenter from "./MapRecenter"
@@ -12,7 +11,6 @@ type Props = {
   center: [number, number]
   start: Location | null
   destination: Location | null
-  graph: Graph | null
   routeCoords: [number, number][]
   currentLocation?: [number, number] | null
   onSetMapDestination: (loc: Location) => void  
