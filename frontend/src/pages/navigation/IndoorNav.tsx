@@ -1,5 +1,6 @@
 import IndoorMap from "../../components/indoornavigation/IndoorMap";
 import { useNavigation } from "../../hooks/useNavigate";
+import { useParams, useSearchParams } from "react-router-dom";
 
 // All POI names from elhc_poi_1.geojson
 const POI_OPTIONS = [
@@ -26,6 +27,10 @@ const selectClass =
  * All pathfinding logic lives in useNavigation — this component is pure UI.
  */
 export function NavigationPage() {
+    const { building } = useParams<{ building: string }>();
+    const [searchParams] = useSearchParams();
+    const floor = Number(searchParams.get("floor")) || 1;
+
     const { from, to, route, noRouteFound, setFrom, setTo, onDataLoad } =
         useNavigation();
 
@@ -67,6 +72,8 @@ export function NavigationPage() {
 
     return (
         <IndoorMap
+            building = {building}
+            floorNo = {floor}
             route={route}
             onDataLoad={onDataLoad}
             headerSlot={routeControls}

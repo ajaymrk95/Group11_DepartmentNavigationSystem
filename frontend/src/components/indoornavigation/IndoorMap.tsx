@@ -14,10 +14,13 @@ import { MapLayers } from "./MapLayers";
 const MAP_CENTER: [number, number] = [11.322591, 75.93372];
 
 
-export function IndoorMap({ route, onDataLoad, headerSlot }: IndoorMapProps) {
-    const [floor, setFloor] = useState<number>(1);
+export function IndoorMap({ building, floorNo, route, onDataLoad, headerSlot }: IndoorMapProps) {
+    if (!building) return null;
+    
+    const [floor, setFloor] = useState<number>(floorNo ? floorNo : 1);
+
     const { buildingOutline, units, paths, pois, loading, error } =
-        useFloorData(floor, "elhc");
+        useFloorData(floor, building);
 
     useEffect(() => {
         if (!loading && !error) {

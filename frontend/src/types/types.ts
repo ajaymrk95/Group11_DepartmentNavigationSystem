@@ -18,6 +18,8 @@ export type UnitCategory = "toilet" | "classroom" | "office" | "lab";
 export type RouteLatLngs = [number, number][];
 
 export interface IndoorMapProps {
+    building: string | undefined;
+    floorNo?: number;
     /** Rendered as a highlighted polyline when provided */
     route?: RouteLatLngs | null;
     /** Called once whenever floor data finishes loading */
