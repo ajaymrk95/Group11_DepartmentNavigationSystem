@@ -1,5 +1,6 @@
 package com.atlas.backend.service;
 
+import com.atlas.backend.annotation.Auditable;
 import com.atlas.backend.entity.Building;
 import com.atlas.backend.repository.BuildingRepository;
 import com.atlas.backend.utils.GeoUtil;

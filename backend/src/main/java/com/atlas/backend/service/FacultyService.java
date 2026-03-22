@@ -1,5 +1,6 @@
 package com.atlas.backend.service;
 
+import com.atlas.backend.annotation.Auditable;
 import com.atlas.backend.dto.FacultyRequest;
 import com.atlas.backend.entity.Faculty;
 import com.atlas.backend.entity.Room;

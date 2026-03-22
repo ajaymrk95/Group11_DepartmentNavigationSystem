@@ -1,5 +1,6 @@
 package com.atlas.backend.service;
 
+import com.atlas.backend.annotation.Auditable;
 import com.atlas.backend.entity.Log;
 import com.atlas.backend.repository.LogRepository;
 import org.springframework.stereotype.Service;
