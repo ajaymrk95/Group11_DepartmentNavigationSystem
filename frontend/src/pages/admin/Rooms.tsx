@@ -562,8 +562,10 @@ export default function Rooms() {
 
   useEffect(() => {
     fetch("http://localhost:8080/api/buildings")
-      .then(r => r.json())
-      .then(data => setBuildings(data.map((b: any) => ({ id: b.id, name: b.name }))));
+  .then(r => r.json())
+  .then((data: { id: number; name: string }[]) =>
+    setBuildings(data.map(b => ({ id: b.id, name: b.name })))
+  );
   }, []);
 
   const fetchRooms = () => {
