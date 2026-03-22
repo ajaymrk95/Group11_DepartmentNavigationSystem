@@ -96,19 +96,19 @@ public class RoomController {
 
     @PatchMapping("/{id}/accessible")
     public ResponseEntity<Map<String, Object>> updateAccessible(
-            @PathVariable Long id,
-            @RequestBody Map<String, Boolean> body) {
-        Boolean accessible = body.get("accessible");
-        if (accessible == null) {
-            return ResponseEntity.badRequest().body(Map.of("error", "accessible field is required"));
-        }
-        roomService.updateAccessible(id, accessible);
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("id", id);
-        response.put("accessible", accessible);
-        return ResponseEntity.ok(response);
+        @PathVariable Long id,
+        @RequestBody Map<String, Boolean> body) {
+    Boolean accessible = body.get("accessible");
+    if (accessible == null) {
+        return ResponseEntity.badRequest().body(Map.of("error", "accessible field is required"));
     }
+    Room room = roomService.updateAccessible(id, accessible);  // now returns Room
+    Map<String, Object> response = new HashMap<>();
+    response.put("success", true);
+    response.put("id", room.getId());
+    response.put("accessible", room.getIsAccessible());
+    return ResponseEntity.ok(response);
+}
 
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> update(@PathVariable Long id,
