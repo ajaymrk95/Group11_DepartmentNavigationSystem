@@ -22,7 +22,7 @@ public class FacultyService {
     }
 
     // --- CRUD ---
-
+    @Auditable(action = "CREATE", entityType = "Faculty")
     public FacultyRequest create(FacultyRequest dto) {
         Faculty faculty = new Faculty();
         mapDtoToEntity(dto, faculty);
@@ -40,6 +40,7 @@ public class FacultyService {
                 .stream().map(this::mapEntityToDto).collect(Collectors.toList());
     }
 
+    @Auditable(action = "UPDATE", entityType = "Faculty")
     public FacultyRequest update(Long id, FacultyRequest dto) {
         Faculty faculty = facultyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Faculty not found: " + id));
@@ -47,6 +48,7 @@ public class FacultyService {
         return mapEntityToDto(facultyRepository.save(faculty));
     }
 
+    @Auditable(action = "DELETE", entityType = "Faculty")
     public void delete(Long id) {
         Faculty faculty = facultyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Faculty not found: " + id));
@@ -64,6 +66,7 @@ public class FacultyService {
     }
 
     // --- Room Mapping ---
+    @Auditable(action = "UPDATE", entityType = "Faculty")
     public FacultyRequest assignRoom(Long facultyId, Long roomId) {
     Faculty faculty = facultyRepository.findById(facultyId)
             .orElseThrow(() -> new RuntimeException("Faculty not found: " + facultyId));
@@ -79,6 +82,7 @@ public class FacultyService {
     return mapEntityToDto(facultyRepository.save(faculty));
 }
 
+    @Auditable(action = "UPDATE", entityType = "Faculty")
     public FacultyRequest unassignRoom(Long facultyId) {
         Faculty faculty = facultyRepository.findById(facultyId)
                 .orElseThrow(() -> new RuntimeException("Faculty not found: " + facultyId));

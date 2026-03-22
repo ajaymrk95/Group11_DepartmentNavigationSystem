@@ -13,7 +13,7 @@ public class BuildingService {
 
     @Autowired
     private BuildingRepository buildingRepository;
-
+    @Auditable(action = "CREATE", entityType = "Building")
     public Building save(String name,
             String description,
             Integer floors,
@@ -43,10 +43,11 @@ public class BuildingService {
     public List<Building> search(String query) {
         return buildingRepository.search(query);
     }
-
+    @Auditable(action = "UPDATE", entityType = "Building")
     public Building updateAccess(Long id, Boolean isOpen) {
         Building b = buildingRepository.findById(id).orElseThrow();
         b.setIsAccessible(isOpen);
         return buildingRepository.save(b);
     }
+    
 }

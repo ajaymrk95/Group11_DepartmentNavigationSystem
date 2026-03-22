@@ -19,6 +19,7 @@ public class RoomService {
     @Autowired
     private BuildingRepository buildingRepository;
 
+    @Auditable(action = "CREATE", entityType = "Room")
     public Room save(RoomRequest req) throws Exception {
         Building building = buildingRepository.findById(req.getBuildingId()).orElseThrow();
         Room r = new Room();
