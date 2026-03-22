@@ -10,7 +10,7 @@ export function NavigationPage() {
     const floor = Number(searchParams.get("floor")) || 1;
     const navigate = useNavigate();
 
-    const { from, to, route, noRouteFound, setFrom, setTo, onDataLoad } = useNavigation();
+    const { from, to, route, noRouteFound, setFrom, setTo, onDataLoad, findPath } = useNavigation();
 
     return (
         <div className="w-full h-screen flex flex-col bg-gray-100">
@@ -36,6 +36,7 @@ export function NavigationPage() {
                         noRouteFound={noRouteFound}
                         setFrom={setFrom}
                         setTo={setTo}
+                        onFindPath={findPath}
                     />
                 </div>
 

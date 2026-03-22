@@ -13,14 +13,10 @@ export interface NavigationState {
     noRouteFound: boolean;
     setFrom: (name: string) => void;
     setTo: (name: string) => void;
-    /** Call this when IndoorMap's onDataLoad fires */
     onDataLoad: (data: FloorData) => void;
+    findPath: () => void;
 }
 
-/**
- * Encapsulates all pathfinding state and logic.
- * The component just calls setFrom/setTo and reads `route`.
- */
 export function useNavigation(
     initialFrom = "entry1",
     initialTo = "entry1"
@@ -28,33 +24,44 @@ export function useNavigation(
     const [from, setFrom] = useState(initialFrom);
     const [to, setTo] = useState(initialTo);
     const [floorData, setFloorData] = useState<FloorData | null>(null);
+    const [route, setRoute] = useState<RouteLatLngs | null>(null);
+    const [noRouteFound, setNoRouteFound] = useState(false);
 
     const onDataLoad = useCallback((data: FloorData) => {
         setFloorData(data);
     }, []);
 
     const graph = useMemo(
-        () =>
-            floorData?.paths
-                ? buildGraph(floorData.paths as FeatureCollection)
-                : null,
+        () => floorData?.paths ? buildGraph(floorData.paths as FeatureCollection) : null,
         [floorData?.paths]
     );
 
-    const { route, noRouteFound } = useMemo(() => {
-        if (!graph || !floorData?.pois) return { route: null, noRouteFound: false };
+    const findPath = useCallback(() => {
+        if (!graph || !floorData?.pois) {
+            setRoute(null);
+            setNoRouteFound(true);
+            return;
+        }
 
         const startNode = getPOINode(floorData.pois as FeatureCollection, from);
         const endNode = getPOINode(floorData.pois as FeatureCollection, to);
 
-        if (!startNode || !endNode) return { route: null, noRouteFound: true };
+        if (!startNode || !endNode) {
+            setRoute(null);
+            setNoRouteFound(true);
+            return;
+        }
 
         const result = dijkstra(graph, startNode, endNode);
 
-        return result
-            ? { route: nodesToLatLngs(result.nodes), noRouteFound: false }
-            : { route: null, noRouteFound: true };
+        if (result) {
+            setRoute(nodesToLatLngs(result.nodes));
+            setNoRouteFound(false);
+        } else {
+            setRoute(null);
+            setNoRouteFound(true);
+        }
     }, [graph, floorData?.pois, from, to]);
 
-    return { from, to, route, noRouteFound, setFrom, setTo, onDataLoad };
+    return { from, to, route, noRouteFound, setFrom, setTo, onDataLoad, findPath };
 }

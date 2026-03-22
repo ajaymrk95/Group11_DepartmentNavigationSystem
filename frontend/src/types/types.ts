@@ -34,6 +34,7 @@ export interface RouteControlsProps {
     noRouteFound: boolean;
     setFrom: (value: string) => void;
     setTo: (value: string) => void;
+    onFindPath: () => void;
 }
 
 export interface FloorToggleProps {

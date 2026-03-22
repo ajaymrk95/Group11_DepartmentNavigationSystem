@@ -19,9 +19,9 @@ export const POI_OPTIONS = [
 const selectClass =
     "border border-gray-300 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500";
 
-export function RouteControls({ from, to, noRouteFound, setFrom, setTo }: RouteControlsProps) {
+export function RouteControls({ from, to, noRouteFound, setFrom, setTo, onFindPath }: RouteControlsProps) {
     return (
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
             <div className="flex items-center gap-3">
                 <label className="w-9 text-sm sm:w-auto text-[#E8E2DB] font-semibold">From</label>
                 <select value={from} onChange={(e) => setFrom(e.target.value)} className={selectClass}>
@@ -29,8 +29,10 @@ export function RouteControls({ from, to, noRouteFound, setFrom, setTo }: RouteC
                         <option key={o.value} value={o.value}>{o.label}</option>
                     ))}
                 </select>
-                <span className="px-4 text-gray-400">→</span>
             </div>
+
+            <span className="hidden sm:block text-gray-400">→</span>
+
             <div className="flex items-center gap-3">
                 <label className="w-9 text-sm sm:w-auto text-[#E8E2DB] font-semibold">To</label>
                 <select value={to} onChange={(e) => setTo(e.target.value)} className={selectClass}>
@@ -39,8 +41,16 @@ export function RouteControls({ from, to, noRouteFound, setFrom, setTo }: RouteC
                     ))}
                 </select>
             </div>
+
+            <button
+                onClick={onFindPath}
+                className="border border-[#E8E2DB] text-[#E8E2DB] hover:bg-[#E8E2DB] hover:text-[#1A3263] font-semibold text-sm px-4 py-1.5 rounded-md transition-colors duration-200"
+            >
+                Find Path
+            </button>
+
             {noRouteFound && (
-                <span className="text-sm text-red-500 text-center">No route found</span>
+                <span className="text-sm text-red-400">No route found</span>
             )}
         </div>
     );
