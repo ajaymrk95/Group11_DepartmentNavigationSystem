@@ -86,7 +86,7 @@ export default function OutdoorNav() {
         {!isPanelOpen && (
           <button 
             onClick={() => setIsPanelOpen(true)}
-            className="md:hidden absolute top-6 left-6 z-[2000] bg-white text-[#1a305b] px-5 py-3 rounded-full shadow-lg font-semibold border border-[#547792]/20 flex items-center gap-2"
+            className="md:hidden absolute top-6 left-6 z-[2000] bg-[#1A3263] text-[#e9e4d9] px-5 py-3 rounded-full shadow-lg font-semibold border border-[#2d4a7a] flex items-center gap-2 hover:bg-[#243d6e] transition-colors"
           >
             🔍 Search Route
           </button>
@@ -95,8 +95,8 @@ export default function OutdoorNav() {
         {/* Distance Indicator */}
         <div className="
           absolute top-6 right-6 md:top-6 md:left-1/2 md:-translate-x-1/2
-          bg-white px-6 py-3 rounded-full shadow-xl
-          border border-[#547792]/20 text-sm font-bold text-[#1a305b] z-[2000]
+          bg-[#1A3263] px-6 py-3 rounded-full shadow-xl
+          border border-[#2d4a7a] text-sm font-bold text-[#e9e4d9] z-[2000]
         ">
           {distanceText || "Select two locations"}
         </div>
