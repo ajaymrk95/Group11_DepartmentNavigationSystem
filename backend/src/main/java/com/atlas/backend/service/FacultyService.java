@@ -55,31 +55,29 @@ public class FacultyService {
         facultyRepository.save(faculty);
         facultyRepository.delete(faculty);
     }
+    // -- room faculty --/
+    public List<FacultyRequest> getByRoomId(Long roomId) {
+        return facultyRepository.findByRoomId(roomId)
+        .stream()
+        .map(this::mapEntityToDto)
+        .toList();
+    }
 
     // --- Room Mapping ---
-
     public FacultyRequest assignRoom(Long facultyId, Long roomId) {
-        Faculty faculty = facultyRepository.findById(facultyId)
-                .orElseThrow(() -> new RuntimeException("Faculty not found: " + facultyId));
+    Faculty faculty = facultyRepository.findById(facultyId)
+            .orElseThrow(() -> new RuntimeException("Faculty not found: " + facultyId));
 
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new RuntimeException("Room not found: " + roomId));
+    Room room = roomRepository.findById(roomId)
+            .orElseThrow(() -> new RuntimeException("Room not found: " + roomId));
 
-        if (!"faculty office".equalsIgnoreCase(room.getCategory())) {
-            throw new RuntimeException("Room category must be 'faculty office'");
-        }
-
-        // ensure no other faculty is already assigned to this room
-        if (facultyRepository.findByRoomIsNotNull().stream()
-                .anyMatch(f -> !f.getId().equals(facultyId)
-                        && f.getRoom() != null
-                        && f.getRoom().getId().equals(roomId))) {
-            throw new RuntimeException("Room is already assigned to another faculty");
-        }
-
-        faculty.setRoom(room);
-        return mapEntityToDto(facultyRepository.save(faculty));
+    if (!"faculty office".equalsIgnoreCase(room.getCategory())) {
+        throw new RuntimeException("Room category must be 'faculty office'");
     }
+
+    faculty.setRoom(room);
+    return mapEntityToDto(facultyRepository.save(faculty));
+}
 
     public FacultyRequest unassignRoom(Long facultyId) {
         Faculty faculty = facultyRepository.findById(facultyId)

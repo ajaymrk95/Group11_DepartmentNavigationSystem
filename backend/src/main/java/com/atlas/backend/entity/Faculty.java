@@ -30,7 +30,7 @@ public class Faculty {
     @Column(columnDefinition = "text[]")
     private String[] tags;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
 

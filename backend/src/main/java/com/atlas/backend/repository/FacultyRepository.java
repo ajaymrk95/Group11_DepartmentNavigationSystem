@@ -11,4 +11,6 @@ public interface FacultyRepository extends JpaRepository<Faculty, Long> {
     List<Faculty> findByDepartment(String department);
     List<Faculty> findByRoomIsNull();
     List<Faculty> findByRoomIsNotNull();
+
+    List<Faculty> findByRoomId(Long roomId);
 }

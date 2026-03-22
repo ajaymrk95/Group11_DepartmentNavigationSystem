@@ -42,7 +42,11 @@ public class FacultyController {
         facultyService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
+    // -- get faculty by room -- //
+    @GetMapping("/by-room/{roomId}")
+    public ResponseEntity<List<FacultyRequest>>  getByRoom(@PathVariable Long roomId) {
+        return ResponseEntity.ok(facultyService.getByRoomId(roomId));
+    }
     // --- Room Mapping ---
 
     @PutMapping("/{facultyId}/assign-room/{roomId}")
