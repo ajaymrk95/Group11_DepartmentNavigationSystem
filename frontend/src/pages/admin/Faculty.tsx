@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Users, Plus, Pencil, Trash2, X, MapPin, ChevronDown, ChevronUp, Search } from "lucide-react";
+import { Users, Plus, Pencil, Trash2, X, MapPin, Search } from "lucide-react";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface Faculty {
@@ -286,7 +286,7 @@ export default function Faculty() {
       if (!res.ok) throw new Error(await res.text());
       await fetchAll();
       setShowModal(false);
-    } catch (e: any) { setFormError(e.message || "Save failed."); }
+    } catch (e: unknown) { setFormError(e instanceof Error ? e.message : "Save failed."); }
     finally { setSaving(false); }
   }
 
@@ -337,8 +337,11 @@ export default function Faculty() {
           </div>
         </div>
         <button style={s.addBtn} onClick={openAdd}
-          onMouseEnter={e => (e.currentTarget.style.background = "#FAB95B") && (e.currentTarget.style.color = "#1A3263")}
-          onMouseLeave={e => { e.currentTarget.style.background = "#1A3263"; e.currentTarget.style.color = "#F6E7BC"; }}>
+          onMouseEnter={e => {
+  e.currentTarget.style.background = "#FAB95B";
+  e.currentTarget.style.color = "#1A3263";
+}}
+onMouseLeave={e => { e.currentTarget.style.background = "#1A3263"; e.currentTarget.style.color = "#F6E7BC"; }}>
           <Plus size={15} strokeWidth={2.5} /> Add Faculty
         </button>
       </div>
