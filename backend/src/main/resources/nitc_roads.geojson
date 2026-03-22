@@ -4033,6 +4033,779 @@
         ]
       },
       "id": "way/1475246426"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_1",
+        "highway": "entry",
+        "name": "p1"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93378046507857,
+              11.322578632641815
+            ],
+            [
+              75.93376664823694,
+              11.322591367171102
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_1"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_2",
+        "highway": "c",
+        "name": "p2"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93376664823694,
+              11.322591367171102
+            ],
+            [
+              75.93375300501582,
+              11.322603980419029
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_2"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_3",
+        "highway": "rentry"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93375300501582,
+              11.322603980419029
+            ],
+            [
+              75.9337524140354,
+              11.322614082761781
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_3"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_4",
+        "highway": "rentry"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93375300501582,
+              11.322603980419029
+            ],
+            [
+              75.93374299246273,
+              11.322603489219018
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_4"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_5",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93376664823694,
+              11.322591367171102
+            ],
+            [
+              75.93372084599464,
+              11.322543016382243
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_5"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_6",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93372084599464,
+              11.322543016382243
+            ],
+            [
+              75.93370018625983,
+              11.322520847638378
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_6"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_7",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93370018625983,
+              11.322520847638378
+            ],
+            [
+              75.93366023111224,
+              11.322555056302749
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_7"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_8",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93370018625983,
+              11.322520847638378
+            ],
+            [
+              75.9337570979821,
+              11.322471350178194
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_8"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_9",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93376664823694,
+              11.322591367171102
+            ],
+            [
+              75.93381167086648,
+              11.322637711298974
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_9"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_10",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93381167086648,
+              11.322637711298974
+            ],
+            [
+              75.9338327204076,
+              11.322659306704454
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_10"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_11",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93383272040758,
+              11.322659306704452
+            ],
+            [
+              75.93388690348571,
+              11.32261114703689
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_11"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_12",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93383272040758,
+              11.322659306704452
+            ],
+            [
+              75.93378828248743,
+              11.322699057535067
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_12"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_13",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93366023111224,
+              11.322555056302745
+            ],
+            [
+              75.93362826699418,
+              11.322581907234769
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_13"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_14",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93362826699418,
+              11.322581907234769
+            ],
+            [
+              75.9335867526214,
+              11.322538716410486
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_14"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_15",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93362826699418,
+              11.322581907234769
+            ],
+            [
+              75.9336230046089,
+              11.322586493870594
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_15"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_16",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93378828248743,
+              11.322699057535067
+            ],
+            [
+              75.9337535897252,
+              11.322730781751694
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_16"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_17",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.9337535897252,
+              11.322730781751694
+            ],
+            [
+              75.93379890470962,
+              11.322778368070033
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_17"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_18",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.9337535897252,
+              11.322730781751694
+            ],
+            [
+              75.93374832733998,
+              11.322735559494857
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_18"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_19",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93374832733998,
+              11.322735559494857
+            ],
+            [
+              75.93375739033687,
+              11.322745306090663
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_19"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_20",
+        "highway": "c"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.9336230046089,
+              11.322586493870594
+            ],
+            [
+              75.93361238238683,
+              11.322575600610397
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_20"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_21",
+        "highway": "rentry"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93372084599464,
+              11.322543016382243
+            ],
+            [
+              75.933711195806,
+              11.322551795107497
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_21"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_22",
+        "highway": "rentry"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93381167086648,
+              11.322637711298974
+            ],
+            [
+              75.93380083718094,
+              11.322647614531974
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_22"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_23",
+        "highway": "rentry"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93388690348571,
+              11.32261114703689
+            ],
+            [
+              75.9338959108672,
+              11.322620136144565
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_23"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_24",
+        "highway": "rentry"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.9337570979821,
+              11.322471350178194
+            ],
+            [
+              75.9337472419102,
+              11.322460503083013
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_24"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_25",
+        "highway": "entry"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.9337570979821,
+              11.322471350178194
+            ],
+            [
+              75.93376671406152,
+              11.322481568901631
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_25"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_26",
+        "highway": "entry"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93388690348571,
+              11.32261114703689
+            ],
+            [
+              75.93387628988023,
+              11.322599508716866
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_26"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_27",
+        "highway": "rentry"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.9335867526214,
+              11.322538716410486
+            ],
+            [
+              75.93357973754578,
+              11.322545040214768
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_27"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_28",
+        "highway": "rentry"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93379890470962,
+              11.322778368070033
+            ],
+            [
+              75.93379366035032,
+              11.322783460254193
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_28"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_29",
+        "highway": "rentry"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93366023111224,
+              11.322555056302745
+            ],
+            [
+              75.9336488721291,
+              11.322543007196384
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_29"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_30",
+        "highway": "rentry"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93378828248743,
+              11.322699057535067
+            ],
+            [
+              75.93379765504035,
+              11.322708701895094
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_30"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_31",
+        "highway": "stairs"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93361238238683,
+              11.322575600610397
+            ],
+            [
+              75.93357786568117,
+              11.322607612181441
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_31"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_32",
+        "highway": "stairs"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93357786568117,
+              11.322607612181441
+            ],
+            [
+              75.93359294332511,
+              11.32262372828198
+            ],
+            [
+              75.93362296277843,
+              11.322596823716943
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_32"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_path_33",
+        "highway": "stairs"
+      },
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              75.93375739033687,
+              11.322745306090663
+            ],
+            [
+              75.9337290496249,
+              11.32277110398572
+            ],
+            [
+              75.93371505865794,
+              11.322756053420271
+            ],
+            [
+              75.93373692803347,
+              11.322735408838058
+            ]
+          ]
+        ]
+      },
+      "id": "way/elhc_path_33"
     }
   ]
 }
