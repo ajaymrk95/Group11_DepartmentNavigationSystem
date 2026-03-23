@@ -18,6 +18,8 @@ export type UnitCategory = "toilet" | "classroom" | "office" | "lab";
 export type RouteLatLngs = [number, number][];
 
 export interface IndoorMapProps {
+    building: string | undefined;
+    floorNo?: number;
     /** Rendered as a highlighted polyline when provided */
     route?: RouteLatLngs | null;
     /** Called once whenever floor data finishes loading */
@@ -25,6 +27,48 @@ export interface IndoorMapProps {
     /** Slot for extra UI rendered inside the header (e.g. route controls) */
     headerSlot?: React.ReactNode;
 }
+
+export interface RouteControlsProps {
+    from: string;
+    to: string;
+    noRouteFound: boolean;
+    setFrom: (value: string) => void;
+    setTo: (value: string) => void;
+    onFindPath: () => void;
+}
+
+export interface FloorToggleProps {
+    currentFloor: number;
+    onChange: (floor: number) => void;
+    floors: number;
+}
+
+export interface MapLayersProps extends FloorData {
+    floor: number;
+}
+
+export interface MapBoundsControllerProps {
+    geojsonData: GeoJsonObject[];
+}
+
+
+export interface BuildingData {
+    id: number;
+    name: string;
+    floors: number;
+    isAccessible: boolean;
+    tags: string[];
+    outline: GeoJsonObject;
+}
+
+export interface FloorLayerData {
+    units: GeoJsonObject | null;
+    paths: GeoJsonObject | null;
+    pois: GeoJsonObject | null;
+    loading: boolean;
+    error: string | null;
+}
+
 
 export type Location = {
     id: number;

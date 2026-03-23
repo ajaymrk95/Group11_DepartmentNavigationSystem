@@ -1,14 +1,10 @@
 import { GeoJSON } from "react-leaflet";
 import L from "leaflet";
 import type { Feature } from "geojson";
-import type { FloorData } from "../../types/types";
+import type { MapLayersProps } from "../../types/types";
 import { buildingOutlineStyle, getUnitStyle, getPathStyle } from "../../utils/indoormap/mapStyles.ts";
 import { createPOIIcon } from "../../utils/indoormap/mapIcons.ts";
 import { onEachUnit, onEachPath, onEachPOI } from "../../utils/indoormap/mapEventHandlers.ts";
-
-interface MapLayersProps extends FloorData {
-    floor: number;
-}
 
 function pointToLayer(feature: Feature, latlng: L.LatLng): L.Marker {
     const type = feature.properties?.type ?? "default";
@@ -16,10 +12,6 @@ function pointToLayer(feature: Feature, latlng: L.LatLng): L.Marker {
     return L.marker(latlng, { icon: createPOIIcon(type, name) });
 }
 
-/**
- * Renders all four GeoJSON map layers in the correct stacking order:
- * building outline → units → paths → POIs
- */
 export function MapLayers({ buildingOutline, units, paths, pois, floor }: MapLayersProps) {
     return (
         <>
