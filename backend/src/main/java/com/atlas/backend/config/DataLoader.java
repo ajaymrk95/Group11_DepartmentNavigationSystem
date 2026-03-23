@@ -21,17 +21,15 @@ public class DataLoader implements CommandLineRunner {
     private PathRepository pathRepository;
 
     @Autowired
+    private com.atlas.backend.repository.BuildingRepository buildingRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Override
     public void run(String... args) throws Exception {
-        // Only load data if no outdoor paths exist
-        if (pathRepository.findOutdoorPaths().isEmpty()) {
-            System.out.println("No outdoor paths found in database. Populating from nitc_roads.geojson...");
-            loadRoadsData();
-        } else {
-            System.out.println("Outdoor paths already exist in the database. Skipping geojson import.");
-        }
+        System.out.println("Checking paths in database...");
+        loadRoadsData();
     }
 
     private void loadRoadsData() {
@@ -43,36 +41,50 @@ public class DataLoader implements CommandLineRunner {
 
             JsonNode root = objectMapper.readTree(is);
             JsonNode features = root.get("features");
+
+            pathRepository.deleteAll();
+            System.out.println("Cleared existing paths. Reloading all " + features.size() + " paths from GeoJSON...");
             
             List<Path> pathsToSave = new ArrayList<>();
 
-            for (JsonNode feature : features) {
+            for (int i = 0; i < features.size(); i++) {
+                JsonNode feature = features.get(i);
                 JsonNode props = feature.get("properties");
                 JsonNode geomNode = feature.get("geometry");
 
                 Path path = new Path();
 
                 // Safely extract properties
-                if (props.has("name")) path.setName(props.get("name").asText());
-                
+                if (props.has("name"))
+                    path.setName(props.get("name").asText());
+
                 String highway = props.has("highway") ? props.get("highway").asText() : "unclassified";
                 path.setRoadType(highway);
-                
+
                 String access = props.has("access") ? props.get("access").asText() : "public";
-                path.setAccess(access);
+                path.setAccess(access); // Kept this line as it was in the original code
+
+                if (props.has("building_id")) {
+                    Long buildingId = props.get("building_id").asLong();
+                    buildingRepository.findById(buildingId).ifPresent(path::setBuilding);
+                }
+
+                if (props.has("floor")) {
+                    path.setFloor(props.get("floor").asInt());
+                }
 
                 if (props.has("lit")) {
                     path.setLit("yes".equalsIgnoreCase(props.get("lit").asText()));
                 }
-                
+
                 if (props.has("oneway")) {
                     path.setIsOneway("yes".equalsIgnoreCase(props.get("oneway").asText()));
                 }
 
                 // Accessible logic based on our discussion
                 boolean isAccessible = true;
-                if ("private".equalsIgnoreCase(access) && 
-                    !List.of("footway", "path", "service").contains(highway.toLowerCase())) {
+                if ("private".equalsIgnoreCase(access) &&
+                        !List.of("footway", "path", "service").contains(highway.toLowerCase())) {
                     isAccessible = false;
                 }
                 path.setIsAccessible(isAccessible);
@@ -86,7 +98,7 @@ public class DataLoader implements CommandLineRunner {
             }
 
             pathRepository.saveAll(pathsToSave);
-            System.out.println("Successfully loaded " + pathsToSave.size() + " outdoor paths into the database!");
+            System.out.println("Successfully loaded " + pathsToSave.size() + " paths into the database!");
 
         } catch (Exception e) {
             System.err.println("Failed to load nitc_roads.geojson data:");
