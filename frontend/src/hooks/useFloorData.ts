@@ -23,7 +23,7 @@ export function useFloorData(buildingId: number | null, floor: number, building:
 
         Promise.all([
             fetch(`${BASE_URL}/rooms?buildingId=${buildingId}&floor=${floor}`).then((res) => res.json()),
-            fetch(`${BASE_PATH}/paths.geojson`).then((res) => res.ok ? res.json() : null),
+            fetch(`${BASE_URL}/paths?buildingId=${buildingId}&floor=${floor}`).then((res) => res.json()),
             fetch(`${BASE_PATH}/poi.geojson`).then((res) => res.ok ? res.json() : null),
         ])
             .then(([units, paths, pois]) => {
