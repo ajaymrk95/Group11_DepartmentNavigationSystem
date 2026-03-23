@@ -90,9 +90,9 @@ export default function OutdoorNav() {
 
         {/* Distance Indicator */}
         <div className="
-          absolute top-6 right-6 md:top-6 md:left-1/2 md:-translate-x-1/2
+          absolute top-24 left-1/2 -translate-x-1/2 md:top-6 md:left-1/2 md:-translate-x-1/2
           bg-[#1A3263] px-6 py-3 rounded-full shadow-xl
-          border border-[#2d4a7a] text-sm font-bold text-[#e9e4d9] z-[2000]
+          border border-[#2d4a7a] text-sm font-bold text-[#e9e4d9] z-[2000] whitespace-nowrap
         ">
           {distanceText || "Select two locations"}
         </div>
