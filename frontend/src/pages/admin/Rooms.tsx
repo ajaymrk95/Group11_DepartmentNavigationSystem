@@ -454,11 +454,11 @@ function RoomFormModal({ room, onClose, onSaved, buildings, existingCategories }
         </div>
 
         <div style={rowStyle}>
-          <div style={halfGroup}>
+          {/* <div style={halfGroup}>
             <label style={S.label}>Level</label>
             <input style={S.input} type="number" placeholder="e.g. 1"
               value={form.level} onChange={e => set("level", e.target.value)} />
-          </div>
+          </div> */}
           <div style={halfGroup}>
             <label style={S.label}>Building *</label>
             <select style={S.input} value={form.buildingId} onChange={e => set("buildingId", e.target.value)}>
