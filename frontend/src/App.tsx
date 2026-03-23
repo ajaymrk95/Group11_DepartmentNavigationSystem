@@ -28,7 +28,7 @@ export default function App() {
         {/* <Route path="/edit-location" element={<EditLocation />} /> */}
         <Route path="/search-location" element={<SearchLocation />} />
         <Route path="/login" element={<AdminLogin />} />
-        <Route path="/indoor-navigation" element={<IndoorNavigation />} />
+        <Route path="/indoor-navigation/:building" element={<IndoorNavigation />} />
         <Route path="/qr-scanner" element={<Scanner />} />
         {/* Protected admin */}
         <Route path="/admin" element={<AdminLayout />}>

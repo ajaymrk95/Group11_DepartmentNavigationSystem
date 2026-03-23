@@ -1,76 +1,63 @@
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import IndoorMap from "../../components/indoornavigation/IndoorMap";
+import { RouteControls } from "../../components/indoornavigation/RouteControls";
 import { useNavigation } from "../../hooks/useNavigate";
+import { HomeIcon } from "../../components/icons/HomeIcon";
 
-// All POI names from elhc_poi_1.geojson
-const POI_OPTIONS = [
-    { value: "entry1", label: "Entry 1" },
-    { value: "entry2", label: "Entry 2" },
-    { value: "entry3", label: "Entry 3" },
-    { value: "101entry1", label: "Room 101 – Door 1" },
-    { value: "101entry2", label: "Room 101 – Door 2" },
-    { value: "102entry1", label: "Room 102 – Door 1" },
-    { value: "102entry2", label: "Room 102 – Door 2" },
-    { value: "103entry1", label: "Room 103 – Door 1" },
-    { value: "103entry2", label: "Room 103 – Door 2" },
-    { value: "104entry1", label: "Room 104 – Door 1" },
-    { value: "104entry2", label: "Room 104 – Door 2" },
-    { value: "girltoilet", label: "Ladies Toilet" },
-    { value: "boystoilet ", label: "Gents Toilet" },  // note: trailing space in source data
-];
-
-const selectClass =
-    "border border-gray-300 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500";
-
-/**
- * Route-finding page.
- * All pathfinding logic lives in useNavigation — this component is pure UI.
- */
 export function NavigationPage() {
-    const { from, to, route, noRouteFound, setFrom, setTo, onDataLoad } =
-        useNavigation();
+    const { building } = useParams<{ building: string }>();
+    const [searchParams] = useSearchParams();
+    const floor = Number(searchParams.get("floor")) || 1;
+    const navigate = useNavigate();
 
-    const routeControls = (
-        <div className="flex flex-col sm:flex-row gap-3">
-            <div className="flex items-center gap-3">
-                <label className="w-9 text-sm sm:w-auto text-[#E8E2DB] font-semibold">From</label>
-                <select
-                    value={from}
-                    onChange={(e) => setFrom(e.target.value)}
-                    className={selectClass}
-                >
-                    {POI_OPTIONS.map((o) => (
-                        <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                </select>
-
-                <span className="px-4 text-gray-400">→</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-                <label className="w-9 text-sm sm:w-auto text-[#E8E2DB] font-semibold">To</label>
-                <select
-                    value={to}
-                    onChange={(e) => setTo(e.target.value)}
-                    className={selectClass}
-                >
-                    {POI_OPTIONS.map((o) => (
-                        <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                </select>
-            </div>
-
-            {noRouteFound && (
-                <span className="text-sm text-red-500 text-center">No route found</span>
-            )}
-        </div>
-    );
+    const { from, to, route, noRouteFound, setFrom, setTo, onDataLoad, findPath } = useNavigation();
 
     return (
-        <IndoorMap
-            route={route}
-            onDataLoad={onDataLoad}
-            headerSlot={routeControls}
-        />
+        <div className="w-full h-screen flex flex-col bg-gray-100">
+            <header className="bg-[#1A3263] shadow-md px-4 py-3 z-10 flex items-center justify-between gap-4 flex-wrap shrink-0">
+
+                <div className="flex items-center gap-3 shrink-0">
+                    <button
+                        onClick={() => navigate("/")}
+                        className="text-[#9DBAD0] hover:text-[#E8E2DB] transition-colors duration-200"
+                        aria-label="Go to home"
+                    >
+                        <HomeIcon className="w-10 h-10" />
+                    </button>
+                    <h1 className="text-3xl font-bold text-[#E8E2DB]">
+                        {building}
+                    </h1>
+                </div>
+
+                <div className="flex-1">
+                    <RouteControls
+                        from={from}
+                        to={to}
+                        noRouteFound={noRouteFound}
+                        setFrom={setFrom}
+                        setTo={setTo}
+                        onFindPath={findPath}
+                    />
+                </div>
+
+                <button
+                    onClick={() => navigate("/outdoor-navigation")}
+                    className="shrink-0 border border-[#E8E2DB] text-[#E8E2DB] hover:bg-[#E8E2DB] hover:text-[#1A3263] font-semibold text-sm px-3 py-1.5 rounded-md transition-colors duration-200"
+                >
+                    Outdoor View
+                </button>
+
+            </header>
+
+            <div className="flex-1 min-h-0 min-w-0">
+                <IndoorMap
+                    building={building}
+                    floorNo={floor}
+                    route={route}
+                    onDataLoad={onDataLoad}
+                />
+            </div>
+        </div>
     );
 }
 

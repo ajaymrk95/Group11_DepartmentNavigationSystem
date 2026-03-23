@@ -1,11 +1,7 @@
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
-import type { GeoJsonObject } from "geojson";
-
-interface MapBoundsControllerProps {
-    geojsonData: GeoJsonObject[];
-}
+import type { MapBoundsControllerProps } from "../../types/types";
 
 /**
  * Fits the map to the given GeoJSON layers and restricts panning beyond them.
