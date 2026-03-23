@@ -2,10 +2,10 @@ import { Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Building2,
-  Layers,
+
   DoorOpen,
   Map,
-  MapPin,
+
   ScrollText,
   LogOut,
   Bell,
@@ -16,11 +16,11 @@ import {
 const navItems = [
   { label: 'Dashboard',     icon: LayoutDashboard, to: '/admin/dashboard' },
   { label: 'Buildings',     icon: Building2,        to: '/admin/buildings' },
-  { label: 'Floors',        icon: Layers,           to: '/admin/floors' },
+  // { label: 'Floors',        icon: Layers,           to: '/admin/floors' },
   { label: 'Rooms',         icon: DoorOpen,         to: '/admin/rooms' },
   { label: 'Faculty',        icon: Users,           to: '/admin/faculty' },
-  { label: 'Floor Layout',  icon: Map,              to: '/admin/floor-layout' },
-  { label: 'Add Locations', icon: MapPin,           to: '/admin/add-location' },
+  { label: 'Path',  icon: Map,              to: '/admin/Path' },
+  // { label: 'Add Locations', icon: MapPin,           to: '/admin/add-location' },
   { label: 'Logs',          icon: ScrollText,       to: '/admin/logs' },
 ];
 
@@ -41,7 +41,7 @@ export default function AdminLayout() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *, *::before, *::after { box-sizing: border-box;}
 
         html, body, #root {
           height: 100%;

@@ -4,7 +4,7 @@ import AdminLogin from "./pages/AdminLogin";
 import OutdoorNav from "./pages/OutdoorNav"
 import AddLocation from "./pages/AddLocation";
 import  AddLocations  from "./pages/admin/AddLocations";
-import  FloorLayout  from "./pages/admin/FloorLayout";
+import  Path  from "./pages/admin/Path";
 import  Floors  from "./pages/admin/Floors";
 import  Rooms  from "./pages/admin/Rooms";
 import  Faculty  from "./pages/admin/Faculty";
@@ -38,7 +38,7 @@ export default function App() {
           <Route path="floors"       element={<Floors />} />
           <Route path="rooms"        element={<Rooms />} />
           <Route path="faculty"      element={<Faculty />} />
-          <Route path="floor-layout" element={<FloorLayout />} />
+          <Route path="Path" element={<Path />} />
            <Route path="add-location" element={<AddLocations />} />
           <Route path="logs"         element={<Logs />} />
         </Route>
