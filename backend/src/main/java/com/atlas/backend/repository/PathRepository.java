@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface PathRepository extends JpaRepository<Path, Long> {
 
+    List<Path> findByBuildingIdAndFloor(Long buildingId, Integer floor);
+
     @Query(value = "SELECT * FROM paths WHERE is_accessible = true", nativeQuery = true)
     List<Path> findAllAccessible();
 
