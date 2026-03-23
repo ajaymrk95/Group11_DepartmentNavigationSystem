@@ -411,10 +411,15 @@ export default function PathsPage() {
     if (mode !== "indoor") return;
     fetch("http://localhost:8080/api/buildings")
       .then((r) => r.json())
-      .then((data: Building[]) => {
-        setBuildings(data);
-        if (data.length > 0 && !selectedBuilding) {
-          setSelectedBuilding(data[0]);
+      .then((data: any[]) => {
+        const parsedBuildings: Building[] = data.map(b => ({
+          ...b,
+          geom: typeof b.geom === 'string' ? JSON.parse(b.geom) : b.geom,
+          entries: typeof b.entries === 'string' ? JSON.parse(b.entries) : b.entries,
+        }));
+        setBuildings(parsedBuildings);
+        if (parsedBuildings.length > 0 && !selectedBuilding) {
+          setSelectedBuilding(parsedBuildings[0]);
           setSelectedFloor(1);
         }
       })
