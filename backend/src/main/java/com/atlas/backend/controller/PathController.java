@@ -21,7 +21,7 @@ public class PathController {
     private PathService pathService;
 
     // GET /api/paths?buildingId=11&floor=1
-    @GetMapping
+    @GetMapping("/floor")
     public Map<String, Object> getFloorPaths(@RequestParam Long buildingId,
             @RequestParam Integer floor) {
         List<Path> paths = pathService.findByFloor(buildingId, floor);
