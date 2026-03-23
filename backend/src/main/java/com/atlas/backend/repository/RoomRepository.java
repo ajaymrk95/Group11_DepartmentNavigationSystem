@@ -58,4 +58,16 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
         ORDER BY r.building.id, r.floor, r.roomNo
     """)
     List<RoomSummaryResponse> findAllRoomSummaries();
+
+    @Query(value = """
+            SELECT * FROM rooms
+            WHERE building_id = :buildingId
+            AND (
+                LOWER(name) LIKE LOWER(CONCAT('%', :query, '%'))
+                OR LOWER(room_no) LIKE LOWER(CONCAT('%', :query, '%'))
+                OR LOWER(:query) = ANY(SELECT LOWER(t) FROM unnest(tags) t)
+            )
+            """, nativeQuery = true)
+    List<Room> searchRoomsInBuilding(@Param("buildingId") Long buildingId,
+            @Param("query") String query);
 }
