@@ -28,4 +28,15 @@ public class RoutingController {
             return ResponseEntity.badRequest().body("Error calculating route: " + e.getMessage());
         }
     }
+
+    @GetMapping("/indoor")
+    public RouteResponse getRoute(@RequestParam Long buildingId,
+            @RequestParam Integer floor,
+            @RequestParam double startLat,
+            @RequestParam double startLng,
+            @RequestParam double endLat,
+            @RequestParam double endLng) {
+                System.out.println(startLat);
+        return routingService.calculateFloorRoute(startLat, startLng, endLat, endLng, buildingId, floor);
+    }
 }

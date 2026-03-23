@@ -11,7 +11,7 @@ interface Props {
     value: string;
     buildingId: number;
     buildingEntries: [number, number][];
-    onChange: (value: string) => void;
+    onChange: (value: string, coordinates: [number, number]) => void;
 }
 
 export function SearchablePointInput({ label, value, buildingId, buildingEntries, onChange }: Props) {
@@ -109,7 +109,7 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
                                 onMouseDown={(e) => e.preventDefault()} // prevent blur before click
                                 onClick={() => {
                                     setQuery(o.label);
-                                    onChange(o.value);
+                                    onChange(o.value, o.coordinates);  // ← pass coordinates
                                     setOpen(false);
                                 }}
                                 className="px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"

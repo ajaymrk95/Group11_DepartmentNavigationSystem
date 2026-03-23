@@ -34,7 +34,7 @@ export interface RouteControlsProps {
     noRouteFound: boolean;
     setFrom: (value: string) => void;
     setTo: (value: string) => void;
-    onFindPath: () => void;
+    onFindPath: (fromCoords: [number, number], toCoords: [number, number]) => void;
     buildingId: number;
     buildingEntries: [number, number][];
 }

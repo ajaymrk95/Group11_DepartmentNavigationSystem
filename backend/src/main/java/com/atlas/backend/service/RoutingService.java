@@ -73,6 +73,27 @@ public class RoutingService {
         return dijkstra(graph, startNode, endNode);
     }
 
+    public RouteResponse calculateFloorRoute(double startLat, double startLng, double endLat, double endLng, Long buildingId, Integer floor) {
+        // 1. Build the in-memory graph from all accessible paths
+        List<Path> accessiblePaths = pathRepository.findAllAccessibleFloorPaths(buildingId, floor);
+        Map<String, Node> graph = buildGraph(accessiblePaths);
+
+        if (graph.isEmpty()) {
+            throw new RuntimeException("No routing data available.");
+        }
+
+        // 2. Snap requested start/end to nearest actual nodes in the graph
+        Node startNode = findNearestNode(graph, startLat, startLng);
+        Node endNode = findNearestNode(graph, endLat, endLng);
+
+        if (startNode == null || endNode == null) {
+            throw new RuntimeException("Could not snap to a valid route point.");
+        }
+
+        // 3. Run Dijkstra
+        return dijkstra(graph, startNode, endNode);
+    }
+
     private Map<String, Node> buildGraph(List<Path> paths) {
         Map<String, Node> graph = new HashMap<>();
 
@@ -139,6 +160,8 @@ public class RoutingService {
     }
 
     private RouteResponse dijkstra(Map<String, Node> graph, Node start, Node end) {
+        System.out.println(start);
+        System.out.println(end);
         Map<Node, Double> distances = new HashMap<>();
         Map<Node, Node> previous = new HashMap<>();
         PriorityQueue<QueueNode> pq = new PriorityQueue<>();
