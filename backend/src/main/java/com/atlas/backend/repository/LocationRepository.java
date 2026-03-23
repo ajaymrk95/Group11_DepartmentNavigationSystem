@@ -62,6 +62,7 @@ List<Object[]> searchBuildings(@Param("q") String q);
     JOIN buildings b ON b.id = le.location_id
     WHERE b.name = :name
 """, nativeQuery = true)
-    List<Point> getEntrances(@Param("name") String name);
+    
+List<Point> getEntrances(@Param("name") String name);
 
 }

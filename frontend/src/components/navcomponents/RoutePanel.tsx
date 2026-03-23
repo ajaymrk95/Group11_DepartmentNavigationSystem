@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import type { Location } from "../../types/types"
 import SearchBar from "../searchcomponents/SearchBar"
+import locationImage from "../../assets/image.png"
 
 type Props = {
   onRouteRequest: (start: Location, end: Location) => void
@@ -28,23 +29,59 @@ export default function RoutePanel({ onRouteRequest, onClose, mapDestination }: 
   }
 
   return (
-    <div className="h-full w-full flex flex-col bg-[#e9e4d9] border-r border-[#547792]/20 overflow-y-auto">
+    <div className="
+      h-full w-full flex flex-col
+      bg-[#1A3263]
+      border-r border-[#2d4a7a]
+      shadow-[10px_0_35px_rgba(0,0,0,0.45)]
+      backdrop-blur-[2px]
+      overflow-y-auto
+    ">
 
-      {/* Header */}
-      <div className="bg-[#1a305b] px-6 py-5 flex justify-between items-center shadow-md z-30 shrink-0">
+      {/* Header with nav buttons */}
+      <div className="px-6 pt-5 pb-4 flex justify-between items-center shrink-0">
         <h2 className="text-[#e9e4d9] text-xl font-bold tracking-wide">
           Outdoor Navigation
         </h2>
-        <button
-          onClick={onClose}
-          className="md:hidden text-white bg-white/20 hover:bg-white/30 rounded-full w-8 h-8 flex items-center justify-center transition"
-        >
-          ✕
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Home button */}
+          <button
+            onClick={() => navigate("/")}
+            title="Home"
+            className="text-[#e9e4d9]/70 hover:text-[#fab75a] hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
+            </svg>
+          </button>
+          {/* Search Location button */}
+          <button
+            onClick={() => navigate("/search-location")}
+            title="Search Location"
+            className="text-[#e9e4d9]/70 hover:text-[#fab75a] hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.3-4.3" />
+            </svg>
+          </button>
+          {/* Close button (mobile) */}
+          <button
+            onClick={onClose}
+            className="md:hidden text-[#e9e4d9]/70 hover:text-white hover:bg-white/10 rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200"
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
+      {/* Section Title */}
+      <p className="px-6 text-xs font-semibold tracking-widest uppercase text-[#e9e4d9]/60 mb-4">
+        Plan your route
+      </p>
+
       {/* Search Inputs Area */}
-      <div className="p-6 flex-1 flex flex-col">
+      <div className="px-6 flex-1 flex flex-col">
         <div className="space-y-4 relative">
 
           <div className="relative z-20">
@@ -61,10 +98,10 @@ export default function RoutePanel({ onRouteRequest, onClose, mapDestination }: 
           </div>
 
           {/* Swap button */}
-          <div className="absolute right-6 top-[42px] z-30">
+          <div className="absolute right-2 top-[42px] z-30">
             <button
               onClick={handleSwap}
-              className="bg-white text-[#547792] p-3.5 rounded-full border border-[#547792]/30 shadow-sm hover:bg-[#fab75a] hover:text-[#1a305b] hover:border-[#fab75a] transition-colors"
+              className="bg-[#e9e4d9] text-[#1A3263] p-3.5 rounded-full border border-[#c8c0b0] shadow-md hover:bg-[#fab75a] hover:text-[#1a305b] hover:border-[#fab75a] transition-colors"
               title="Swap locations"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,7 +111,6 @@ export default function RoutePanel({ onRouteRequest, onClose, mapDestination }: 
           </div>
 
           <div className="relative z-10 pt-2">
-            {/* CHANGED: using SearchBar for end point too, no QR needed here */}
             <SearchBar
               label="Choose destination..."
               onSelect={setEnd}
@@ -88,33 +124,95 @@ export default function RoutePanel({ onRouteRequest, onClose, mapDestination }: 
           </div>
         </div>
 
+        {/* Rich Destination Card — same style as SearchLocation */}
         {end && (
-          <div className="mt-6 p-4 bg-white/60 backdrop-blur-sm rounded-xl border border-[#547792]/20 shadow-sm flex-1">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold text-[#1a305b] text-sm uppercase tracking-wider">Destination Info</h3>
-              {end.category && (
-                <span className="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
-                  {end.category}
-                </span>
-              )}
+          <div className="
+            mt-6
+            bg-[#e9e4d9]
+            rounded-xl
+            overflow-hidden
+            border border-[#c8c0b0]
+            shadow-xl
+            transition-all duration-200
+            hover:-translate-y-[2px]
+          ">
+
+            <div className="h-48 overflow-hidden">
+              <img
+                src={locationImage}
+                alt="Location"
+                className="w-full h-full object-cover transition-transform duration-300 hover:scale-[1.04]"
+              />
             </div>
-            <h4 className="text-[#1a305b] font-semibold text-lg">{end.name}</h4>
 
-            {(end.room || end.floor != null) && (
-              <div className="flex gap-4 text-xs font-medium text-[#1A3263]/60 mt-1">
-                {end.room && <p>Room {end.room}</p>}
-                {end.floor != null && <p>Floor {end.floor}</p>}
+            <div className="p-5 space-y-3">
+
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold text-[#1a305b] text-md">
+                  {end.name.toUpperCase()}
+                </h3>
+
+                {end.category && (
+                  <span
+                    className="
+                      px-2.5 py-0.5
+                      text-sm
+                      rounded-full
+                      bg-[#f0b35a]
+                      border border-[#f0b35a]
+                      text-[#1a305b]
+                      font-medium
+                    "
+                  >
+                    {end.category.toUpperCase()}
+                  </span>
+                )}
               </div>
-            )}
 
-            <p className="text-sm text-[#547792] mt-2 leading-relaxed">
-              {end.description || `Located on campus. Follow the route shown on the map to reach here.`}
-            </p>
+              {end.category === "INDOOR" && (
+                <div className="flex gap-4 text-xs font-medium text-[#1A3263]/60">
+                  {end.room && <p>Room {end.room}</p>}
+                  {end.floor !== undefined && <p>Floor {end.floor}</p>}
+                </div>
+              )}
+
+              {end.description && (
+                <p className="text-sm text-[#1A3263]/70 leading-relaxed">
+                  {end.description}
+                </p>
+              )}
+
+              {end.tag && end.tag.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {end.tag.map(tag => (
+                    <span
+                      key={tag}
+                      className="
+                        text-xs
+                        font-medium
+                        bg-[#1A3263]/10
+                        text-[#1A3263]
+                        border border-[#1A3263]/10
+                        px-3 py-1
+                        rounded-full
+                        transition-colors duration-200
+                        hover:bg-[#1A3263]/20
+                      "
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+            </div>
+
           </div>
         )}
       </div>
 
-      <div className="p-6 bg-white/50 border-t border-[#547792]/10 z-0 shrink-0">
+      {/* Find Route Button */}
+      <div className="p-6 mt-auto shrink-0">
         <button
           disabled={!start || !end}
           onClick={() => {
@@ -124,13 +222,32 @@ export default function RoutePanel({ onRouteRequest, onClose, mapDestination }: 
             }
           }}
           className="
-            w-full py-3.5 rounded-xl shadow-md
-            bg-[#fab75a] text-[#1a305b] font-bold text-lg tracking-wide
+            w-full flex items-center justify-between
+            px-6 py-4
+            rounded-full
+            bg-[#e9e4d9]
+            text-[#1A3263]
+            text-sm font-bold tracking-wide
+            shadow-md
+            transition-all duration-200
+            hover:bg-[#f0b35a]
+            hover:shadow-2xl
+            active:scale-[0.96]
             disabled:bg-[#547792]/20 disabled:text-[#547792]/50 disabled:cursor-not-allowed
-            hover:bg-[#f9aa3d] active:scale-[0.98] transition-all duration-200
           "
         >
           Find Route
+
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
         </button>
       </div>
 
