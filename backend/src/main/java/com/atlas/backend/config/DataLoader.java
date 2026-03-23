@@ -28,8 +28,12 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("Checking paths in database...");
-        loadRoadsData();
+        if (pathRepository.count() == 0) {
+            System.out.println("Database is empty. Loading paths...");
+            loadRoadsData();
+        } else {
+            System.out.println("Paths already loaded. Skipping DataLoader.");
+        }
     }
 
     private void loadRoadsData() {
@@ -42,8 +46,7 @@ public class DataLoader implements CommandLineRunner {
             JsonNode root = objectMapper.readTree(is);
             JsonNode features = root.get("features");
 
-            pathRepository.deleteAll();
-            System.out.println("Cleared existing paths. Reloading all " + features.size() + " paths from GeoJSON...");
+            System.out.println("Loading " + features.size() + " paths from GeoJSON...");
             
             List<Path> pathsToSave = new ArrayList<>();
 

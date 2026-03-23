@@ -4872,6 +4872,27 @@
         ]
       },
       "id": "way/elhc_path_33"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/elhc_bridge_1",
+        "highway": "path"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            75.93378046507857,
+            11.322578632641815
+          ],
+          [
+            75.9340607,
+            11.3224994
+          ]
+        ]
+      },
+      "id": "way/elhc_bridge_1"
     }
   ]
 }
