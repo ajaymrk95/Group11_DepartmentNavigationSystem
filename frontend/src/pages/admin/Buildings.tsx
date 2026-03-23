@@ -12,10 +12,10 @@ interface Building {
   entries: string | null;
 }
 
-const BASE   = "http://localhost:8080";
-const API    = `${BASE}/api/buildings`;
-const token  = () => localStorage.getItem("token") ?? "";
-const authH  = (): Record<string, string> => ({
+const BASE  = "http://localhost:8080";
+const API   = `${BASE}/api/buildings`;
+const token = () => localStorage.getItem("token") ?? "";
+const authH = (): Record<string, string> => ({
   "Content-Type": "application/json",
   Authorization: `Bearer ${token()}`,
 });
@@ -67,28 +67,6 @@ function Toggle({ checked, onChange, loading }: {
   );
 }
 
-// ── File picker ───────────────────────────────────────────────────────────────
-function FilePicker({ label, hint, file, onChange }: {
-  label: string; hint: string; file: File | null; onChange: (f: File | null) => void;
-}) {
-  return (
-    <div>
-      {label && <label style={labelSt}>{label}</label>}
-      {file ? (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", border: "1.5px solid #34c759", borderRadius: 10, padding: "10px 14px", background: "#f0fdf4" }}>
-          <span style={{ fontSize: 13, color: "#1e8e3e", fontWeight: 500 }}>✓ {file.name}</span>
-          <button onClick={() => onChange(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "#9aafbf", display: "flex" }}><X size={14} /></button>
-        </div>
-      ) : (
-        <label style={{ border: "1.5px dashed #e2ddd6", borderRadius: 10, padding: "14px 16px", display: "flex", cursor: "pointer", background: "#fafcff" }}>
-          <input type="file" accept=".geojson,.json" style={{ display: "none" }} onChange={e => onChange(e.target.files?.[0] ?? null)} />
-          <span style={{ fontSize: 13, color: "#547792" }}>📁 {hint}</span>
-        </label>
-      )}
-    </div>
-  );
-}
-
 // ── Building Modal (Add + Edit) ───────────────────────────────────────────────
 function BuildingModal({ building, onClose, onSaved }: {
   building?: Building; onClose: () => void; onSaved: () => void;
@@ -101,37 +79,36 @@ function BuildingModal({ building, onClose, onSaved }: {
     isAccessible: building?.isAccessible ?? true,
     tags:         building?.tags?.join(", ") ?? "",
   });
-  const [geomFile,      setGeomFile]      = useState<File | null>(null);
-  const [entriesFile,   setEntriesFile]   = useState<File | null>(null);
-  const [manualEntries, setManualEntries] = useState<{ lng: string; lat: string }[]>([]);
-  const [entriesMode,   setEntriesMode]   = useState<"file" | "manual">("file");
-  const [saving,        setSaving]        = useState(false);
-  const [error,         setError]         = useState("");
+  const [geomText,    setGeomText]    = useState("");
+  const [entriesText, setEntriesText] = useState("");
+  const [saving,      setSaving]      = useState(false);
+  const [error,       setError]       = useState("");
 
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }));
 
-  const readJson = (file: File): Promise<unknown> =>
-    new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload = e => { try { res(JSON.parse(e.target!.result as string)); } catch { rej(new Error("Invalid JSON")); } };
-      r.onerror = () => rej(new Error("File read error"));
-      r.readAsText(file);
-    });
+  const parseJson = (text: string, label: string): unknown => {
+    try {
+      return JSON.parse(text.trim());
+    } catch {
+      throw new Error(`${label}: invalid JSON.`);
+    }
+  };
 
   async function handleSubmit() {
     if (!form.name.trim()) { setError("Name is required."); return; }
-    if (!isEdit && !geomFile) { setError("Geometry file is required."); return; }
+    if (!isEdit && !geomText.trim()) { setError("Geometry JSON is required."); return; }
     setSaving(true); setError("");
     try {
       let geoJson = null;
-      if (geomFile) geoJson = await readJson(geomFile);
+      if (geomText.trim()) {
+        const parsed = parseJson(geomText, "Geometry") as Record<string, unknown>;
+        delete parsed.crs; // RFC 7946 — remove deprecated crs field
+        geoJson = parsed;
+      }
 
       let entries = null;
-      if (entriesMode === "file" && entriesFile) {
-        entries = await readJson(entriesFile);
-      } else if (entriesMode === "manual" && manualEntries.length > 0) {
-        if (manualEntries.some(p => !p.lng || !p.lat)) throw new Error("All entry points need lng and lat.");
-        entries = manualEntries.map(p => [parseFloat(p.lng), parseFloat(p.lat)]);
+      if (entriesText.trim()) {
+        entries = parseJson(entriesText, "Entries");
       }
 
       const payload: Record<string, unknown> = {
@@ -141,8 +118,8 @@ function BuildingModal({ building, onClose, onSaved }: {
         isAccessible: form.isAccessible,
         tags:         form.tags.split(",").map(t => t.trim()).filter(Boolean),
       };
-      if (geoJson !== null) payload.geoJson = geoJson;
-      if (entries !== null) payload.entries = entries;
+      if (geoJson  !== null) payload.geoJson  = geoJson;
+      if (entries  !== null) payload.entries  = entries;
 
       const url = isEdit ? `${API}/${building!.id}` : API;
       const res = await fetch(url, {
@@ -157,9 +134,20 @@ function BuildingModal({ building, onClose, onSaved }: {
     } finally { setSaving(false); }
   }
 
+  const textareaSt: React.CSSProperties = {
+    ...inputSt,
+    resize: "vertical",
+    minHeight: 100,
+    fontFamily: "'Courier New', monospace",
+    fontSize: 12,
+    lineHeight: 1.5,
+  };
+
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(11,45,114,0.45)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, backdropFilter: "blur(3px)" }}
-      onClick={e => e.target === e.currentTarget && onClose()}>
+    <div
+      style={{ position: "fixed", inset: 0, background: "rgba(11,45,114,0.45)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, backdropFilter: "blur(3px)" }}
+      onClick={e => e.target === e.currentTarget && onClose()}
+    >
       <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 520, maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 24px 64px rgba(11,45,114,0.25)" }}>
 
         <div style={{ background: "#0B2D72", padding: "22px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -191,7 +179,6 @@ function BuildingModal({ building, onClose, onSaved }: {
             <input style={inputSt} value={form.tags} onChange={e => set("tags", e.target.value)} placeholder="lab, engineering" />
           </div>
 
-          {/* Accessible toggle */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <Toggle checked={form.isAccessible} loading={false} onChange={() => set("isAccessible", !form.isAccessible)} />
             <span style={{ fontSize: 13, fontWeight: 600, color: "#1A3263" }}>
@@ -202,41 +189,31 @@ function BuildingModal({ building, onClose, onSaved }: {
             </span>
           </div>
 
-          <FilePicker
-            label={`Geometry (.geojson)${isEdit ? " — leave empty to keep existing" : " *"}`}
-            hint={isEdit ? "Click to replace existing geometry (optional)" : "Click to upload .geojson file"}
-            file={geomFile}
-            onChange={setGeomFile}
-          />
+          <div>
+            <label style={labelSt}>
+              Geometry (GeoJSON){isEdit ? " — leave empty to keep existing" : " *"}
+            </label>
+            <textarea
+              style={textareaSt}
+              value={geomText}
+              onChange={e => setGeomText(e.target.value)}
+              placeholder={'{\n  "type": "MultiPolygon",\n  "coordinates": [...]\n}'}
+              spellCheck={false}
+            />
+          </div>
 
           <div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-              <label style={{ ...labelSt, margin: 0 }}>Entry Points{isEdit ? " — leave empty to keep existing" : ""}</label>
-              <div style={{ display: "flex", borderRadius: 8, overflow: "hidden", border: "1px solid #e2ddd6" }}>
-                {(["file", "manual"] as const).map(m => (
-                  <button key={m} onClick={() => setEntriesMode(m)} style={{ padding: "4px 12px", fontSize: 12, fontWeight: 600, border: "none", cursor: "pointer", fontFamily: "'Outfit', sans-serif", background: entriesMode === m ? "#1A3263" : "#fff", color: entriesMode === m ? "#fff" : "#547792" }}>
-                    {m === "file" ? "Upload" : "Manual"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {entriesMode === "file" ? (
-              <FilePicker label="" hint="Upload entries JSON — format: [[lng, lat], ...]" file={entriesFile} onChange={setEntriesFile} />
-            ) : (
-              <div>
-                {manualEntries.map((pt, i) => (
-                  <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "center" }}>
-                    <input style={{ ...inputSt, flex: 1 }} type="number" step="any" placeholder="Longitude" value={pt.lng} onChange={e => setManualEntries(p => p.map((x, idx) => idx === i ? { ...x, lng: e.target.value } : x))} />
-                    <input style={{ ...inputSt, flex: 1 }} type="number" step="any" placeholder="Latitude"  value={pt.lat} onChange={e => setManualEntries(p => p.map((x, idx) => idx === i ? { ...x, lat: e.target.value } : x))} />
-                    <button onClick={() => setManualEntries(p => p.filter((_, idx) => idx !== i))} style={{ background: "#fce8e6", border: "none", borderRadius: 8, padding: 8, cursor: "pointer", display: "flex" }}><X size={14} color="#d93025" /></button>
-                  </div>
-                ))}
-                <button onClick={() => setManualEntries(p => [...p, { lng: "", lat: "" }])} style={{ width: "100%", padding: "8px 14px", borderRadius: 10, border: "1px dashed #e2ddd6", background: "#f7f4ef", color: "#547792", fontSize: 13, cursor: "pointer", fontFamily: "'Outfit', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                  <Plus size={14} /> Add Entry Point
-                </button>
-              </div>
-            )}
+            <label style={labelSt}>
+              Entry Points (JSON){isEdit ? " — leave empty to keep existing" : ""}
+              {" "}<span style={{ fontWeight: 400, color: "#9aafbf" }}>[[lng, lat], ...]</span>
+            </label>
+            <textarea
+              style={textareaSt}
+              value={entriesText}
+              onChange={e => setEntriesText(e.target.value)}
+              placeholder={"[[75.9337, 11.3226], [75.9338, 11.3227]]"}
+              spellCheck={false}
+            />
           </div>
         </div>
 
@@ -276,10 +253,8 @@ export default function Buildings() {
   async function handleToggleAccess(b: Building) {
     const newValue = !b.isAccessible;
     setTogglingId(b.id);
-    // optimistic update
     setBuildings(prev => prev.map(x => x.id === b.id ? { ...x, isAccessible: newValue } : x));
     try {
-      // hardcoded full URL to avoid any proxy/routing issues
       const res = await fetch(`${BASE}/api/buildings/${b.id}/accessible`, {
         method:  "PATCH",
         headers: authH(),
@@ -287,7 +262,6 @@ export default function Buildings() {
       });
       if (!res.ok) throw new Error(`Server error ${res.status}`);
     } catch (e: unknown) {
-      // revert on failure
       setBuildings(prev => prev.map(x => x.id === b.id ? { ...x, isAccessible: b.isAccessible } : x));
       console.error("Toggle failed:", e instanceof Error ? e.message : String(e));
     } finally {

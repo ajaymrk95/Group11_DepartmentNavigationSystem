@@ -20,6 +20,7 @@ public class GeoUtil {
     }
 
     public static Geometry toMultiPoint(List<List<Double>> coordinates) {
+        if (coordinates == null || coordinates.isEmpty()) return null;
         Point[] points = coordinates.stream()
                 .map(c -> factory.createPoint(new Coordinate(c.get(0), c.get(1))))
                 .toArray(Point[]::new);
