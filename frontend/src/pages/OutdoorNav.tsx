@@ -40,6 +40,7 @@ export default function OutdoorNav() {
 
       const route = await res.json()
       
+      console.log(route)
       // route.coordinates return [lng, lat], we need [lat, lng] for Leaflet Polyline
       const latLngCoords = route.coordinates.map((coord: number[]) => [coord[1], coord[0]] as [number, number])
       

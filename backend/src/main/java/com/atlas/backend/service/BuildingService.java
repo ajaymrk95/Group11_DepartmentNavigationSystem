@@ -35,7 +35,7 @@ public class BuildingService {
         b.setIsAccessible(isAccessible != null ? isAccessible : true);
         b.setTags(tags);
         b.setGeom(GeoUtil.fromGeoJson(geoJson.toString()));
-        b.setEntries(GeoUtil.toMultiPoint(entries));
+      if (entries != null) b.setEntries(GeoUtil.toMultiPoint(entries));
         return buildingRepository.save(b);
     }
 

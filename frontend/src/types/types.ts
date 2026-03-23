@@ -84,3 +84,16 @@ export type Location = {
     floor: number | null;
     description: string | null;
 }
+
+export type Room = {
+    id: number;
+  name: string;
+  roomNo: string | null;
+  category: string;
+  floor: number;
+  isAccessible: boolean;
+  description: string | null;
+  tags: string[];
+  buildingId: number;
+  buildingName: string;
+}

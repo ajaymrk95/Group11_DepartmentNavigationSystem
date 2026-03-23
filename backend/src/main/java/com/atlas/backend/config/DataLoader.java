@@ -47,7 +47,7 @@ public class DataLoader implements CommandLineRunner {
             JsonNode features = root.get("features");
 
             System.out.println("Loading " + features.size() + " paths from GeoJSON...");
-
+            
             List<Path> pathsToSave = new ArrayList<>();
 
             for (int i = 0; i < features.size(); i++) {
