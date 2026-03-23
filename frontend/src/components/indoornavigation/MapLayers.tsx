@@ -40,7 +40,7 @@ export function MapLayers({ buildingOutline, units, paths, pois, floor }: MapLay
                     onEachFeature={onEachPath}
                 />
             )}
-
+{/* 
             {pois && (
                 <GeoJSON
                     key={`poi-${floor}`}
@@ -48,7 +48,7 @@ export function MapLayers({ buildingOutline, units, paths, pois, floor }: MapLay
                     pointToLayer={pointToLayer}
                     onEachFeature={onEachPOI}
                 />
-            )}
+            )} */}
         </>
     );
 }
