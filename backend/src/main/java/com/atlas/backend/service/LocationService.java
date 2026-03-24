@@ -45,7 +45,8 @@ public class LocationService {
                 row[8] != null ? ((Number) row[8]).doubleValue() : null,
                 tags,
                 row[4] != null ? ((Number) row[4]).intValue() : null,
-                (String) row[5]
+                (String) row[5],
+                (String) row[9]
             );
         }).toList();
     }
@@ -82,7 +83,8 @@ public class LocationService {
             lon,
             loc.getTag(),
             loc.getFloor(),
-            loc.getDescription()      // add description
+            loc.getDescription(),
+            null // buildingName not fetched in getAllLocations right now, can be null
         );
     }
 
