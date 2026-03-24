@@ -23,7 +23,8 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
             r.tags,
             ST_Y(ST_GeometryN(r.entries, 1)) AS lat,
             ST_X(ST_GeometryN(r.entries, 1)) AS lng,
-            r.visit_count
+            r.visit_count,
+            b.name AS building_name
         FROM rooms r
         WHERE 
             LOWER(r.name) LIKE LOWER(CONCAT('%', :q, '%')) OR
@@ -47,7 +48,8 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
             b.tags,
             ST_Y(ST_GeometryN(b.entries, 1)) AS lat,
             ST_X(ST_GeometryN(b.entries, 1)) AS lng,
-            b.visit_count
+            b.visit_count,
+            b.name AS building_name
         FROM buildings b
         WHERE 
             LOWER(b.name) LIKE LOWER(CONCAT('%', :q, '%')) OR

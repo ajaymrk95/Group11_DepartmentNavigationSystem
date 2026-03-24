@@ -211,8 +211,8 @@ export default function RoutePanel({ onRouteRequest, onClose, mapDestination }: 
         )}
       </div>
 
-      {/* Find Route Button */}
-      <div className="p-6 mt-auto shrink-0">
+      {/* Find Route Button and Conditional Indoor Nav Button */}
+      <div className="p-6 mt-auto shrink-0 flex flex-col gap-3">
         <button
           disabled={!start || !end}
           onClick={() => {
@@ -249,6 +249,42 @@ export default function RoutePanel({ onRouteRequest, onClose, mapDestination }: 
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
           </svg>
         </button>
+
+        {end && end.category && end.buildingName && (
+          <button
+            onClick={() => {
+              navigate(`/indoor-navigation/${end.buildingName.toLowerCase()}?floor=${end.floor || 1}`)
+              onClose()
+            }}
+            className="
+              w-full flex items-center justify-center gap-2
+              px-6 py-4
+              rounded-full
+              bg-[#1A3263]
+              text-[#e9e4d9]
+              border border-[#547792]
+              text-sm font-bold tracking-wide
+              shadow-md
+              transition-all duration-200
+              hover:bg-[#547792]
+              hover:shadow-xl
+              active:scale-[0.96]
+            "
+          >
+            Indoor Navigation
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        )}
       </div>
 
     </div>

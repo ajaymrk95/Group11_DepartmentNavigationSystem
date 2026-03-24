@@ -34,7 +34,9 @@ export interface RouteControlsProps {
     noRouteFound: boolean;
     setFrom: (value: string) => void;
     setTo: (value: string) => void;
-    onFindPath: () => void;
+    onFindPath: (fromCoords: [number, number], toCoords: [number, number]) => void;
+    buildingId: number;
+    buildingEntries: [number, number][];
 }
 
 export interface FloorToggleProps {
@@ -59,6 +61,7 @@ export interface BuildingData {
     isAccessible: boolean;
     tags: string[];
     outline: GeoJsonObject;
+    entries: object | null;   // ← add this
 }
 
 export interface FloorLayerData {
@@ -81,6 +84,7 @@ export type Location = {
     floor: number | null;
     description: string | null;
     locationType?: "ROOM" | "BUILDING";  // add this
+    buildingName?: string | null;
 }
 
 export type Room = {

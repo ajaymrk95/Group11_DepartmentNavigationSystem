@@ -1,10 +1,7 @@
-import { useMemo, useState, useCallback } from "react";
-import type { FeatureCollection } from "geojson";
+import { useState, useCallback } from "react";
 import type { FloorData, RouteLatLngs } from "../types/types";
-import { buildGraph } from "../utils/indoornavigation/buildGraph";
-import { dijkstra } from "../utils/indoornavigation/dijkstra";
-import { getPOINode } from "../utils/indoornavigation/poiToNode";
-import { nodesToLatLngs } from "../utils/indoornavigation/nodesToLatLngs";
+
+const BASE_URL = "http://localhost:8080/api";
 
 export interface NavigationState {
     from: string;
@@ -14,54 +11,69 @@ export interface NavigationState {
     setFrom: (name: string) => void;
     setTo: (name: string) => void;
     onDataLoad: (data: FloorData) => void;
-    findPath: () => void;
+    findPath: (fromCoords: [number, number], toCoords: [number, number]) => void;
 }
 
 export function useNavigation(
-    initialFrom = "entry1",
-    initialTo = "entry1"
+    initialFrom = "",
+    initialTo = ""
 ): NavigationState {
     const [from, setFrom] = useState(initialFrom);
     const [to, setTo] = useState(initialTo);
-    const [floorData, setFloorData] = useState<FloorData | null>(null);
     const [route, setRoute] = useState<RouteLatLngs | null>(null);
     const [noRouteFound, setNoRouteFound] = useState(false);
+    const [buildingId, setBuildingId] = useState<number | null>(null);
+    const [floor, setFloor] = useState<number>(1);
 
     const onDataLoad = useCallback((data: FloorData) => {
-        setFloorData(data);
+        // Extract buildingId and floor from loaded data
+        const outline = data.buildingOutline as any;
+        if (outline?.features?.[0]?.properties) {
+            setBuildingId(outline.features[0].properties.id);
+        }
     }, []);
 
-    const graph = useMemo(
-        () => floorData?.paths ? buildGraph(floorData.paths as FeatureCollection) : null,
-        [floorData?.paths]
-    );
-
-    const findPath = useCallback(() => {
-        if (!graph || !floorData?.pois) {
-            setRoute(null);
+    const findPath = useCallback(async (
+        fromCoords: [number, number],
+        toCoords: [number, number]
+    ) => {
+        if (!buildingId) {
             setNoRouteFound(true);
             return;
         }
 
-        const startNode = getPOINode(floorData.pois as FeatureCollection, from);
-        const endNode = getPOINode(floorData.pois as FeatureCollection, to);
+        try {
+            const url = `${BASE_URL}/routes/indoor?buildingId=${buildingId}&floor=${floor}` +
+                `&startLng=${fromCoords[0]}&startLat=${fromCoords[1]}` +
+                `&endLng=${toCoords[0]}&endLat=${toCoords[1]}`;
 
-        if (!startNode || !endNode) {
+            const res = await fetch(url);
+
+            if (!res.ok) {
+                setRoute(null);
+                setNoRouteFound(true);
+                return;
+            }
+
+            const data = await res.json();
+
+            if (data.coordinates && data.coordinates.length > 0) {
+                // Convert [lng, lat] → [lat, lng] for Leaflet
+                const latLngs: [number, number][] = data.coordinates.map(
+                    ([lng, lat]: [number, number]) => [lat, lng]
+                );
+                setRoute(latLngs);
+                setNoRouteFound(false);
+            } else {
+                setRoute(null);
+                setNoRouteFound(true);
+            }
+        } catch (err) {
+            console.error("Routing failed:", err);
             setRoute(null);
             setNoRouteFound(true);
-            return;
         }
-
-        const result = dijkstra(graph, startNode, endNode);
-
-        if (result) {
-            setRoute(nodesToLatLngs(result.nodes));
-            setNoRouteFound(false);
-        } else {
-            setRoute(null);
-            setNoRouteFound(true);
-        }
-    }, [graph, floorData?.pois, from, to]);
+    }, [buildingId, floor]);
 
     return { from, to, route, noRouteFound, setFrom, setTo, onDataLoad, findPath };
 }

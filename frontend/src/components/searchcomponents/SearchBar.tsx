@@ -101,6 +101,7 @@ export default function SearchBar({
           tag: loc.tag || [],
           floor: loc.floor ?? null,
           locationType: loc.locationType ?? undefined,  // ← added
+          buildingName: loc.buildingName ?? null,
         }
         onSelect(mapped)
         setQuery(mapped.name)
@@ -131,6 +132,7 @@ export default function SearchBar({
         tag: loc.tag || [],
         floor: loc.floor ?? null,
         locationType: loc.locationType ?? undefined,  // ← added
+        buildingName: loc.buildingName ?? null,
       }))
       setResults(mapped)
     } catch (err) {

@@ -52,9 +52,34 @@ public class RoutingService {
         }
     }
 
+    private String toNodeId(double lat, double lon) {
+        return String.format("%.8f,%.8f", lat, lon);
+    }
+
     public RouteResponse calculateRoute(double startLat, double startLng, double endLat, double endLng) {
         // 1. Build the in-memory graph from all accessible paths
         List<Path> accessiblePaths = pathRepository.findAllAccessible();
+        Map<String, Node> graph = buildGraph(accessiblePaths);
+
+        if (graph.isEmpty()) {
+            throw new RuntimeException("No routing data available.");
+        }
+
+        // 2. Snap requested start/end to nearest actual nodes in the graph
+        Node startNode = findNearestNode(graph, startLat, startLng);
+        Node endNode = findNearestNode(graph, endLat, endLng);
+
+        if (startNode == null || endNode == null) {
+            throw new RuntimeException("Could not snap to a valid route point.");
+        }
+
+        // 3. Run Dijkstra
+        return dijkstra(graph, startNode, endNode);
+    }
+
+    public RouteResponse calculateFloorRoute(double startLat, double startLng, double endLat, double endLng, Long buildingId, Integer floor) {
+        // 1. Build the in-memory graph from all accessible paths
+        List<Path> accessiblePaths = pathRepository.findAllAccessibleFloorPaths(buildingId, floor);
         Map<String, Node> graph = buildGraph(accessiblePaths);
 
         if (graph.isEmpty()) {
@@ -95,8 +120,8 @@ public class RoutingService {
                     Coordinate c1 = coords[i];
                     Coordinate c2 = coords[i + 1];
 
-                    String id1 = c1.y + "," + c1.x; // lat,lon
-                    String id2 = c2.y + "," + c2.x;
+                    String id1 = toNodeId(c1.y, c1.x);
+                    String id2 = toNodeId(c2.y, c2.x);
 
                     graph.putIfAbsent(id1, new Node(id1));
                     graph.putIfAbsent(id2, new Node(id2));
@@ -139,6 +164,8 @@ public class RoutingService {
     }
 
     private RouteResponse dijkstra(Map<String, Node> graph, Node start, Node end) {
+        System.out.println(start);
+        System.out.println(end);
         Map<Node, Double> distances = new HashMap<>();
         Map<Node, Node> previous = new HashMap<>();
         PriorityQueue<QueueNode> pq = new PriorityQueue<>();

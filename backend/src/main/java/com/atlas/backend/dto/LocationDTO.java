@@ -16,6 +16,7 @@ public class LocationDTO {
     private String description;
     private String locationType; // "ROOM" or "BUILDING"
     private Integer visitCount;
+    private String buildingName;
 
     public LocationDTO(Long id, String name,
                        LocationCategory category, String room,
@@ -24,7 +25,9 @@ public class LocationDTO {
                        Integer floor,
                        String description,
                        String locationType,
-                       Integer visitCount) {
+                       Integer visitCount,
+                        String buildingName) {
+    
         this.id = id;
         this.name = name;
         this.category = category;
@@ -36,6 +39,7 @@ public class LocationDTO {
         this.description = description;
         this.locationType = locationType;
         this.visitCount = visitCount;
+        this.buildingName = buildingName;
     }
 
     public String getDescription() { return description; }
@@ -49,4 +53,5 @@ public class LocationDTO {
     public Integer getFloor() { return floor; }
     public String getLocationType() { return locationType; }
     public Integer getVisitCount() { return visitCount; }
+    public String getBuildingName() { return buildingName; }
 }

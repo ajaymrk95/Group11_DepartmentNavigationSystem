@@ -18,12 +18,16 @@ public class PathService {
 
     @Autowired
     private PathRepository pathRepository;
-
+  
     @Autowired
     private BuildingRepository buildingRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
+  
+    public List<Path> findByFloor(Long buildingId, Integer floor) {
+        return pathRepository.findByBuildingIdAndFloor(buildingId, floor);
+    }
 
     public List<Path> getOutdoorPaths() {
         return pathRepository.findAllOutdoorPaths();

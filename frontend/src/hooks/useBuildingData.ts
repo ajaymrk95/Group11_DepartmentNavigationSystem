@@ -44,6 +44,7 @@ export function useBuildingData(building: string) {
                     isAccessible: found.isAccessible,
                     tags: found.tags,
                     outline,
+                    entries: found.entries ? JSON.parse(found.entries) : null,  // ← add this
                 });
                 setLoading(false);
             })

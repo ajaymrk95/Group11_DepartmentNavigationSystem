@@ -67,6 +67,31 @@ public class RoomController {
         return map;
     }
 
+    // Updated GET /api/rooms/search?buildingId=11&q=101
+    @GetMapping("/search")
+    public List<Map<String, Object>> searchRooms(@RequestParam Long buildingId,
+            @RequestParam String q) {
+        // 1. Notice 'floor' is removed from parameters and service call
+        return roomService.searchRooms(buildingId, q)
+                .stream()
+                .map(r -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", r.getId());
+                    map.put("name", r.getName());
+                    map.put("roomNo", r.getRoomNo());
+                    map.put("category", r.getCategory());
+
+                    // 2. Add floor to the response so the frontend can display it
+                    map.put("floor", r.getFloor());
+
+                    map.put("entries", r.getEntries() != null
+                            ? GeoUtil.parseGeoJson(GeoUtil.toGeoJson(r.getEntries()))
+                            : null);
+                    return map;
+                })
+                .collect(Collectors.toList());
+    }
+
     private Map<String, Object> toRoomFeature(Room r) {
         Map<String, Object> feature = new HashMap<>();
         feature.put("type", "Feature");

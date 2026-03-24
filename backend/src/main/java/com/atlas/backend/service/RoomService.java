@@ -48,12 +48,14 @@ public class RoomService {
     }
 
    @Auditable(action = "UPDATE", entityType = "Room")
-public Room updateAccessible(Long id, Boolean accessible) {
-    Room room = roomRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Room not found with id: " + id));
-    room.setIsAccessible(accessible);
-    return roomRepository.save(room);  // ← return the saved entity
-}
+    public Room updateAccessible(Long id, Boolean accessible) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Room not found with id: " + id));
+        room.setIsAccessible(accessible);
+        return roomRepository.save(room);  // ← return the saved entity
+    }
+
+    
      @Auditable(action = "UPDATE", entityType = "Room")
     public Room update(Long id, RoomRequest body) throws Exception {
         Room room = roomRepository.findById(id)
@@ -85,7 +87,12 @@ public Room updateAccessible(Long id, Boolean accessible) {
         return roomRepository.save(room);
     
     }
+
     public List<Room> findAll() {
         return roomRepository.findAll();
+    }
+
+    public List<Room> searchRooms(Long buildingId, String query) {
+        return roomRepository.searchRoomsInBuilding(buildingId, query);
     }
 }

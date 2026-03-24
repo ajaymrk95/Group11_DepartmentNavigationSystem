@@ -67,7 +67,8 @@ public class LocationService {
                     row[4] != null ? ((Number) row[4]).intValue() : null,
                     (String) row[5],
                     (String) row[10], // location_type: "ROOM" or "BUILDING"
-                    row[9] != null ? ((Number) row[9]).intValue() : null  // visit_count
+                    row[9] != null ? ((Number) row[9]).intValue() : null,  // visit_count
+                    null
             );
         }).toList();
     }
@@ -89,7 +90,8 @@ public class LocationService {
                     row[4] != null ? ((Number) row[4]).intValue() : null,
                     (String) row[5],
                     locationType,
-                    row[9] != null ? ((Number) row[9]).intValue() : null  // visit_count
+                    row[9] != null ? ((Number) row[9]).intValue() : null,  // visit_count
+                    null
             );
         }).toList();
     }
@@ -128,6 +130,7 @@ public class LocationService {
                 loc.getFloor(),
                 loc.getDescription(),
                 null,  // legacy Location entity has no locationType
+                null,
                 null
         );
     }

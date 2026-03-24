@@ -2,6 +2,7 @@ import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import IndoorMap from "../../components/indoornavigation/IndoorMap";
 import { RouteControls } from "../../components/indoornavigation/RouteControls";
 import { useNavigation } from "../../hooks/useNavigate";
+import { useBuildingData } from "../../hooks/useBuildingData";
 import { HomeIcon } from "../../components/icons/HomeIcon";
 
 export function NavigationPage() {
@@ -10,12 +11,18 @@ export function NavigationPage() {
     const floor = Number(searchParams.get("floor")) || 1;
     const navigate = useNavigate();
 
+    const { data: buildingData } = useBuildingData(building ?? "");
+
+    // Extract [lng, lat] pairs from MultiPoint entries
+    const buildingEntries: [number, number][] = buildingData?.entries
+        ? (buildingData.entries as any).coordinates ?? []
+        : [];
+
     const { from, to, route, noRouteFound, setFrom, setTo, onDataLoad, findPath } = useNavigation();
 
     return (
         <div className="w-full h-screen flex flex-col bg-gray-100">
-            <header className="bg-[#1A3263] shadow-md px-4 py-3 z-10 flex items-center justify-between gap-4 flex-wrap shrink-0">
-
+            <header className="bg-[#1A3263] shadow-md px-4 py-3 z-[2000] flex items-center justify-between gap-4 flex-wrap shrink-0">
                 <div className="flex items-center gap-3 shrink-0">
                     <button
                         onClick={() => navigate("/")}
@@ -37,6 +44,8 @@ export function NavigationPage() {
                         setFrom={setFrom}
                         setTo={setTo}
                         onFindPath={findPath}
+                        buildingId={buildingData?.id ?? 0}
+                        buildingEntries={buildingEntries}
                     />
                 </div>
 
@@ -46,7 +55,6 @@ export function NavigationPage() {
                 >
                     Outdoor View
                 </button>
-
             </header>
 
             <div className="flex-1 min-h-0 min-w-0">
