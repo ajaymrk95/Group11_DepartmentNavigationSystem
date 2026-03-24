@@ -52,6 +52,10 @@ public class RoutingService {
         }
     }
 
+    private String toNodeId(double lat, double lon) {
+        return String.format("%.8f,%.8f", lat, lon);
+    }
+
     public RouteResponse calculateRoute(double startLat, double startLng, double endLat, double endLng) {
         // 1. Build the in-memory graph from all accessible paths
         List<Path> accessiblePaths = pathRepository.findAllAccessible();
@@ -116,8 +120,8 @@ public class RoutingService {
                     Coordinate c1 = coords[i];
                     Coordinate c2 = coords[i + 1];
 
-                    String id1 = c1.y + "," + c1.x; // lat,lon
-                    String id2 = c2.y + "," + c2.x;
+                    String id1 = toNodeId(c1.y, c1.x);
+                    String id2 = toNodeId(c2.y, c2.x);
 
                     graph.putIfAbsent(id1, new Node(id1));
                     graph.putIfAbsent(id2, new Node(id2));
