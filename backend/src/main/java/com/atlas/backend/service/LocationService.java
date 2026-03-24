@@ -91,7 +91,7 @@ public class LocationService {
                     (String) row[5],
                     locationType,
                     row[9] != null ? ((Number) row[9]).intValue() : null,  // visit_count
-                    null
+                    (String) row[10]
             );
         }).toList();
     }

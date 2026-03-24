@@ -26,6 +26,7 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
             r.visit_count,
             b.name AS building_name
         FROM rooms r
+        LEFT JOIN buildings b ON b.id = r.building_id
         WHERE 
             LOWER(r.name) LIKE LOWER(CONCAT('%', :q, '%')) OR
             LOWER(r.room_no) LIKE LOWER(CONCAT('%', :q, '%')) OR

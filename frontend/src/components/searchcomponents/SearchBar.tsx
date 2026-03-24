@@ -5,18 +5,15 @@ import SearchResults from "./SearchResults"
 import { useCurrentLocation } from "../../hooks/useCurrentLocation"
 
 type Props = {
-  // --- existing props (used by search location RoutePanel) ---
   onSelect: (location: Location | null) => void
   onFocusSearch?: () => void
-
-  // --- new optional props (used by outdoor navigation RoutePanel) ---
-  label?: string                        // placeholder text, defaults to "Search location..."
-  iconType?: "start" | "end"            // shows start/end icon instead of search icon
-  selectedLoc?: Location | null         // controlled selected value
-  showQr?: boolean                      // show QR scanner button, defaults to false
-  useQrResult?: boolean                 // listen for QR scan result from router state, defaults to false
-  showFilters?: boolean                 // show filter chips, defaults to true
-  showMyLocation?: boolean              // show "My Location" option in dropdown, defaults to false
+  label?: string
+  iconType?: "start" | "end"
+  selectedLoc?: Location | null
+  showQr?: boolean
+  useQrResult?: boolean
+  showFilters?: boolean
+  showMyLocation?: boolean
 }
 
 const filters = [
@@ -100,7 +97,7 @@ export default function SearchBar({
           longitude: loc.longitude ?? null,
           tag: loc.tag || [],
           floor: loc.floor ?? null,
-          locationType: loc.locationType ?? undefined,  // ← added
+          locationType: loc.locationType ?? undefined,
           buildingName: loc.buildingName ?? null,
         }
         onSelect(mapped)
@@ -116,7 +113,6 @@ export default function SearchBar({
     handleQr()
   }, [location.state, useQrResult])
 
-  // ── Change 1: map locationType from API response ──────────────────────────
   async function fetchResults(value: string) {
     try {
       const res = await fetch(`http://localhost:8080/locations/search?q=${encodeURIComponent(value)}`)
@@ -131,7 +127,7 @@ export default function SearchBar({
         longitude: loc.longitude ?? null,
         tag: loc.tag || [],
         floor: loc.floor ?? null,
-        locationType: loc.locationType ?? undefined,  // ← added
+        locationType: loc.locationType ?? undefined,
         buildingName: loc.buildingName ?? null,
       }))
       setResults(mapped)
@@ -157,10 +153,10 @@ export default function SearchBar({
   async function handleFilter(filter: string) {
     onFocusSearch?.()
     setActiveFilter(filter)
+    setOpen(true)          // ← fix: was missing, results never showed
     await fetchResults(filter)
   }
 
-  // ── Change 2: fire visit increment on select ──────────────────────────────
   function handleSelect(loc: Location) {
     setQuery(loc.name)
     setResults([])
@@ -228,7 +224,10 @@ export default function SearchBar({
           placeholder={label}
           value={query}
           onChange={handleSearch}
-          onFocus={onFocusSearch}
+          onFocus={() => {
+            onFocusSearch?.()
+            if (results.length > 0) setOpen(true)  // ← fix: reopen if results exist on refocus
+          }}
           className="
             w-full py-1.5 bg-transparent
             text-[#1a305b] text-base font-medium
@@ -313,7 +312,7 @@ export default function SearchBar({
       )}
 
       {isRoutingMode ? (
-        open && query && (
+        open && (query || activeFilter) && (
           <div className="absolute mt-2 w-full bg-white border border-[#547792]/20 rounded-xl shadow-2xl max-h-60 overflow-y-auto z-[9999]">
             {[...(myLocation ? [myLocation] : []), ...results].map((loc, index) => (
               <div
@@ -330,9 +329,11 @@ export default function SearchBar({
           </div>
         )
       ) : (
-        <div className="relative z-10">
-          <SearchResults results={results} onSelect={handleSelect} />
-        </div>
+        open && (query || activeFilter) && results.length > 0 && (  // ← fix: gate on open + results
+          <div className="relative z-10">
+            <SearchResults results={results} onSelect={handleSelect} />
+          </div>
+        )
       )}
     </div>
   )
