@@ -80,6 +80,7 @@ export type Location = {
     tag: string[];
     floor: number | null;
     description: string | null;
+    locationType?: "ROOM" | "BUILDING";  // add this
 }
 
 export type Room = {

@@ -49,7 +49,6 @@ export default function SearchBar({
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Only run geolocation hook when needed (outdoor routing panel)
   const { location: currentCoords } = useCurrentLocation()
   const myLocation: Location | null = showMyLocation && currentCoords
     ? {
@@ -65,7 +64,6 @@ export default function SearchBar({
       }
     : null
 
-  // Sync query with controlled selectedLoc (used in outdoor routing panel)
   useEffect(() => {
     if (selectedLoc) {
       setQuery(selectedLoc.name)
@@ -74,7 +72,6 @@ export default function SearchBar({
     }
   }, [selectedLoc])
 
-  // Handle QR scan result (used in outdoor routing panel)
   useEffect(() => {
     if (!useQrResult) return
     const qrValue = location.state?.qrData
@@ -103,6 +100,7 @@ export default function SearchBar({
           longitude: loc.longitude ?? null,
           tag: loc.tag || [],
           floor: loc.floor ?? null,
+          locationType: loc.locationType ?? undefined,  // ← added
         }
         onSelect(mapped)
         setQuery(mapped.name)
@@ -117,6 +115,7 @@ export default function SearchBar({
     handleQr()
   }, [location.state, useQrResult])
 
+  // ── Change 1: map locationType from API response ──────────────────────────
   async function fetchResults(value: string) {
     try {
       const res = await fetch(`http://localhost:8080/locations/search?q=${encodeURIComponent(value)}`)
@@ -131,6 +130,7 @@ export default function SearchBar({
         longitude: loc.longitude ?? null,
         tag: loc.tag || [],
         floor: loc.floor ?? null,
+        locationType: loc.locationType ?? undefined,  // ← added
       }))
       setResults(mapped)
     } catch (err) {
@@ -146,7 +146,6 @@ export default function SearchBar({
 
     if (value.trim() === "") {
       setResults([])
-      // notify parent that selection was cleared (outdoor routing panel needs this)
       onSelect(null)
       return
     }
@@ -159,21 +158,26 @@ export default function SearchBar({
     await fetchResults(filter)
   }
 
+  // ── Change 2: fire visit increment on select ──────────────────────────────
   function handleSelect(loc: Location) {
     setQuery(loc.name)
     setResults([])
     setActiveFilter(null)
     setOpen(false)
     onSelect(loc)
+
+    if (loc.id !== -1 && loc.locationType) {
+      fetch(`http://localhost:8080/locations/visit?id=${loc.id}&locationType=${loc.locationType}`, {
+        method: "POST",
+      }).catch(err => console.error("Failed to record visit", err))
+    }
   }
 
-  // Decide which icon to show in the input
   function renderIcon() {
     if (iconType === "start") {
       return <div className="w-4 h-4 rounded-full border-[4px] border-[#547792]" />
     }
     if (iconType === "end") {
-      // Pin icon for end point
       return (
         <svg className="w-5 h-5 text-[#1a305b]" fill="currentColor" viewBox="0 0 20 20">
           <path
@@ -184,7 +188,6 @@ export default function SearchBar({
         </svg>
       )
     }
-    // Default search icon (used in search location RoutePanel)
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -200,14 +203,11 @@ export default function SearchBar({
     )
   }
 
-  // When used as a routing input (iconType provided), render a compact input-only style
-  // When used as the main search bar (no iconType), render the full card with filters
   const isRoutingMode = iconType !== undefined
 
   return (
     <div className={`relative w-full ${!isRoutingMode ? "bg-[#E8E2DB] p-4 rounded-xl shadow-md" : ""}`}>
 
-      {/* Input */}
       <div
         className={`
           flex items-center bg-white
@@ -235,7 +235,6 @@ export default function SearchBar({
           "
         />
 
-        {/* QR button — only shown when showQr is true */}
         {showQr && (
           <button
             type="button"
@@ -249,7 +248,6 @@ export default function SearchBar({
         )}
       </div>
 
-      {/* QR error banner — only shown when useQrResult is true and there's an error */}
       {qrError && (
         <div
           className="mt-2 flex items-start gap-3 bg-[#1A3263] border border-[#547792] rounded-xl px-4 py-3 shadow-md"
@@ -285,7 +283,6 @@ export default function SearchBar({
         }
       `}</style>
 
-      {/* Filters — only shown in non-routing mode (search location RoutePanel) */}
       {showFilters && !isRoutingMode && (
         <>
           <div className="mt-5 mb-2 text-sm font-semibold text-[#1a305b]">Filters</div>
@@ -313,9 +310,7 @@ export default function SearchBar({
         </>
       )}
 
-      {/* Search Results dropdown */}
       {isRoutingMode ? (
-        // Routing mode: inline dropdown with My Location support
         open && query && (
           <div className="absolute mt-2 w-full bg-white border border-[#547792]/20 rounded-xl shadow-2xl max-h-60 overflow-y-auto z-[9999]">
             {[...(myLocation ? [myLocation] : []), ...results].map((loc, index) => (
@@ -333,7 +328,6 @@ export default function SearchBar({
           </div>
         )
       ) : (
-        // Search location mode: uses SearchResults component (has tags, category badge etc.)
         <div className="relative z-10">
           <SearchResults results={results} onSelect={handleSelect} />
         </div>
