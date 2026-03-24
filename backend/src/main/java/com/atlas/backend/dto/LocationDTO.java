@@ -15,13 +15,15 @@ public class LocationDTO {
     private List<String> tag;
     private Integer floor;
     private String description;
+    private String buildingName;
 
     public LocationDTO(Long id, String name,
             LocationCategory category, String room,
             Double latitude, Double longitude,
             List<String> tag,
             Integer floor,
-            String description) {
+            String description,
+            String buildingName) {
         this.id = id;
         this.name = name;
         this.category = category;
@@ -31,6 +33,7 @@ public class LocationDTO {
         this.tag = tag;
         this.floor = floor;
         this.description = description;
+        this.buildingName = buildingName;
     }
 
     public String getDescription() { return description; }
@@ -48,4 +51,5 @@ public class LocationDTO {
     public List<String> getTag() { return tag; }
 
     public Integer getFloor() { return floor; }
+    public String getBuildingName() { return buildingName; }
 }

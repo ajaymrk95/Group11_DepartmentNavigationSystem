@@ -83,6 +83,7 @@ export type Location = {
     tag: string[];
     floor: number | null;
     description: string | null;
+    buildingName?: string | null;
 }
 
 export type Room = {
