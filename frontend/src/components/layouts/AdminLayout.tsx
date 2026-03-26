@@ -2,10 +2,8 @@ import { Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Building2,
-
   DoorOpen,
   Map,
-
   ScrollText,
   LogOut,
   Bell,
@@ -14,14 +12,12 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  { label: 'Dashboard',     icon: LayoutDashboard, to: '/admin/dashboard' },
-  { label: 'Buildings',     icon: Building2,        to: '/admin/buildings' },
-  // { label: 'Floors',        icon: Layers,           to: '/admin/floors' },
-  { label: 'Rooms',         icon: DoorOpen,         to: '/admin/rooms' },
-  { label: 'Faculty',        icon: Users,           to: '/admin/faculty' },
-  { label: 'Path',  icon: Map,              to: '/admin/Path' },
-  // { label: 'Add Locations', icon: MapPin,           to: '/admin/add-location' },
-  { label: 'Logs',          icon: ScrollText,       to: '/admin/logs' },
+  { label: 'Dashboard',    icon: LayoutDashboard, to: '/admin/dashboard' },
+  { label: 'Buildings',    icon: Building2,        to: '/admin/buildings' },
+  { label: 'Rooms',        icon: DoorOpen,         to: '/admin/rooms' },
+  { label: 'Faculty',      icon: Users,            to: '/admin/faculty' },
+  { label: 'Path',         icon: Map,              to: '/admin/Path' },
+  { label: 'Logs',         icon: ScrollText,       to: '/admin/logs' },
 ];
 
 export default function AdminLayout() {
@@ -40,187 +36,36 @@ export default function AdminLayout() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
-
-        *, *::before, *::after { box-sizing: border-box;}
-
-        html, body, #root {
-          height: 100%;
-          width: 100%;
-          overflow: hidden;
-        }
-
-        .al-root {
-          display: flex;
-          height: 100vh;
-          width: 100vw;
-          font-family: 'Outfit', sans-serif;
-          background: #EDE8DC;
-          overflow: hidden;
-        }
-
-        /* ══ Sidebar ══ */
-        .al-sidebar {
-          width: 200px;
-          min-width: 200px;
-          background: #1A3263;
-          display: flex;
-          flex-direction: column;
-          height: 100vh;
-          flex-shrink: 0;
-        }
-
-        .al-brand {
-          padding: 22px 18px 18px;
-          border-bottom: 1px solid rgba(255,255,255,.08);
-        }
-        .al-brand-name {
-          font-size: 22px;
-          font-weight: 800;
-          color: #FAB95B;
-          letter-spacing: -0.02em;
-          line-height: 1;
-        }
-        .al-brand-role {
-          font-size: 10px;
-          font-weight: 500;
-          color: rgba(255,255,255,.4);
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          margin-top: 4px;
-        }
-        .al-brand-org {
-          font-size: 11px;
-          color: rgba(255,255,255,.3);
-          margin-top: 2px;
-        }
-
-        .al-nav {
-          flex: 1;
-          padding: 10px 8px;
-          overflow-y: auto;
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-        .al-nav::-webkit-scrollbar { display: none; }
-
-        .al-nav-btn {
-          display: flex;
-          align-items: center;
-          gap: 9px;
-          width: 100%;
-          padding: 9px 11px;
-          border-radius: 9px;
-          border: none;
-          background: transparent;
-          color: rgba(255,255,255,.5);
-          font-family: 'Outfit', sans-serif;
-          font-size: 13px;
-          font-weight: 400;
-          cursor: pointer;
-          text-align: left;
-          transition: background .15s, color .15s;
-          white-space: nowrap;
-        }
-        .al-nav-btn:hover {
-          background: rgba(255,255,255,.08);
-          color: rgba(255,255,255,.85);
-        }
-        .al-nav-btn.active {
-          background: #FAB95B;
-          color: #1A3263;
-          font-weight: 600;
-        }
-
-        .al-signout-wrap {
-          padding: 8px 8px 18px;
-          border-top: 1px solid rgba(255,255,255,.07);
-        }
-        .al-signout-btn {
-          display: flex;
-          align-items: center;
-          gap: 9px;
-          width: 100%;
-          padding: 9px 11px;
-          border-radius: 9px;
-          border: none;
-          background: transparent;
-          color: rgba(255,255,255,.4);
-          font-family: 'Outfit', sans-serif;
-          font-size: 13px;
-          cursor: pointer;
-          transition: background .15s, color .15s;
-        }
-        .al-signout-btn:hover {
-          background: rgba(255,255,255,.08);
-          color: rgba(255,255,255,.75);
-        }
-
-        /* ══ Main area ══ */
-        .al-main {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          overflow: hidden;
-          min-width: 0;       /* critical: prevents flex child overflow */
-        }
-
-        .al-topbar {
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          gap: 10px;
-          padding: 12px 24px;
-          background: #EDE8DC;
-          flex-shrink: 0;
-        }
-
-        .al-topbar-btn {
-          width: 34px;
-          height: 34px;
-          border-radius: 50%;
-          border: none;
-          background: rgba(26,50,99,.08);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          color: #1A3263;
-          transition: background .15s;
-        }
-        .al-topbar-btn:hover { background: rgba(26,50,99,.14); }
-
-        .al-content {
-          flex: 1;
-          overflow-y: auto;
-          overflow-x: hidden;
-          width: 100%;
-        }
-        .al-content::-webkit-scrollbar { width: 5px; }
-        .al-content::-webkit-scrollbar-track { background: transparent; }
-        .al-content::-webkit-scrollbar-thumb {
-          background: rgba(26,50,99,.15);
-          border-radius: 99px;
-        }
       `}</style>
 
-      <div className="al-root">
-
+      {/* ── Root ── */}
+      <div className="flex h-screen w-screen overflow-hidden bg-[#EDE8DC] font-['Outfit',sans-serif]">
+        
         {/* ── Sidebar ── */}
-        <aside className="al-sidebar">
-          <div className="al-brand">
-            <div className="al-brand-name">Atlas</div>
-            <div className="al-brand-role">Admin Console</div>
-            <div className="al-brand-org">NIT Calicut</div>
+        <aside className="flex h-screen w-[200px] min-w-[200px] shrink-0 flex-col bg-[#1A3263]">
+          <div className="border-b border-white/[.08] px-[18px] pb-[18px] pt-[22px]">
+            <div className="text-[22px] font-[800] leading-none tracking-[-0.02em] text-[#FAB95B]">
+              Atlas
+            </div>
+            <div className="mt-1 text-[10px] font-medium uppercase tracking-[0.1em] text-white/40">
+              Admin Console
+            </div>
+            <div className="mt-[2px] text-[11px] text-white/30">
+              NIT Calicut
+            </div>
           </div>
 
-          <nav className="al-nav">
+          <nav className="flex flex-1 flex-col gap-[2px] overflow-y-auto px-[8px] py-[10px] [&::-webkit-scrollbar]:hidden">
             {navItems.map(({ label, icon: Icon, to }) => {
               const active = location.pathname === to;
               return (
                 <button
                   key={to}
-                  className={`al-nav-btn${active ? ' active' : ''}`}
+                  className={`flex w-full items-center gap-[9px] whitespace-nowrap rounded-[9px] px-[11px] py-[9px] text-left text-[13px] transition-colors duration-150 ${
+                    active
+                      ? 'bg-[#FAB95B] font-semibold text-[#1A3263]'
+                      : 'font-normal text-white/50 hover:bg-white/[.08] hover:text-white/[.85]'
+                  }`}
                   onClick={() => navigate(to)}
                 >
                   <Icon size={16} strokeWidth={active ? 2.2 : 1.8} />
@@ -230,8 +75,24 @@ export default function AdminLayout() {
             })}
           </nav>
 
-          <div className="al-signout-wrap">
-            <button className="al-signout-btn" onClick={handleSignOut}>
+          {/* ── Sidebar Bottom Area ── */}
+          <div className="flex flex-col gap-2 border-t border-white/[.07] px-[8px] pb-[18px] pt-[12px]">
+            
+            {/* Action Buttons */}
+            <div className="flex items-center justify-around px-2 mb-1">
+              <button className="flex h-[34px] w-[34px] cursor-pointer items-center justify-center rounded-full bg-white/[.05] text-white/50 transition-colors duration-150 hover:bg-white/[.12] hover:text-white/[.85]">
+                <Bell size={16} strokeWidth={1.8} />
+              </button>
+              <button className="flex h-[34px] w-[34px] cursor-pointer items-center justify-center rounded-full bg-white/[.05] text-white/50 transition-colors duration-150 hover:bg-white/[.12] hover:text-white/[.85]">
+                <User size={16} strokeWidth={1.8} />
+              </button>
+            </div>
+
+            {/* Sign Out */}
+            <button
+              className="flex w-full cursor-pointer items-center gap-[9px] rounded-[9px] bg-transparent px-[11px] py-[9px] text-[13px] text-white/40 transition-colors duration-150 hover:bg-white/[.08] hover:text-white/[.75]"
+              onClick={handleSignOut}
+            >
               <LogOut size={16} strokeWidth={1.8} />
               Sign Out
             </button>
@@ -239,21 +100,11 @@ export default function AdminLayout() {
         </aside>
 
         {/* ── Main ── */}
-        <div className="al-main">
-          <div className="al-topbar">
-            <button className="al-topbar-btn">
-              <Bell size={16} strokeWidth={1.8} />
-            </button>
-            <button className="al-topbar-btn">
-              <User size={16} strokeWidth={1.8} />
-            </button>
-          </div>
-
-          <main className="al-content">
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <main className="flex-1 w-full overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#1A3263]/15 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-[5px]">
             <Outlet />
           </main>
         </div>
-
       </div>
     </>
   );
