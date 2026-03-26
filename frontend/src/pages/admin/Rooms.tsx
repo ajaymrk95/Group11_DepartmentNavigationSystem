@@ -2,210 +2,246 @@
 import { useEffect, useState } from "react";
 import { DoorOpen, Plus, Search, Loader2, Building2, Layers, Eye, Pencil } from "lucide-react";
 
-import { S, catColor, defaultCat } from "./room/constants";
 import { fetchRooms, fetchBuildings, patchAccessible } from "./room/api";
-import Toggle       from "./room/Toggle";
-import DetailModal  from "./room/DetailModal";
+import Toggle        from "./room/Toggle";
+import DetailModal   from "./room/DetailModal";
 import RoomFormModal from "./room/RoomFormModal";
 
 import type { Room } from "../../types/types";
 
-export default function Rooms() {
-  const [rooms,        setRooms]        = useState<Room[]>([]);
-  const [loading,      setLoading]      = useState(true);
-  const [search,       setSearch]       = useState("");
-  const [catFilter,    setCatFilter]    = useState("all");
-  const [floorFilter,  setFloorFilter]  = useState("all");
-  const [hoveredRow,   setHoveredRow]   = useState<number | null>(null);
-  const [togglingId,   setTogglingId]   = useState<number | null>(null);
-  const [showAdd,      setShowAdd]      = useState(false);
-  const [editRoom,     setEditRoom]     = useState<Room | null>(null);
-  const [detailRoom,   setDetailRoom]   = useState<Room | null>(null);
-  const [buildings,    setBuildings]    = useState<{ id: number; name: string }[]>([]);
+const catColor: Record<string, { bg: string; color: string }> = {
+  classroom:      { bg: "#e8f4fd", color: "#1a73e8" },
+  lab:            { bg: "#e6f4ea", color: "#1e8e3e" },
+  toilet:         { bg: "#fce8e6", color: "#d93025" },
+  "seminar hall": { bg: "#fef7e0", color: "#f29900" },
+  office:         { bg: "#f3e8fd", color: "#8430ce" },
+};
+const defaultCat = { bg: "#f0f4f9", color: "#547792" };
 
-  // ── Data fetching ───────────────────────────────────────────────────────────
-  useEffect(() => {
-    fetchBuildings().then(setBuildings);
-  }, []);
+export default function Rooms() {
+  const [rooms,       setRooms]       = useState<Room[]>([]);
+  const [loading,     setLoading]     = useState(true);
+  const [search,      setSearch]      = useState("");
+  const [catFilter,   setCatFilter]   = useState("all");
+  const [floorFilter, setFloorFilter] = useState("all");
+  const [hoveredRow,  setHoveredRow]  = useState<number | null>(null);
+  const [togglingId,  setTogglingId]  = useState<number | null>(null);
+  const [showAdd,     setShowAdd]     = useState(false);
+  const [editRoom,    setEditRoom]    = useState<Room | null>(null);
+  const [detailRoom,  setDetailRoom]  = useState<Room | null>(null);
+  const [buildings,   setBuildings]   = useState<{ id: number; name: string }[]>([]);
+
+  useEffect(() => { fetchBuildings().then(setBuildings); }, []);
 
   const loadRooms = () => {
     setLoading(true);
     fetchRooms().then(setRooms).finally(() => setLoading(false));
   };
-
   useEffect(() => { loadRooms(); }, []);
 
-  // ── Accessible toggle ───────────────────────────────────────────────────────
   const handleToggleAccessible = async (room: Room) => {
     setTogglingId(room.id);
-    setRooms((prev) =>
-      prev.map((r) => (r.id === room.id ? { ...r, isAccessible: !r.isAccessible } : r))
-    );
+    setRooms(prev => prev.map(r => r.id === room.id ? { ...r, isAccessible: !r.isAccessible } : r));
     try {
       await patchAccessible(room.id, !room.isAccessible);
     } catch {
-      setRooms((prev) =>
-        prev.map((r) => (r.id === room.id ? { ...r, isAccessible: room.isAccessible } : r))
-      );
+      setRooms(prev => prev.map(r => r.id === room.id ? { ...r, isAccessible: room.isAccessible } : r));
     } finally {
       setTogglingId(null);
     }
   };
 
-  // ── Derived values ──────────────────────────────────────────────────────────
-  const categories  = ["all", ...Array.from(new Set(rooms.map((r) => r.category)))];
-  const floors      = ["all", ...Array.from(new Set(rooms.map((r) => r.floor))).sort((a, b) => a - b).map(String)];
+  const categories  = ["all", ...Array.from(new Set(rooms.map(r => r.category)))];
+  const floors      = ["all", ...Array.from(new Set(rooms.map(r => r.floor))).sort((a, b) => a - b).map(String)];
   const catCounts   = rooms.reduce((acc, r) => { acc[r.category] = (acc[r.category] ?? 0) + 1; return acc; }, {} as Record<string, number>);
   const topCategory = Object.entries(catCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
 
-  const filtered = rooms.filter((r) => {
+  const filtered = rooms.filter(r => {
     const matchSearch = !search ||
       r.name.toLowerCase().includes(search.toLowerCase()) ||
       r.roomNo?.includes(search) ||
       r.buildingName.toLowerCase().includes(search.toLowerCase());
-    const matchCat   = catFilter   === "all" || r.category === catFilter;
-    const matchFloor = floorFilter === "all" || r.floor.toString() === floorFilter;
-    return matchSearch && matchCat && matchFloor;
+    return matchSearch &&
+      (catFilter   === "all" || r.category === catFilter) &&
+      (floorFilter === "all" || r.floor.toString() === floorFilter);
   });
 
   return (
-    <div style={S.page}>
-      {/* Header */}
-      <div style={S.hdr}>
-        <div style={S.hdrLeft}>
-          <DoorOpen size={22} strokeWidth={1.8} />
+    <div className="font-[Outfit] text-[#1A3263] p-7 w-full box-border">
+
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <DoorOpen size={22} strokeWidth={1.8} color="#1A3263" />
           <div>
-            <h1 style={S.h1}>Rooms</h1>
-            <p style={S.sub}>Manage rooms and categories</p>
+            <h1 className="text-2xl font-extrabold tracking-tight m-0 leading-none">Rooms</h1>
+            <p className="text-[13px] text-[#547792] mt-0.5 m-0">Manage rooms and categories</p>
           </div>
         </div>
-        <button style={S.addBtn} onClick={() => setShowAdd(true)}>
-          <Plus size={16} /> Add Room
+        <button
+          onClick={() => setShowAdd(true)}
+          className="flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#1A3263] text-[#F6E7BC] text-[13px] font-bold border-none cursor-pointer transition-all duration-200 hover:bg-[#FAB95B] hover:text-[#1A3263]"
+        >
+          <Plus size={15} strokeWidth={2.5} /> Add Room
         </button>
       </div>
 
-      {/* Stats row */}
+      {/* ── Stats ── */}
       {!loading && (
-        <div style={S.statsRow}>
-          <div style={S.statCard}>
-            <span style={S.statNum}>{rooms.length}</span>
-            <span style={S.statLabel}>Total Rooms</span>
-          </div>
-          <div style={S.statCard}>
-            <span style={S.statNum}>{Object.keys(catCounts).length}</span>
-            <span style={S.statLabel}>Categories</span>
-          </div>
-          <div style={S.statCard}>
-            <span style={S.statNum}>{floors.length - 1}</span>
-            <span style={S.statLabel}>Floors</span>
-          </div>
-          <div style={S.statCard}>
-            <span style={{ ...S.statNum, fontSize: 16, paddingTop: 4, textTransform: "capitalize" }}>
-              {topCategory}
-            </span>
-            <span style={S.statLabel}>Top Category</span>
-          </div>
+        <div className="flex gap-3 mb-5 flex-wrap">
+          {[
+            { num: rooms.length,                  label: "Total Rooms" },
+            { num: Object.keys(catCounts).length, label: "Categories" },
+            { num: floors.length - 1,             label: "Floors" },
+            { num: topCategory,                   label: "Top Category", small: true },
+          ].map(({ num, label, small }) => (
+            <div key={label} className="bg-white rounded-xl px-5 py-3.5 shadow-[0_1px_4px_rgba(26,50,99,0.07)] flex flex-col gap-0.5 min-w-[110px]">
+              <span className={`font-bold text-[#1A3263] ${small ? "text-base pt-1 capitalize" : "text-[22px]"}`}>{num}</span>
+              <span className="text-xs text-[#547792]">{label}</span>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Filter bar */}
-      <div style={S.filterBar}>
-        <div style={S.searchWrap}>
-          <Search size={15} color="#547792" />
+      {/* ── Filters ── */}
+      <div className="flex gap-2.5 mb-5 flex-wrap">
+        <div className="flex items-center gap-2 bg-white border border-[rgba(26,50,99,0.12)] rounded-full px-4 py-2.5 flex-1 min-w-[200px]">
+          <Search size={15} color="#547792" className="shrink-0" />
           <input
-            style={S.searchInput}
+            className="border-none outline-none text-sm text-[#1A3263] bg-transparent w-full font-[Outfit] placeholder-[#9aafbf]"
             placeholder="Search by name, room no, building..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
           />
         </div>
-        <select style={S.select} value={catFilter} onChange={(e) => setCatFilter(e.target.value)}>
-          {categories.map((c) => (
-            <option key={c} value={c}>{c === "all" ? "All Categories" : c}</option>
-          ))}
+        <select
+          className="bg-white border border-[rgba(26,50,99,0.12)] rounded-full px-4 py-2.5 text-sm text-[#1A3263] outline-none font-[Outfit] cursor-pointer"
+          value={catFilter}
+          onChange={e => setCatFilter(e.target.value)}
+        >
+          {categories.map(c => <option key={c} value={c}>{c === "all" ? "All Categories" : c}</option>)}
         </select>
-        <select style={S.select} value={floorFilter} onChange={(e) => setFloorFilter(e.target.value)}>
-          {floors.map((f) => (
-            <option key={f} value={f}>{f === "all" ? "All Floors" : `Floor ${f}`}</option>
-          ))}
+        <select
+          className="bg-white border border-[rgba(26,50,99,0.12)] rounded-full px-4 py-2.5 text-sm text-[#1A3263] outline-none font-[Outfit] cursor-pointer"
+          value={floorFilter}
+          onChange={e => setFloorFilter(e.target.value)}
+        >
+          {floors.map(f => <option key={f} value={f}>{f === "all" ? "All Floors" : `Floor ${f}`}</option>)}
         </select>
       </div>
 
-      {/* Table */}
-      {loading ? (
-        <div style={S.empty}><Loader2 size={20} /></div>
-      ) : filtered.length === 0 ? (
-        <div style={S.empty}>No rooms found.</div>
-      ) : (
-        <div style={S.tableWrap}>
-          <table style={S.table}>
+      {/* ── States ── */}
+      {loading && (
+        <div className="bg-white rounded-2xl py-14 flex items-center justify-center shadow-sm">
+          <Loader2 size={20} className="text-[#547792] animate-spin" />
+        </div>
+      )}
+      {!loading && filtered.length === 0 && (
+        <div className="bg-white rounded-2xl py-14 text-center text-[#9aafbf] text-sm shadow-sm">
+          {search || catFilter !== "all" || floorFilter !== "all" ? "No rooms match your filters." : "No rooms added yet."}
+        </div>
+      )}
+
+      {/* ── Table ── */}
+      {!loading && filtered.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-[0_1px_4px_rgba(26,50,99,0.07)] overflow-hidden">
+          <table className="w-full border-collapse text-sm">
             <thead>
               <tr>
-                {["Room", "Room No", "Building", "Floor", "Category", "Tags", "Accessible", "Actions"].map((h) => (
-                  <th key={h} style={S.th}>{h}</th>
+                {["Room", "Room No", "Building", "Floor", "Category", "Tags", "Accessible", "Actions"].map(h => (
+                  <th key={h} className="text-left px-5 py-3.5 bg-[#f4f7fb] text-[#547792] font-semibold text-[11px] uppercase tracking-wide border-b border-[#eaf0f7] first:rounded-tl-2xl last:rounded-tr-2xl">
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {filtered.map((room) => {
+              {filtered.map(room => {
                 const cat = catColor[room.category?.toLowerCase()] ?? defaultCat;
+                const isHovered = hoveredRow === room.id;
                 return (
                   <tr
                     key={room.id}
-                    style={hoveredRow === room.id ? S.trHover : {}}
+                    className={`transition-colors duration-100 ${isHovered ? "bg-[#f9fbfd]" : "bg-white"}`}
                     onMouseEnter={() => setHoveredRow(room.id)}
                     onMouseLeave={() => setHoveredRow(null)}
                   >
-                    <td style={S.td}><span style={{ fontWeight: 600 }}>{room.name}</span></td>
-                    <td style={S.td}>{room.roomNo ?? <span style={{ color: "#c0cdd8" }}>—</span>}</td>
-                    <td style={S.td}>
-                      <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                        <Building2 size={13} color="#547792" /> {room.buildingName}
+                    {/* Name */}
+                    <td className="px-5 py-4 border-b border-[#f0f4f9] align-middle">
+                      <span className="font-semibold text-[#1A3263]">{room.name}</span>
+                    </td>
+
+                    {/* Room No */}
+                    <td className="px-5 py-4 border-b border-[#f0f4f9] align-middle text-[#547792]">
+                      {room.roomNo ?? <span className="text-[#c0cdd8]">—</span>}
+                    </td>
+
+                    {/* Building */}
+                    <td className="px-5 py-4 border-b border-[#f0f4f9] align-middle">
+                      <span className="flex items-center gap-1.5 text-[#547792]">
+                        <Building2 size={13} color="#9aafbf" /> {room.buildingName}
                       </span>
                     </td>
-                    <td style={S.td}>
-                      <span style={S.floorBadge}><Layers size={11} /> {room.floor}</span>
+
+                    {/* Floor */}
+                    <td className="px-5 py-4 border-b border-[#f0f4f9] align-middle">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[rgba(26,50,99,0.07)] text-[#1A3263]">
+                        <Layers size={11} /> {room.floor}
+                      </span>
                     </td>
-                    <td style={S.td}>
-                      <span style={{ ...S.catBadge, background: cat.bg, color: cat.color }}>
+
+                    {/* Category */}
+                    <td className="px-5 py-4 border-b border-[#f0f4f9] align-middle">
+                      <span
+                        className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize"
+                        style={{ background: cat.bg, color: cat.color }}
+                      >
                         {room.category}
                       </span>
                     </td>
-                    <td style={S.td}>
-                      {room.tags?.slice(0, 2).map((t) => (
-                        <span key={t} style={S.tag}>{t}</span>
-                      ))}
-                      {room.tags?.length > 2 && (
-                        <span style={S.tag}>+{room.tags.length - 2}</span>
-                      )}
+
+                    {/* Tags */}
+                    <td className="px-5 py-4 border-b border-[#f0f4f9] align-middle">
+                      <div className="flex flex-wrap gap-1">
+                        {room.tags?.slice(0, 2).map(t => (
+                          <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[rgba(26,50,99,0.06)] text-[#547792] border border-[rgba(26,50,99,0.08)]">{t}</span>
+                        ))}
+                        {room.tags?.length > 2 && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[rgba(26,50,99,0.06)] text-[#547792] border border-[rgba(26,50,99,0.08)]">+{room.tags.length - 2}</span>
+                        )}
+                      </div>
                     </td>
-                    <td style={S.td}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+
+                    {/* Accessible */}
+                    <td className="px-5 py-4 border-b border-[#f0f4f9] align-middle">
+                      <div className="flex items-center gap-2">
                         <Toggle
                           checked={room.isAccessible}
                           loading={togglingId === room.id}
                           onChange={() => handleToggleAccessible(room)}
                         />
-                        <span style={{ fontSize: 12, color: room.isAccessible ? "#34c759" : "#ff3b30", fontWeight: 600 }}>
+                        <span className={`text-xs font-semibold ${room.isAccessible ? "text-[#34c759]" : "text-[#ff3b30]"}`}>
                           {room.isAccessible ? "Yes" : "No"}
                         </span>
                       </div>
                     </td>
-                    <td style={S.td}>
-                      <div style={S.actionRow}>
+
+                    {/* Actions */}
+                    <td className="px-5 py-4 border-b border-[#f0f4f9] align-middle">
+                      <div className="flex items-center gap-1.5">
                         <button
                           title="View details"
-                          style={{ ...S.iconBtn, background: "#f0f4f9", color: "#547792" }}
                           onClick={() => setDetailRoom(room)}
+                          className="w-8 h-8 rounded-lg border-none flex items-center justify-center cursor-pointer bg-[rgba(26,50,99,0.06)] text-[#547792] transition-colors duration-150 hover:bg-[rgba(26,50,99,0.12)]"
                         >
-                          <Eye size={15} />
+                          <Eye size={14} />
                         </button>
                         <button
                           title="Edit"
-                          style={{ ...S.iconBtn, background: "#eef2ff", color: "#4361ee" }}
                           onClick={() => setEditRoom(room)}
+                          className="w-8 h-8 rounded-lg border-none flex items-center justify-center cursor-pointer bg-[rgba(9,146,194,0.08)] text-[#0992C2] transition-colors duration-150 hover:bg-[rgba(9,146,194,0.16)]"
                         >
-                          <Pencil size={15} />
+                          <Pencil size={14} />
                         </button>
                       </div>
                     </td>
@@ -217,11 +253,11 @@ export default function Rooms() {
         </div>
       )}
 
-      {/* Modals */}
+      {/* ── Modals ── */}
       {showAdd && (
         <RoomFormModal
           buildings={buildings}
-          existingCategories={categories.filter((c) => c !== "all")}
+          existingCategories={categories.filter(c => c !== "all")}
           onClose={() => setShowAdd(false)}
           onSaved={loadRooms}
         />
@@ -229,7 +265,7 @@ export default function Rooms() {
       {editRoom && (
         <RoomFormModal
           buildings={buildings}
-          existingCategories={categories.filter((c) => c !== "all")}
+          existingCategories={categories.filter(c => c !== "all")}
           room={editRoom}
           onClose={() => setEditRoom(null)}
           onSaved={loadRooms}
