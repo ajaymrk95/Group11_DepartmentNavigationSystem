@@ -101,25 +101,25 @@ function FitBounds({ paths, rooms, buildingGeom }: { paths: PathFeature[]; rooms
 // ─── Color helpers ────────────────────────────────────────────────────────────
 
 const ROAD_COLORS: Record<string, string> = {
-  primary: "#f97316",
-  secondary: "#eab308",
-  tertiary: "#84cc16",
-  footway: "#22d3ee",
-  path: "#a78bfa",
-  service: "#94a3b8",
-  corridor: "#818cf8",
-  stairs: "#fb923c",
-  default: "#60a5fa",
+  primary: "#d97563",
+  secondary: "#f5a563",
+  tertiary: "#84b494",
+  footway: "#6ba8c9",
+  path: "#6b7ba7",
+  service: "#9b9187",
+  corridor: "#4a7ba7",
+  stairs: "#d97563",
+  default: "#6b8fb9",
 };
 
 const ROOM_CATEGORY_COLORS: Record<string, { fill: string; stroke: string }> = {
-  classroom: { fill: "#3b82f6", stroke: "#60a5fa" },
-  lab: { fill: "#8b5cf6", stroke: "#a78bfa" },
-  office: { fill: "#f59e0b", stroke: "#fbbf24" },
-  restroom: { fill: "#06b6d4", stroke: "#22d3ee" },
-  corridor: { fill: "#374151", stroke: "#4b5563" },
-  stairs: { fill: "#d97706", stroke: "#f59e0b" },
-  default: { fill: "#1e3a5f", stroke: "#2563eb" },
+  classroom: { fill: "#c5dced", stroke: "#4a7ba7" },
+  lab: { fill: "#d4c5e8", stroke: "#7b68ae" },
+  office: { fill: "#f5d5b8", stroke: "#d9823e" },
+  restroom: { fill: "#c9e4e8", stroke: "#4a9fb9" },
+  corridor: { fill: "#e8e4df", stroke: "#a89b8f" },
+  stairs: { fill: "#e8c5c0", stroke: "#d97563" },
+  default: { fill: "#dfe0e0", stroke: "#6b8fb9" },
 };
 
 const ROAD_TYPES = Object.keys(ROAD_COLORS).filter((k) => k !== "default");
@@ -129,7 +129,7 @@ function roadColor(type: string) {
 }
 
 function roomColor(category: string, accessible: boolean) {
-  if (!accessible) return { fill: "#3f1515", stroke: "#ef4444" };
+  if (!accessible) return { fill: "#f5dcd7", stroke: "#d97563" };
   return ROOM_CATEGORY_COLORS[category?.toLowerCase()] ?? ROOM_CATEGORY_COLORS.default;
 }
 
@@ -353,7 +353,7 @@ function BuildingSelector({ buildings, selected, onSelect }: {
               </div>
               {b.isAccessible && <span className="bld-accessible-badge">♿</span>}
               {selected?.id === b.id && (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{color:"#22d3ee",flexShrink:0}}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{color:"#4a7ba7",flexShrink:0}}>
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               )}
@@ -480,7 +480,7 @@ export default function PathsPage() {
 
   // Indoor map uses light blueprint theme
   const indoorTileUrl = "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png";
-  const outdoorTileUrl = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+  const outdoorTileUrl = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
 
   return (
     <div className="paths-root">
@@ -621,7 +621,7 @@ export default function PathsPage() {
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                opacity={0.3}
+                opacity={0.15}
               />
 
               {/* ── Indoor: building outline (thick blueprint border) ── */}
@@ -629,10 +629,10 @@ export default function PathsPage() {
                 polygonCoords(selectedBuilding.geom).map((ring, i) => (
                   <Polygon key={`bldg-outer-${i}`} positions={ring}
                     pathOptions={{
-                      color: "#1d4ed8",
-                      fillColor: "#eff6ff",
-                      fillOpacity: 0.4,
-                      weight: 3,
+                      color: "#4a7ba7",
+                      fillColor: "#f0f4f8",
+                      fillOpacity: 0.3,
+                      weight: 2.5,
                       dashArray: undefined,
                     }} />
                 ))}
@@ -648,8 +648,8 @@ export default function PathsPage() {
                     pathOptions={{
                       color: stroke,
                       fillColor: fill,
-                      fillOpacity: isHovered ? 0.55 : 0.3,
-                      weight: isHovered ? 2.5 : 1.5,
+                      fillOpacity: isHovered ? 0.5 : 0.35,
+                      weight: isHovered ? 2 : 1.5,
                     }}
                     eventHandlers={{
                       mouseover: () => setHoveredRoomId(room.id),
@@ -674,9 +674,9 @@ export default function PathsPage() {
                 return lines.map((latlngs, i) => (
                   <Polyline key={`ip-${path.id}-${i}`} positions={latlngs}
                     pathOptions={{
-                      color: isSelected ? "#f0f" : path.isAccessible ? roadColor(path.roadType) : "#ef4444",
-                      weight: isSelected ? 7 : 4,
-                      opacity: isSelected ? 1 : path.isAccessible ? 0.95 : 0.35,
+                      color: isSelected ? "#f5a563" : path.isAccessible ? roadColor(path.roadType) : "#d97563",
+                      weight: isSelected ? 6 : 4,
+                      opacity: isSelected ? 1 : path.isAccessible ? 0.9 : 0.4,
                       dashArray: path.isAccessible ? undefined : "5 5",
                       lineCap: "round",
                       lineJoin: "round",
@@ -721,9 +721,9 @@ export default function PathsPage() {
                 return lines.map((latlngs, i) => (
                   <Polyline key={`${path.id}-${i}`} positions={latlngs}
                     pathOptions={{
-                      color: isSelected ? "#fff" : path.isAccessible ? roadColor(path.roadType) : "#ef4444",
-                      weight: isSelected ? 7 : path.isAccessible ? 4 : 2,
-                      opacity: isSelected ? 1 : path.isAccessible ? 0.9 : 0.4,
+                      color: isSelected ? "#f5a563" : path.isAccessible ? roadColor(path.roadType) : "#d97563",
+                      weight: isSelected ? 6 : path.isAccessible ? 4 : 2,
+                      opacity: isSelected ? 1 : path.isAccessible ? 0.85 : 0.4,
                       dashArray: path.isAccessible ? undefined : "6 4",
                     }}
                     eventHandlers={{ click: () => handlePathClick(path.id) }}>
@@ -758,17 +758,17 @@ export default function PathsPage() {
                 <div className="legend-title">ROOMS</div>
                 {Object.entries(ROOM_CATEGORY_COLORS).filter(([k]) => k !== "default").map(([cat, { fill }]) => (
                   <div className="legend-row" key={cat}>
-                    <span className="swatch-box" style={{ background: fill, opacity: 0.7 }} />
+                    <span className="swatch-box" style={{ background: fill, opacity: 0.8 }} />
                     <span style={{ textTransform: "capitalize" }}>{cat}</span>
                   </div>
                 ))}
                 <div className="legend-divider" />
                 <div className="legend-title">PATHS</div>
                 <div className="legend-row">
-                  <span className="swatch" style={{ background: "#818cf8" }} />Corridor
+                  <span className="swatch" style={{ background: "#4a7ba7" }} />Corridor
                 </div>
                 <div className="legend-row">
-                  <span className="swatch" style={{ background: "#ef4444", opacity: 0.5 }} />Blocked
+                  <span className="swatch" style={{ background: "#d97563", opacity: 0.6 }} />Blocked
                 </div>
               </>
             ) : (
@@ -782,7 +782,7 @@ export default function PathsPage() {
                 ))}
                 <div className="legend-divider" />
                 <div className="legend-row">
-                  <span className="swatch" style={{ background: "#ef4444", opacity: 0.4 }} />Inaccessible
+                  <span className="swatch" style={{ background: "#d97563", opacity: 0.5 }} />Inaccessible
                 </div>
               </>
             )}
@@ -858,7 +858,7 @@ export default function PathsPage() {
             <>
               <div className="sidebar-header" style={{ borderTop: "1px solid var(--border)" }}>
                 <div className="sidebar-title">Rooms</div>
-                <span className="badge" style={{ background: "var(--accent2)", color: "#0c0f14" }}>{rooms.length}</span>
+                <span className="badge" style={{ background: "#f5a563", color: "#fff" }}>{rooms.length}</span>
               </div>
               <div className="room-list">
                 {rooms.map((room) => {
@@ -888,16 +888,16 @@ export default function PathsPage() {
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         .paths-root {
-          --bg: #0a0d12;
-          --surface: #111621;
-          --surface2: #161d2a;
-          --border: #1e2a3a;
-          --text: #e1e7f0;
-          --muted: #556070;
-          --accent: #2563eb;
-          --accent2: #22d3ee;
-          --on: #34d399;
-          --off: #f87171;
+          --bg: #f5f1ed;
+          --surface: #ffffff;
+          --surface2: #fafaf8;
+          --border: #e8e4df;
+          --text: #2c2620;
+          --muted: #8b8680;
+          --accent: #4a7ba7;
+          --accent2: #f5a563;
+          --on: #6ba882;
+          --off: #d97563;
           font-family: 'IBM Plex Sans', sans-serif;
           background: var(--bg);
           color: var(--text);
@@ -930,7 +930,7 @@ export default function PathsPage() {
         .topbar-title {
           font-family: 'IBM Plex Mono', monospace;
           font-size: 11px; font-weight: 600;
-          letter-spacing: 0.15em; color: var(--accent2);
+          letter-spacing: 0.15em; color: var(--accent);
         }
         .topbar-sub { font-size: 10px; color: var(--muted); margin-top: 1px; }
         .topbar-center { display: flex; align-items: center; }
@@ -965,7 +965,7 @@ export default function PathsPage() {
           cursor: pointer; transition: border-color 0.15s; white-space: nowrap;
           min-width: 160px; max-width: 220px;
         }
-        .bld-trigger:hover { border-color: var(--accent2); }
+        .bld-trigger:hover { border-color: var(--accent); }
         .bld-name { font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; }
         .bld-meta { font-size: 10px; color: var(--muted); flex-shrink: 0; }
         .bld-chevron { color: var(--muted); flex-shrink: 0; transition: transform 0.2s; }
@@ -974,7 +974,7 @@ export default function PathsPage() {
           position: absolute; top: calc(100% + 6px); left: 0; right: 0;
           background: var(--surface); border: 1px solid var(--border);
           border-radius: 10px; z-index: 9999; overflow: hidden;
-          box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.1);
           min-width: 220px;
         }
         .bld-option {
@@ -1025,7 +1025,7 @@ export default function PathsPage() {
         }
         .building-card-icon {
           width: 36px; height: 36px;
-          background: rgba(37,99,235,0.15);
+          background: rgba(74, 123, 167, 0.1);
           border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
           color: var(--accent); flex-shrink: 0;
@@ -1042,7 +1042,7 @@ export default function PathsPage() {
         .blocked-tag { color: var(--off); }
         .building-card-stats { display: flex; gap: 16px; margin-left: 8px; }
         .bc-stat { text-align: center; }
-        .bc-stat-val { font-size: 18px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; color: var(--accent2); line-height: 1; }
+        .bc-stat-val { font-size: 18px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; color: var(--accent); line-height: 1; }
         .bc-stat-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
 
         /* Floor strip */
@@ -1060,8 +1060,8 @@ export default function PathsPage() {
           cursor: pointer; transition: all 0.15s;
           display: flex; align-items: center; justify-content: center;
         }
-        .floor-tab.active { background: var(--accent2); color: #0a0d12; border-color: var(--accent2); }
-        .floor-tab:hover:not(.active) { border-color: var(--accent2); color: var(--text); }
+        .floor-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .floor-tab:hover:not(.active) { border-color: var(--accent); color: var(--text); }
         .floor-num {}
 
         /* ── Body ── */
@@ -1070,7 +1070,7 @@ export default function PathsPage() {
         /* ── Map ── */
         .map-wrapper { flex: 1; position: relative; }
         .map-wrapper.indoor-mode .the-map { filter: none; }
-        .the-map { width: 100%; height: 100%; background: #0a0d12; }
+        .the-map { width: 100%; height: 100%; background: #f5f1ed; }
 
         .map-loading {
           position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
@@ -1082,23 +1082,23 @@ export default function PathsPage() {
         /* Map mode badge */
         .map-mode-badge {
           position: absolute; top: 12px; left: 12px; z-index: 999;
-          background: rgba(17,22,33,0.9); border: 1px solid var(--border);
+          background: rgba(255, 255, 255, 0.85); border: 1px solid var(--border);
           padding: 5px 12px; border-radius: 20px;
           font-size: 11px; font-family: 'IBM Plex Mono', monospace;
           display: flex; align-items: center; gap: 7px;
-          backdrop-filter: blur(6px);
+          backdrop-filter: blur(8px);
         }
         .badge-dot { width: 7px; height: 7px; border-radius: 50%; }
-        .badge-dot.indoor { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
-        .badge-dot.outdoor { background: #f97316; box-shadow: 0 0 6px #f97316; }
+        .badge-dot.indoor { background: #4a7ba7; box-shadow: 0 0 6px rgba(74, 123, 167, 0.3); }
+        .badge-dot.outdoor { background: #f5a563; box-shadow: 0 0 6px rgba(245, 165, 99, 0.3); }
 
         /* Legend */
         .legend {
           position: absolute; bottom: 16px; left: 12px; z-index: 999;
-          background: rgba(17,22,33,0.93); border: 1px solid var(--border);
+          background: rgba(255, 255, 255, 0.92); border: 1px solid var(--border);
           border-radius: 10px; padding: 10px 12px;
           display: flex; flex-direction: column; gap: 5px;
-          backdrop-filter: blur(6px); max-height: 300px; overflow-y: auto;
+          backdrop-filter: blur(8px); max-height: 300px; overflow-y: auto;
         }
         .legend-title { font-size: 9px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.1em; font-weight: 600; margin-bottom: 2px; }
         .legend-divider { height: 1px; background: var(--border); margin: 4px 0; }
@@ -1129,9 +1129,9 @@ export default function PathsPage() {
         .selected-banner {
           display: flex; align-items: center; gap: 6px;
           padding: 6px 14px;
-          background: rgba(34,211,238,0.06);
+          background: rgba(74, 123, 167, 0.06);
           border-bottom: 1px solid var(--border);
-          font-size: 11px; color: var(--accent2); flex-shrink: 0;
+          font-size: 11px; color: var(--accent); flex-shrink: 0;
           font-family: 'IBM Plex Mono', monospace;
         }
         .clear-sel {
@@ -1157,9 +1157,9 @@ export default function PathsPage() {
           background: transparent; border: 1px solid transparent;
           transition: all 0.1s; cursor: pointer;
         }
-        .path-row:hover { background: var(--bg); border-color: var(--border); }
+        .path-row:hover { background: var(--surface2); border-color: var(--border); }
         .path-row.inaccessible { opacity: 0.6; }
-        .path-row.selected { background: rgba(34,211,238,0.06) !important; border-color: rgba(34,211,238,0.3) !important; }
+        .path-row.selected { background: rgba(74, 123, 167, 0.08) !important; border-color: rgba(74, 123, 167, 0.2) !important; }
 
         .path-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
         .road-swatch { width: 4px; height: 32px; border-radius: 2px; flex-shrink: 0; }
@@ -1174,10 +1174,10 @@ export default function PathsPage() {
           border: none; cursor: pointer; transition: all 0.15s;
           min-width: 54px; display: flex; align-items: center; justify-content: center;
         }
-        .toggle-btn.on { background: rgba(52,211,153,0.12); color: var(--on); border: 1px solid rgba(52,211,153,0.25); }
-        .toggle-btn.on:hover { background: rgba(52,211,153,0.22); }
-        .toggle-btn.off { background: rgba(248,113,113,0.12); color: var(--off); border: 1px solid rgba(248,113,113,0.25); }
-        .toggle-btn.off:hover { background: rgba(248,113,113,0.22); }
+        .toggle-btn.on { background: rgba(107, 168, 130, 0.12); color: var(--on); border: 1px solid rgba(107, 168, 130, 0.25); }
+        .toggle-btn.on:hover { background: rgba(107, 168, 130, 0.22); }
+        .toggle-btn.off { background: rgba(217, 117, 99, 0.12); color: var(--off); border: 1px solid rgba(217, 117, 99, 0.25); }
+        .toggle-btn.off:hover { background: rgba(217, 117, 99, 0.22); }
         .toggle-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* Room list */
@@ -1189,7 +1189,7 @@ export default function PathsPage() {
           padding: 6px 10px; border-radius: 6px; margin-bottom: 2px;
           cursor: default; border: 1px solid transparent; transition: all 0.1s;
         }
-        .room-row.hovered { background: var(--bg); border-color: var(--border); }
+        .room-row.hovered { background: var(--surface2); border-color: var(--border); }
         .room-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
         .room-name { font-size: 11px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
         .room-meta { font-size: 10px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; margin-top: 1px; }
@@ -1198,35 +1198,35 @@ export default function PathsPage() {
         @keyframes spin { to { transform: rotate(360deg); } }
         .spinner {
           display: inline-block; width: 16px; height: 16px;
-          border: 2px solid var(--border); border-top-color: var(--accent2);
+          border: 2px solid var(--border); border-top-color: var(--accent);
           border-radius: 50%; animation: spin 0.6s linear infinite;
         }
         .spinner.sm { width: 11px; height: 11px; }
 
         /* ── Modal ── */
         .modal-overlay {
-          position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+          position: fixed; inset: 0; background: rgba(0,0,0,0.3);
           z-index: 10000; display: flex; align-items: center; justify-content: center;
         }
         .modal {
           background: var(--surface); border: 1px solid var(--border);
           border-radius: 12px; width: 480px; max-width: 95vw;
           display: flex; flex-direction: column;
-          box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+          box-shadow: 0 16px 48px rgba(0,0,0,0.1);
         }
         .modal-header {
           display: flex; align-items: center; justify-content: space-between;
           padding: 16px 20px; border-bottom: 1px solid var(--border);
         }
         .modal-title {
-          font-size: 13px; font-weight: 600; color: var(--accent2);
+          font-size: 13px; font-weight: 600; color: var(--accent);
           font-family: 'IBM Plex Mono', monospace;
         }
         .modal-close {
           background: transparent; border: none; color: var(--muted);
           font-size: 14px; cursor: pointer; padding: 4px 8px; border-radius: 4px;
         }
-        .modal-close:hover { background: var(--bg); color: var(--text); }
+        .modal-close:hover { background: var(--surface2); color: var(--text); }
         .modal-body {
           padding: 20px; display: flex; flex-direction: column; gap: 10px;
           max-height: 60vh; overflow-y: auto;
@@ -1247,24 +1247,24 @@ export default function PathsPage() {
         }
         .field-row-info {
           display: flex; gap: 16px; font-size: 12px; color: var(--muted);
-          padding: 8px 10px; background: var(--bg); border-radius: 6px; border: 1px solid var(--border);
+          padding: 8px 10px; background: var(--surface2); border-radius: 6px; border: 1px solid var(--border);
           font-family: 'IBM Plex Mono', monospace;
         }
-        .field-row-info b { color: var(--accent2); }
+        .field-row-info b { color: var(--accent); }
         .field-input {
-          width: 100%; background: var(--bg); border: 1px solid var(--border);
+          width: 100%; background: var(--surface2); border: 1px solid var(--border);
           color: var(--text); border-radius: 6px; padding: 8px 10px;
           font-size: 12px; font-family: 'IBM Plex Sans', sans-serif;
           outline: none; transition: border-color 0.15s;
         }
-        .field-input:focus { border-color: var(--accent2); }
+        .field-input:focus { border-color: var(--accent); }
         .field-textarea {
           min-height: 88px; resize: vertical;
           font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.5;
         }
         .field-error {
           font-size: 11px; color: var(--off); padding: 6px 10px;
-          background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); border-radius: 5px;
+          background: rgba(217, 117, 99, 0.08); border: 1px solid rgba(217, 117, 99, 0.2); border-radius: 5px;
         }
         .optional { font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 10px; }
         .required { color: var(--off); }
@@ -1284,14 +1284,14 @@ export default function PathsPage() {
         .btn-save:hover:not(:disabled) { opacity: 0.85; }
         .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Leaflet tooltip override for indoor */
+        /* Leaflet tooltip override for light theme */
         .leaflet-tooltip {
           background: var(--surface) !important;
           border: 1px solid var(--border) !important;
           color: var(--text) !important;
           font-family: 'IBM Plex Sans', sans-serif !important;
           font-size: 12px !important;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
           border-radius: 6px !important;
           padding: 6px 10px !important;
         }
