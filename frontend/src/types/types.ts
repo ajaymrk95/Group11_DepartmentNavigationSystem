@@ -18,11 +18,13 @@ export type RouteLatLngs = [number, number][];
 
 export interface IndoorMapProps {
     building: string | undefined;
-    /** Rendered as a highlighted polyline when provided */
     route?: RouteLatLngs | null;
-    /** Called once whenever floor data finishes loading */
+    routeSegments: Record<number, RouteLatLngs>;
+    fromCoords: [number, number] | null;
+    toCoords: [number, number] | null;
+    fromFloor: number | null;
+    toFloor: number | null;
     onDataLoad?: (data: FloorData) => void;
-    /** Slot for extra UI rendered inside the header (e.g. route controls) */
     headerSlot?: React.ReactNode;
 }
 

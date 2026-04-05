@@ -15,7 +15,10 @@ function NavigationContent({ building }: { building: string }) {
         ? (buildingData.entries as any).coordinates ?? []
         : [];
 
-    const { from, to, route, noRouteFound, setFrom, setTo, onDataLoad, findPath } = useNavigation();
+    const { from, to, route, routeSegments,
+        noRouteFound, fromCoords, toCoords, fromFloor, toFloor,
+        setFrom, setTo, onDataLoad, findPath 
+    } = useNavigation();
 
     return (
         <div className="w-full h-screen flex flex-col bg-gray-100">
@@ -55,6 +58,11 @@ function NavigationContent({ building }: { building: string }) {
                 <IndoorMap
                     building={building}
                     route={route}
+                    routeSegments={routeSegments}
+                    fromCoords={fromCoords}
+                    toCoords={toCoords}
+                    fromFloor={fromFloor}
+                    toFloor={toFloor}
                     onDataLoad={onDataLoad}
                 />
             </div>

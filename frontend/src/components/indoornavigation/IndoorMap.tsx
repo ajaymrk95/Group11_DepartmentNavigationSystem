@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Polyline } from "react-leaflet";
+import { MapContainer, TileLayer, Polyline, CircleMarker, Tooltip, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { GeoJsonObject } from "geojson";
+import { AnimatedPolyline } from "../../utils/indoormap/mapStyles";
 
 import type { IndoorMapProps } from "../../types/types";
 import { useBuildingData } from "../../hooks/useBuildingData";
@@ -9,13 +10,14 @@ import { useFloorData } from "../../hooks/useFloorData";
 import { routeStyle } from "../../utils/indoormap/mapStyles";
 import { MapBoundsController } from "./MapBoundsController";
 import { RoomLabels } from "./RoomLabels";
+import { stairIcon, startIcon, endIcon } from "../../utils/indoormap/mapIcons";
 import FloorToggle from "./FloorToggle";
 import { MapLayers } from "./MapLayers";
 import { useFloor } from "../../context/FloorContext";
 
 const MAP_CENTER: [number, number] = [11.322591, 75.93372];
 
-export function IndoorMap({ building, route, onDataLoad }: IndoorMapProps) {
+export function IndoorMap({ building, route, routeSegments, fromCoords, toCoords, fromFloor, toFloor, onDataLoad }: IndoorMapProps) {
     if (!building) return null;
 
     const { floor, setFloor } = useFloor();
@@ -89,8 +91,40 @@ export function IndoorMap({ building, route, onDataLoad }: IndoorMapProps) {
                     onChange={setFloor}
                     floors={buildingData?.floors ?? 1}
                 />
+
                 {route && route.length > 0 && (
+                    <AnimatedPolyline positions={route} />
+                )}
+
+                {/* {route && route.length > 0 && (
                     <Polyline positions={route} pathOptions={routeStyle} />
+                )} */}
+
+                {fromCoords && fromFloor === floor && (
+                    <Marker
+                        position={[fromCoords[1], fromCoords[0]]}
+                        icon={startIcon()}
+                    />
+                )}
+
+                {toCoords && toFloor === floor && (
+                    <Marker
+                        position={[toCoords[1], toCoords[0]]}
+                        icon={endIcon()}
+                    />
+                )}
+
+                {routeSegments && routeSegments[floor] && routeSegments[floor + 1] && (
+                    <Marker
+                        position={routeSegments[floor][routeSegments[floor].length - 1]}
+                        icon={stairIcon("up")}
+                    />
+                )}
+                {routeSegments && routeSegments[floor] && routeSegments[floor - 1] && (
+                    <Marker
+                        position={routeSegments[floor][0]}
+                        icon={stairIcon("down")}
+                    />
                 )}
             </MapContainer>
         </div>
