@@ -4,6 +4,7 @@ interface PointOption {
     value: string;
     label: string;
     coordinates: [number, number];
+    floor: number;
 }
 
 interface Props {
@@ -11,7 +12,7 @@ interface Props {
     value: string;
     buildingId: number;
     buildingEntries: [number, number][];
-    onChange: (value: string, coordinates: [number, number]) => void;
+    onChange: (value: string, coordinates: [number, number], floor: number) => void;
 }
 
 export function SearchablePointInput({ label, value, buildingId, buildingEntries, onChange }: Props) {
@@ -59,6 +60,7 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
                             value: `building-entry-${i}`,
                             label: `Building Entry ${i + 1}`,
                             coordinates: coords,
+                            floor: 1
                         });
                     });
 
@@ -69,6 +71,7 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
                                     value: `room-${room.id}-entry-${i}`,
                                     label: `${room.name} (Floor ${room.floor}) — Door ${i + 1}`,
                                     coordinates: coords,
+                                    floor: room.floor
                                 });
                             });
                         }
@@ -109,7 +112,7 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
                                 onMouseDown={(e) => e.preventDefault()} // prevent blur before click
                                 onClick={() => {
                                     setQuery(o.label);
-                                    onChange(o.value, o.coordinates);  // ← pass coordinates
+                                    onChange(o.value, o.coordinates, o.floor);  // ← pass coordinates
                                     setOpen(false);
                                 }}
                                 className="px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"

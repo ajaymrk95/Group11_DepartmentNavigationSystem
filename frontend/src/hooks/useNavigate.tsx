@@ -12,7 +12,8 @@ export interface NavigationState {
     setFrom: (name: string) => void;
     setTo: (name: string) => void;
     onDataLoad: (data: FloorData) => void;
-    findPath: (fromCoords: [number, number], toCoords: [number, number]) => void;
+    findPath: (fromCoords: [number, number], toCoords: [number, number], fromFloor: number,
+        toFloor: number) => void;
 }
 
 export function useNavigation(initialFrom = "", initialTo = ""): NavigationState {
@@ -20,11 +21,11 @@ export function useNavigation(initialFrom = "", initialTo = ""): NavigationState
     const [to, setTo] = useState(initialTo);
     const [noRouteFound, setNoRouteFound] = useState(false);
     const [buildingId, setBuildingId] = useState<number | null>(null);
-    const [routes, setRoutes] = useState<Record<number, RouteLatLngs | null>>({});
+    const [routeSegments, setRouteSegments] = useState<Record<number, RouteLatLngs>>({});
     const { floor } = useFloor();
 
     // Current floor's route
-    const route = routes[floor] ?? null;
+    const route = routeSegments[floor] ?? null;
 
     const onDataLoad = useCallback((data: FloorData) => {
         // Extract buildingId and floor from loaded data
@@ -40,44 +41,42 @@ export function useNavigation(initialFrom = "", initialTo = ""): NavigationState
 
     const findPath = useCallback(async (
         fromCoords: [number, number],
-        toCoords: [number, number]
+        toCoords: [number, number],
+        fromFloor: number,
+        toFloor: number
     ) => {
-        if (!buildingId) {
-            setNoRouteFound(true);
-            return;
-        }
+        if (!buildingId) { setNoRouteFound(true); return; }
 
         try {
-            const url = `${BASE_URL}/routes/indoor?buildingId=${buildingId}&floor=${floor}` +
-                `&startLng=${fromCoords[0]}&startLat=${fromCoords[1]}` +
-                `&endLng=${toCoords[0]}&endLat=${toCoords[1]}`;
+            const url = `${BASE_URL}/routes/indoor?buildingId=${buildingId}` +
+                `&startLng=${fromCoords[0]}&startLat=${fromCoords[1]}&startFloor=${fromFloor}` +
+                `&endLng=${toCoords[0]}&endLat=${toCoords[1]}&endFloor=${toFloor}`;
+                console.log(url);
 
             const res = await fetch(url);
-
-            if (!res.ok) {
-                setRoutes(prev => ({ ...prev, [floor]: null }));
-                setNoRouteFound(true);
-                return;
-            }
+            if (!res.ok) { setRouteSegments({}); setNoRouteFound(true); return; }
 
             const data = await res.json();
 
-            if (data.coordinates && data.coordinates.length > 0) {
-                const latLngs: [number, number][] = data.coordinates.map(
-                    ([lng, lat]: [number, number]) => [lat, lng]
-                );
-                setRoutes(prev => ({ ...prev, [floor]: latLngs }));
+            if (data.segments && data.segments.length > 0) {
+                const segments: Record<number, RouteLatLngs> = {};
+                data.segments.forEach((seg: any) => {
+                    segments[seg.floor] = seg.coordinates.map(
+                        ([lng, lat]: [number, number]) => [lat, lng]
+                    );
+                });
+                setRouteSegments(segments);
                 setNoRouteFound(false);
             } else {
-                setRoutes(prev => ({ ...prev, [floor]: null }));
+                setRouteSegments({});
                 setNoRouteFound(true);
             }
         } catch (err) {
             console.error("Routing failed:", err);
-            setRoutes(prev => ({ ...prev, [floor]: null }));
+            setRouteSegments({});
             setNoRouteFound(true);
         }
-    }, [buildingId, floor]);
+    }, [buildingId]);
 
     return { from, to, route, noRouteFound, setFrom, setTo, onDataLoad, findPath };
 }
