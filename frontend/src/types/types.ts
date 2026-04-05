@@ -4,7 +4,6 @@ export interface FloorData {
     buildingOutline: GeoJsonObject | null;
     units: GeoJsonObject | null;
     paths: GeoJsonObject | null;
-    pois: GeoJsonObject | null;
 }
 
 export type FloorNumber = 1 | 2;
@@ -67,7 +66,6 @@ export interface BuildingData {
 export interface FloorLayerData {
     units: GeoJsonObject | null;
     paths: GeoJsonObject | null;
-    pois: GeoJsonObject | null;
     loading: boolean;
     error: string | null;
 }

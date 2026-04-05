@@ -9,7 +9,6 @@ export function useFloorData(buildingId: number | null, floor: number, building:
     const [data, setData] = useState<FloorLayerData>({
         units: null,
         paths: null,
-        pois: null,
         loading: true,
         error: null,
     });
@@ -24,10 +23,9 @@ export function useFloorData(buildingId: number | null, floor: number, building:
         Promise.all([
             fetch(`${BASE_URL}/rooms?buildingId=${buildingId}&floor=${floor}`).then((res) => res.json()),
             fetch(`${BASE_URL}/paths/floor?buildingId=${buildingId}&floor=${floor}`).then((res) => res.json()),
-            fetch(`${BASE_PATH}/poi.geojson`).then((res) => res.ok ? res.json() : null),
         ])
-            .then(([units, paths, pois]) => {
-                setData({ units, paths, pois, loading: false, error: null });
+            .then(([units, paths]) => {
+                setData({ units, paths, loading: false, error: null });
             })
             .catch((err) => {
                 console.error("Error loading floor data:", err);

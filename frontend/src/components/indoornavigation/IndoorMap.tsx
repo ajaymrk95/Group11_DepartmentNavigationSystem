@@ -22,7 +22,7 @@ export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapPro
     const { data: buildingData, loading: buildingLoading, error: buildingError } =
         useBuildingData(building);
 
-    const { units, paths, pois, loading: floorLoading, error: floorError } =
+    const { units, paths, loading: floorLoading, error: floorError } =
         useFloorData(buildingData?.id ?? null, floor, building);
 
     const loading = buildingLoading || floorLoading;
@@ -34,10 +34,9 @@ export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapPro
                 buildingOutline: buildingData.outline,
                 units,
                 paths,
-                pois,
             });
         }
-    }, [buildingData, units, paths, pois, loading, error, onDataLoad]);
+    }, [buildingData, units, paths, loading, error, onDataLoad]);
 
     if (loading) {
         return (
@@ -55,7 +54,7 @@ export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapPro
         );
     }
 
-    const allLayers = [buildingData?.outline, units, paths, pois].filter(
+    const allLayers = [buildingData?.outline, units, paths].filter(
         Boolean
     ) as GeoJsonObject[];
 
@@ -81,7 +80,6 @@ export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapPro
                     buildingOutline={buildingData?.outline ?? null}
                     units={units}
                     paths={paths}
-                    pois={pois}
                 />
                 <RoomLabels key={`labels-${floor}`} units={units} />
                 <MapBoundsController geojsonData={allLayers} />
