@@ -4,16 +4,13 @@ import { RouteControls } from "../../components/indoornavigation/RouteControls";
 import { useNavigation } from "../../hooks/useNavigate";
 import { useBuildingData } from "../../hooks/useBuildingData";
 import { HomeIcon } from "../../components/icons/HomeIcon";
+import { FloorProvider } from "../../context/FloorContext";
 
-export function NavigationPage() {
-    const { building } = useParams<{ building: string }>();
-    const [searchParams] = useSearchParams();
-    const floor = Number(searchParams.get("floor")) || 1;
+// ── Inner component — lives inside FloorProvider so useFloor() works ──
+function NavigationContent({ building }: { building: string }) {
     const navigate = useNavigate();
+    const { data: buildingData } = useBuildingData(building);
 
-    const { data: buildingData } = useBuildingData(building ?? "");
-
-    // Extract [lng, lat] pairs from MultiPoint entries
     const buildingEntries: [number, number][] = buildingData?.entries
         ? (buildingData.entries as any).coordinates ?? []
         : [];
@@ -35,7 +32,6 @@ export function NavigationPage() {
                         {building}
                     </h1>
                 </div>
-
                 <div className="flex-1">
                     <RouteControls
                         from={from}
@@ -48,7 +44,6 @@ export function NavigationPage() {
                         buildingEntries={buildingEntries}
                     />
                 </div>
-
                 <button
                     onClick={() => navigate("/outdoor-navigation")}
                     className="shrink-0 border border-[#E8E2DB] text-[#E8E2DB] hover:bg-[#E8E2DB] hover:text-[#1A3263] font-semibold text-sm px-3 py-1.5 rounded-md transition-colors duration-200"
@@ -56,16 +51,29 @@ export function NavigationPage() {
                     Outdoor View
                 </button>
             </header>
-
             <div className="flex-1 min-h-0 min-w-0">
                 <IndoorMap
                     building={building}
-                    floorNo={floor}
                     route={route}
                     onDataLoad={onDataLoad}
                 />
             </div>
         </div>
+    );
+}
+
+// ── Outer component — owns the provider ──
+export function NavigationPage() {
+    const { building } = useParams<{ building: string }>();
+    const [searchParams] = useSearchParams();
+    const initialFloor = Number(searchParams.get("floor")) || 1;
+
+    if (!building) return null;
+
+    return (
+        <FloorProvider initialFloor={initialFloor}>
+            <NavigationContent building={building} />
+        </FloorProvider>
     );
 }
 

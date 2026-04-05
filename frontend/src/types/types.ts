@@ -18,7 +18,6 @@ export type RouteLatLngs = [number, number][];
 
 export interface IndoorMapProps {
     building: string | undefined;
-    floorNo?: number;
     /** Rendered as a highlighted polyline when provided */
     route?: RouteLatLngs | null;
     /** Called once whenever floor data finishes loading */
@@ -87,13 +86,13 @@ export type Location = {
 
 export type Room = {
     id: number;
-  name: string;
-  roomNo: string | null;
-  category: string;
-  floor: number;
-  isAccessible: boolean;
-  description: string | null;
-  tags: string[];
-  buildingId: number;
-  buildingName: string;
+    name: string;
+    roomNo: string | null;
+    category: string;
+    floor: number;
+    isAccessible: boolean;
+    description: string | null;
+    tags: string[];
+    buildingId: number;
+    buildingName: string;
 }

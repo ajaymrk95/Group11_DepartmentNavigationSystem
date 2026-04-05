@@ -11,13 +11,14 @@ import { MapBoundsController } from "./MapBoundsController";
 import { RoomLabels } from "./RoomLabels";
 import FloorToggle from "./FloorToggle";
 import { MapLayers } from "./MapLayers";
+import { useFloor } from "../../context/FloorContext";
 
 const MAP_CENTER: [number, number] = [11.322591, 75.93372];
 
-export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapProps) {
+export function IndoorMap({ building, route, onDataLoad }: IndoorMapProps) {
     if (!building) return null;
 
-    const [floor, setFloor] = useState<number>(floorNo ?? 1);
+    const { floor, setFloor } = useFloor();
 
     const { data: buildingData, loading: buildingLoading, error: buildingError } =
         useBuildingData(building);
