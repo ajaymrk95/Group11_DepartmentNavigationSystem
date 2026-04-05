@@ -85,7 +85,3 @@ export function onEachPath(feature: any, layer: L.Layer) {
         mouseout: (e) => e.target.setStyle(getPathStyle(feature)),
     });
 }
-
-export function onEachPOI(feature: any, layer: L.Layer) {
-    layer.bindPopup(buildPOIPopup(feature.properties ?? {}));
-}
