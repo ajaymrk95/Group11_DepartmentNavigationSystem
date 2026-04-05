@@ -15,7 +15,6 @@ import FloorToggle from "./FloorToggle";
 import { MapLayers } from "./MapLayers";
 import { useFloor } from "../../context/FloorContext";
 
-const MAP_CENTER: [number, number] = [11.322591, 75.93372];
 
 export function IndoorMap({ building, route, routeSegments, fromCoords, toCoords, fromFloor, toFloor, onDataLoad }: IndoorMapProps) {
     if (!building) return null;
@@ -64,8 +63,8 @@ export function IndoorMap({ building, route, routeSegments, fromCoords, toCoords
     return (
         <div className="h-full w-full rounded-lg shadow-lg overflow-hidden">
             <MapContainer
-                center={MAP_CENTER}
-                zoom={20}
+                center={[0, 0]}
+                zoom={2}
                 className="h-full w-full"
                 zoomControl
                 attributionControl={false}
