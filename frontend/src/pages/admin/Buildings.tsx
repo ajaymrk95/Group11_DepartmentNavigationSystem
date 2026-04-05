@@ -342,8 +342,8 @@ export default function Buildings() {
 
       {/* Table */}
       {!loading && !fetchError && filtered.length > 0 && (
-        <div style={{ background: "#fff", borderRadius: 14, boxShadow: "0 1px 4px rgba(26,50,99,.07)", overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ background: "#fff", borderRadius: 14, boxShadow: "0 1px 4px rgba(26,50,99,.07)", overflowX: "auto" }}>
+          <table style={{ width: "100%", minWidth: 700, borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#f7f4ef", borderBottom: "1px solid #ede8dc" }}>
                 {["Building", "Floors", "Tags", "Accessible", "Entries", ""].map(h => (
