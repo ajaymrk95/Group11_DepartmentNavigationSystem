@@ -14,6 +14,8 @@ public class Admin {
 
     private String username;
     private String password;
+    private String email;
+    private String resetToken;
 
     public Admin(){}
 
@@ -34,5 +36,17 @@ public class Admin {
 
     public void setPassword(String password){
         this.password = password;
+    }
+
+    public String getEmail() { return email; }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getResetToken() { return resetToken; }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
     }
 }

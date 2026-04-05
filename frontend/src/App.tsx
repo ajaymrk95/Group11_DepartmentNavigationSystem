@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route , Navigate } from "react-router-dom"
 import Dashboard from "./pages/Dashboard";
 import AdminLogin from "./pages/AdminLogin";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import OutdoorNav from "./pages/OutdoorNav"
 import AddLocation from "./pages/AddLocation";
 import  AddLocations  from "./pages/admin/AddLocations";
@@ -28,6 +30,9 @@ export default function App() {
         {/* <Route path="/edit-location" element={<EditLocation />} /> */}
         <Route path="/search-location" element={<SearchLocation />} />
         <Route path="/login" element={<AdminLogin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/forgot-password" element={<ForgotPassword />} />
+        <Route path="/admin/reset-password" element={<ResetPassword />} />
         <Route path="/indoor-navigation/:building" element={<IndoorNavigation />} />
         <Route path="/qr-scanner" element={<Scanner />} />
         {/* Protected admin */}

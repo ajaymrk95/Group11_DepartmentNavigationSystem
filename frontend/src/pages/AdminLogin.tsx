@@ -186,7 +186,7 @@ const AdminLogin = () => {
 
             {/* Forgot password */}
             <div className="w-full text-right -mt-2 mb-8">
-              <button type="button" className="text-sm text-[#F6E7BC] bg-none border-none font-[Outfit] cursor-pointer opacity-75 transition-opacity duration-[180ms] hover:opacity-100">
+              <button onClick={() => navigate("/admin/forgot-password")} type="button" className="text-sm text-[#F6E7BC] bg-none border-none font-[Outfit] cursor-pointer opacity-75 transition-opacity duration-[180ms] hover:opacity-100">
                 Forgot Password?
               </button>
             </div>
