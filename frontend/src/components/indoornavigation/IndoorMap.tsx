@@ -113,17 +113,22 @@ export function IndoorMap({ building, route, routeSegments, fromCoords, toCoords
                     />
                 )}
 
-                {routeSegments && routeSegments[floor] && routeSegments[floor + 1] && (
-                    <Marker
-                        position={routeSegments[floor][routeSegments[floor].length - 1]}
-                        icon={stairIcon("up")}
-                    />
-                )}
-                {routeSegments && routeSegments[floor] && routeSegments[floor - 1] && (
-                    <Marker
-                        position={routeSegments[floor][0]}
-                        icon={stairIcon("down")}
-                    />
+                {routeSegments && routeSegments[floor] && toFloor !== null && toFloor !== floor && (
+                    <>
+                        {toFloor > floor && routeSegments[floor + 1] && (
+                            <Marker
+                                position={routeSegments[floor][routeSegments[floor].length - 1]}
+                                icon={stairIcon("up")}
+                            />
+                        )}
+
+                        {toFloor < floor && routeSegments[floor - 1] && (
+                            <Marker
+                                position={routeSegments[floor][routeSegments[floor].length - 1]}
+                                icon={stairIcon("down")}
+                            />
+                        )}
+                    </>
                 )}
             </MapContainer>
         </div>
