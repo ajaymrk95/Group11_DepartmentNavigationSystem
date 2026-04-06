@@ -1,18 +1,11 @@
 import { GeoJSON } from "react-leaflet";
-import L from "leaflet";
 import type { Feature } from "geojson";
 import type { MapLayersProps } from "../../types/types";
 import { buildingOutlineStyle, getUnitStyle, getPathStyle } from "../../utils/indoormap/mapStyles.ts";
-import { createPOIIcon } from "../../utils/indoormap/mapIcons.ts";
-import { onEachUnit, onEachPath, onEachPOI } from "../../utils/indoormap/mapEventHandlers.ts";
+import { onEachUnit, onEachPath } from "../../utils/indoormap/mapEventHandlers.ts";
 
-function pointToLayer(feature: Feature, latlng: L.LatLng): L.Marker {
-    const type = feature.properties?.type ?? "default";
-    const name = feature.properties?.name ?? "Unknown";
-    return L.marker(latlng, { icon: createPOIIcon(type, name) });
-}
 
-export function MapLayers({ buildingOutline, units, paths, pois, floor }: MapLayersProps) {
+export function MapLayers({ buildingOutline, units, paths, floor }: MapLayersProps) {
     return (
         <>
             {buildingOutline && (

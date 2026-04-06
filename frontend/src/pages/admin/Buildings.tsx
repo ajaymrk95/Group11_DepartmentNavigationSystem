@@ -288,19 +288,17 @@ export default function Buildings() {
     <div style={{ padding: "32px 28px 40px", width: "100%", boxSizing: "border-box", fontFamily: "'Outfit', sans-serif", color: "#1A3263" }}>
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <Building2 size={22} strokeWidth={1.8} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3">
+          <Building2 size={22} strokeWidth={1.8} color="#1A3263" />
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", margin: 0 }}>Buildings</h1>
-            <p style={{ fontSize: 13, color: "#547792", margin: "3px 0 0" }}>Manage registered buildings</p>
+            <h1 className="text-2xl font-extrabold tracking-tight m-0 leading-none">Buildings</h1>
+            <p className="text-[13px] text-[#547792] mt-0.5 m-0">Manage registered buildings</p>
           </div>
         </div>
         <button
-          style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 20px", borderRadius: 100, border: "none", background: "#1A3263", color: "#F6E7BC", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
-          onMouseEnter={e => { e.currentTarget.style.background = "#FAB95B"; e.currentTarget.style.color = "#1A3263"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "#1A3263"; e.currentTarget.style.color = "#F6E7BC"; }}
           onClick={() => setShowAdd(true)}
+          className="flex w-full sm:w-auto justify-center items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#1A3263] text-[#F6E7BC] text-[13px] font-bold border-none cursor-pointer transition-all duration-200 hover:bg-[#FAB95B] hover:text-[#1A3263]"
         >
           <Plus size={15} strokeWidth={2.5} /> Add Building
         </button>
@@ -342,8 +340,8 @@ export default function Buildings() {
 
       {/* Table */}
       {!loading && !fetchError && filtered.length > 0 && (
-        <div style={{ background: "#fff", borderRadius: 14, boxShadow: "0 1px 4px rgba(26,50,99,.07)", overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ background: "#fff", borderRadius: 14, boxShadow: "0 1px 4px rgba(26,50,99,.07)", overflowX: "auto" }}>
+          <table style={{ width: "100%", minWidth: 700, borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#f7f4ef", borderBottom: "1px solid #ede8dc" }}>
                 {["Building", "Floors", "Tags", "Accessible", "Entries", ""].map(h => (

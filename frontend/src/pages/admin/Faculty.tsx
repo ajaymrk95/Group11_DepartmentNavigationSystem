@@ -157,10 +157,10 @@ export default function Faculty() {
     name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 
   return (
-    <div className="font-[Outfit] text-[#1A3263] p-7 w-full min-h-screen bg-[#EDE8DC] box-border">
+    <div className="font-[Outfit] text-[#1A3263] p-4 md:p-7 w-full min-h-screen bg-[#EDE8DC] box-border">
 
       {/* ── Header ── */}
-      <div className="flex items-center justify-between mb-7">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
           <Users size={22} strokeWidth={1.8} color="#1A3263" />
           <div>
@@ -170,7 +170,7 @@ export default function Faculty() {
         </div>
         <button
           onClick={openAdd}
-          className="flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#1A3263] text-[#F6E7BC] text-[13px] font-bold border-none cursor-pointer transition-all duration-200 hover:bg-[#FAB95B] hover:text-[#1A3263]"
+          className="flex w-full sm:w-auto justify-center items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#1A3263] text-[#F6E7BC] text-[13px] font-bold border-none cursor-pointer transition-all duration-200 hover:bg-[#FAB95B] hover:text-[#1A3263]"
         >
           <Plus size={15} strokeWidth={2.5} /> Add Faculty
         </button>
@@ -211,7 +211,7 @@ export default function Faculty() {
 
       {/* ── Grid ── */}
       {!loading && !error && filtered.length > 0 && (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
           {filtered.map(f => (
             <div
               key={f.id}

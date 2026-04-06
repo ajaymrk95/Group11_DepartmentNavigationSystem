@@ -5,6 +5,8 @@ import { type Location } from "../../types/types"
 import L from "leaflet"
 import MapRecenter from "./MapRecenter"
 
+type TileType = "light" | "standard" | "satelite"
+
 import { useState, useEffect } from "react" 
 
 type Props = {
@@ -14,6 +16,15 @@ type Props = {
   routeCoords: [number, number][]
   currentLocation?: [number, number] | null
   onSetMapDestination: (loc: Location) => void  
+
+  tileType: TileType
+}
+
+// ✅ NEW: tile mapping
+const tileLayers = {
+  light: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+  standard: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  satelite: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
 }
 
 // Default blue for regular buildings
@@ -43,7 +54,7 @@ const redIcon = new L.Icon({
   popupAnchor: [1, -34],
 })
 
-function MapView({ center, start, destination, routeCoords, currentLocation, onSetMapDestination}: Props) {
+function MapView({ center, start, destination, routeCoords, currentLocation, onSetMapDestination, tileType}: Props) {
 
   const [locations, setLocations] = useState<Location[]>([])
   
@@ -77,8 +88,9 @@ function MapView({ center, start, destination, routeCoords, currentLocation, onS
         zoomControl={false}
         className="h-full w-full z-0"
       >
+        {/* ✅ FIXED */}
         <TileLayer
-          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url={tileLayers[tileType]}
           attribution="&copy; OpenStreetMap contributors"
         />
 

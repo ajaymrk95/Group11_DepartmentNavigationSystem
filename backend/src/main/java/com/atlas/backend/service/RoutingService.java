@@ -1,6 +1,7 @@
 package com.atlas.backend.service;
 
 import com.atlas.backend.dto.RouteResponse;
+import com.atlas.backend.dto.FloorRouteResponse;
 import com.atlas.backend.entity.Path;
 import com.atlas.backend.repository.PathRepository;
 import org.locationtech.jts.geom.Coordinate;
@@ -227,5 +228,203 @@ public class RoutingService {
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
+    }
+
+    private Map<String, Node> buildMultiFloorGraph(List<Path> allPaths) {
+        Map<String, Node> graph = new HashMap<>();
+
+        // 1. Build graph normally with floor-aware node IDs
+        for (Path p : allPaths) {
+            Geometry geom = p.getGeom();
+            if (geom == null)
+                continue;
+
+            for (int geomIdx = 0; geomIdx < geom.getNumGeometries(); geomIdx++) {
+                Geometry subGeom = geom.getGeometryN(geomIdx);
+                if (!(subGeom instanceof LineString))
+                    continue;
+
+                LineString ls = (LineString) subGeom;
+                Coordinate[] coords = ls.getCoordinates();
+
+                for (int i = 0; i < coords.length - 1; i++) {
+                    Coordinate c1 = coords[i];
+                    Coordinate c2 = coords[i + 1];
+
+                    // ← include floor in node ID
+                    String id1 = p.getFloor() + ":" + toNodeId(c1.y, c1.x);
+                    String id2 = p.getFloor() + ":" + toNodeId(c2.y, c2.x);
+
+                    graph.putIfAbsent(id1, new Node(id1));
+                    graph.putIfAbsent(id2, new Node(id2));
+
+                    Node n1 = graph.get(id1);
+                    Node n2 = graph.get(id2);
+
+                    double dist = haversineDistance(c1.y, c1.x, c2.y, c2.x);
+                    n1.edges.add(new Edge(n2, dist));
+                    if (!p.getIsOneway())
+                        n2.edges.add(new Edge(n1, dist));
+                }
+            }
+        }
+
+        // 2. Add virtual edges between stair nodes on adjacent floors
+        // Group stair paths by their lat/lng
+        Map<String, List<Integer>> stairFloorMap = new HashMap<>();
+
+        for (Path p : allPaths) {
+            if (!"stairs".equals(p.getRoadType()))
+                continue;
+
+            Geometry geom = p.getGeom();
+            for (int geomIdx = 0; geomIdx < geom.getNumGeometries(); geomIdx++) {
+                Geometry subGeom = geom.getGeometryN(geomIdx);
+                if (!(subGeom instanceof LineString))
+                    continue;
+
+                for (Coordinate c : ((LineString) subGeom).getCoordinates()) {
+                    String latLng = toNodeId(c.y, c.x);
+                    stairFloorMap.computeIfAbsent(latLng, k -> new ArrayList<>())
+                            .add(p.getFloor());
+                }
+            }
+        }
+
+        // 3. For each stair point that appears on multiple floors, connect them
+        double STAIR_COST = 10.0; // penalty for using stairs (in meters equivalent)
+
+        for (Map.Entry<String, List<Integer>> entry : stairFloorMap.entrySet()) {
+            String latLng = entry.getKey();
+            List<Integer> floors = entry.getValue().stream().distinct().sorted().toList();
+
+            // Connect adjacent floors
+            for (int i = 0; i < floors.size() - 1; i++) {
+                String nodeIdFloorA = floors.get(i) + ":" + latLng;
+                String nodeIdFloorB = floors.get(i + 1) + ":" + latLng;
+
+                Node nodeA = graph.get(nodeIdFloorA);
+                Node nodeB = graph.get(nodeIdFloorB);
+
+                if (nodeA != null && nodeB != null) {
+                    // Bidirectional stair edge
+                    nodeA.edges.add(new Edge(nodeB, STAIR_COST));
+                    nodeB.edges.add(new Edge(nodeA, STAIR_COST));
+                }
+            }
+        }
+
+        return graph;
+    }
+
+    public FloorRouteResponse calculateMultiFloorRoute(double startLat, double startLng, int startFloor,
+            double endLat, double endLng, int endFloor,
+            Long buildingId) {
+        // Fetch ALL floors, not just one
+        List<Path> allPaths = pathRepository.findAllAccessibleByBuilding(buildingId);
+        Map<String, Node> graph = buildMultiFloorGraph(allPaths);
+
+        // Start and end nodes are floor-aware
+        String startId = startFloor + ":" + toNodeId(startLat, startLng);
+        String endId = endFloor + ":" + toNodeId(endLat, endLng);
+
+        Node startNode = findNearestNodeOnFloor(graph, startLat, startLng, startFloor);
+        Node endNode = findNearestNodeOnFloor(graph, endLat, endLng, endFloor);
+
+        return dijkstraFloor(graph, startNode, endNode);
+    }
+
+    private FloorRouteResponse dijkstraFloor(Map<String, Node> graph, Node start, Node end) {
+        Map<Node, Double> distances = new HashMap<>();
+        Map<Node, Node> previous = new HashMap<>();
+        PriorityQueue<QueueNode> pq = new PriorityQueue<>();
+
+        for (Node node : graph.values()) {
+            distances.put(node, Double.MAX_VALUE);
+        }
+
+        distances.put(start, 0.0);
+        pq.add(new QueueNode(start, 0.0));
+
+        while (!pq.isEmpty()) {
+            QueueNode current = pq.poll();
+            Node u = current.node;
+
+            if (current.distance > distances.get(u))
+                continue;
+            if (u.id.equals(end.id))
+                break;
+
+            for (Edge edge : u.edges) {
+                Node v = edge.target;
+                double newDist = distances.get(u) + edge.weight;
+
+                if (newDist < distances.get(v)) {
+                    distances.put(v, newDist);
+                    previous.put(v, u);
+                    pq.add(new QueueNode(v, newDist));
+                }
+            }
+        }
+
+        if (distances.get(end) == Double.MAX_VALUE) {
+            throw new RuntimeException("No path found between the points.");
+        }
+
+        // ── Reconstruct path and group by floor ───────────────────────────────
+
+        // Use LinkedHashMap to preserve insertion order (path order)
+        Map<Integer, List<List<Double>>> segmentsByFloor = new LinkedHashMap<>();
+
+        // Reconstruct in reverse then reverse each segment
+        List<Node> pathNodes = new ArrayList<>();
+        Node current = end;
+        while (current != null) {
+            pathNodes.add(0, current);
+            current = previous.get(current);
+        }
+
+        // Group coordinates by floor in path order
+        for (Node node : pathNodes) {
+            String[] parts = node.id.split(":", 2);
+            int floor = Integer.parseInt(parts[0]);
+            String[] latLng = parts[1].split(",");
+            double lat = Double.parseDouble(latLng[0]);
+            double lng = Double.parseDouble(latLng[1]);
+
+            // GeoJSON uses [lng, lat]
+            segmentsByFloor.computeIfAbsent(floor, k -> new ArrayList<>())
+                    .add(List.of(lng, lat));
+        }
+
+        // Convert to FloorSegment list
+        List<FloorRouteResponse.FloorSegment> segments = segmentsByFloor.entrySet().stream()
+                .map(e -> new FloorRouteResponse.FloorSegment(e.getKey(), e.getValue()))
+                .toList();
+
+        return new FloorRouteResponse(segments, distances.get(end));
+    }
+
+    private Node findNearestNodeOnFloor(Map<String, Node> graph, double lat, double lng, int floor) {
+        Node nearest = null;
+        double minDistance = Double.MAX_VALUE;
+        String floorPrefix = floor + ":";
+
+        for (Map.Entry<String, Node> entry : graph.entrySet()) {
+            if (!entry.getKey().startsWith(floorPrefix))
+                continue;
+
+            String[] parts = entry.getKey().split(":");
+            String[] latLng = parts[1].split(",");
+            double nodeLat = Double.parseDouble(latLng[0]);
+            double nodeLng = Double.parseDouble(latLng[1]);
+
+            double dist = haversineDistance(lat, lng, nodeLat, nodeLng);
+            if (dist < minDistance) {
+                minDistance = dist;
+                nearest = entry.getValue();
+            }
+        }
+        return nearest;
     }
 }

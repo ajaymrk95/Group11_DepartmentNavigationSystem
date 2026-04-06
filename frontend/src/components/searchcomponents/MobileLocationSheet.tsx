@@ -3,15 +3,21 @@ import type { Location } from "../../types/types"
 import SearchBar from "./SearchBar"
 import { useNavigate } from "react-router-dom"
 import locationImage from "../../assets/image.png"
+import TileSwitcher from "./TileSwitcher"
 
 const API_BASE = "http://localhost:8080"
 
 type Props = {
   selectedLocation: Location | null
   onSelectLocation: (location: Location | null) => void
+
+  tileType: TileType
+  setTileType: React.Dispatch<React.SetStateAction<TileType>>
 }
 
-export default function MobileLocationSheet({ selectedLocation, onSelectLocation }: Props) {
+type TileType = "light" | "standard" | "satelite"
+
+export default function MobileLocationSheet({ selectedLocation, onSelectLocation, tileType, setTileType }: Props) {
 
   const sheetRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
@@ -168,8 +174,11 @@ export default function MobileLocationSheet({ selectedLocation, onSelectLocation
             </svg>
           </button>
 
+          {/* ✅ TILE SWITCHER HERE */}
+          <TileSwitcher tileType={tileType} setTileType={setTileType} />
+
           {/* Find Location — only at peek */}
-          {!isExpanded && (
+          {/* {!isExpanded && (
             <button
               onClick={openSearch}
               className="
@@ -185,7 +194,7 @@ export default function MobileLocationSheet({ selectedLocation, onSelectLocation
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z" />
               </svg>
             </button>
-          )}
+          )} */}
 
           <button
             onClick={goToNavigate}

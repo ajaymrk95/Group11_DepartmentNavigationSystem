@@ -1,32 +1,34 @@
+import { useState } from 'react';
 import { Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Building2,
-
   DoorOpen,
   Map,
-
   ScrollText,
   LogOut,
   Bell,
   User,
   Users,
+  ChevronLeft,
+  Menu
 } from 'lucide-react';
 
 const navItems = [
-  { label: 'Dashboard',     icon: LayoutDashboard, to: '/admin/dashboard' },
-  { label: 'Buildings',     icon: Building2,        to: '/admin/buildings' },
-  // { label: 'Floors',        icon: Layers,           to: '/admin/floors' },
-  { label: 'Rooms',         icon: DoorOpen,         to: '/admin/rooms' },
-  { label: 'Faculty',        icon: Users,           to: '/admin/faculty' },
-  { label: 'Path',  icon: Map,              to: '/admin/Path' },
-  // { label: 'Add Locations', icon: MapPin,           to: '/admin/add-location' },
-  { label: 'Logs',          icon: ScrollText,       to: '/admin/logs' },
+  { label: 'Dashboard',    icon: LayoutDashboard, to: '/admin/dashboard' },
+  { label: 'Buildings',    icon: Building2,       to: '/admin/buildings' },
+  { label: 'Rooms',        icon: DoorOpen,        to: '/admin/rooms' },
+  { label: 'Faculty',      icon: Users,           to: '/admin/faculty' },
+  { label: 'Path',         icon: Map,             to: '/admin/Path' },
+  { label: 'Logs',         icon: ScrollText,      to: '/admin/logs' },
 ];
 
 export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // ── State for collapsing the sidebar ──
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const token = localStorage.getItem('token');
   if (!token) return <Navigate to="/login" replace />;
@@ -40,220 +42,106 @@ export default function AdminLayout() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
-
-        *, *::before, *::after { box-sizing: border-box;}
-
-        html, body, #root {
-          height: 100%;
-          width: 100%;
-          overflow: hidden;
-        }
-
-        .al-root {
-          display: flex;
-          height: 100vh;
-          width: 100vw;
-          font-family: 'Outfit', sans-serif;
-          background: #EDE8DC;
-          overflow: hidden;
-        }
-
-        /* ══ Sidebar ══ */
-        .al-sidebar {
-          width: 200px;
-          min-width: 200px;
-          background: #1A3263;
-          display: flex;
-          flex-direction: column;
-          height: 100vh;
-          flex-shrink: 0;
-        }
-
-        .al-brand {
-          padding: 22px 18px 18px;
-          border-bottom: 1px solid rgba(255,255,255,.08);
-        }
-        .al-brand-name {
-          font-size: 22px;
-          font-weight: 800;
-          color: #FAB95B;
-          letter-spacing: -0.02em;
-          line-height: 1;
-        }
-        .al-brand-role {
-          font-size: 10px;
-          font-weight: 500;
-          color: rgba(255,255,255,.4);
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          margin-top: 4px;
-        }
-        .al-brand-org {
-          font-size: 11px;
-          color: rgba(255,255,255,.3);
-          margin-top: 2px;
-        }
-
-        .al-nav {
-          flex: 1;
-          padding: 10px 8px;
-          overflow-y: auto;
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-        .al-nav::-webkit-scrollbar { display: none; }
-
-        .al-nav-btn {
-          display: flex;
-          align-items: center;
-          gap: 9px;
-          width: 100%;
-          padding: 9px 11px;
-          border-radius: 9px;
-          border: none;
-          background: transparent;
-          color: rgba(255,255,255,.5);
-          font-family: 'Outfit', sans-serif;
-          font-size: 13px;
-          font-weight: 400;
-          cursor: pointer;
-          text-align: left;
-          transition: background .15s, color .15s;
-          white-space: nowrap;
-        }
-        .al-nav-btn:hover {
-          background: rgba(255,255,255,.08);
-          color: rgba(255,255,255,.85);
-        }
-        .al-nav-btn.active {
-          background: #FAB95B;
-          color: #1A3263;
-          font-weight: 600;
-        }
-
-        .al-signout-wrap {
-          padding: 8px 8px 18px;
-          border-top: 1px solid rgba(255,255,255,.07);
-        }
-        .al-signout-btn {
-          display: flex;
-          align-items: center;
-          gap: 9px;
-          width: 100%;
-          padding: 9px 11px;
-          border-radius: 9px;
-          border: none;
-          background: transparent;
-          color: rgba(255,255,255,.4);
-          font-family: 'Outfit', sans-serif;
-          font-size: 13px;
-          cursor: pointer;
-          transition: background .15s, color .15s;
-        }
-        .al-signout-btn:hover {
-          background: rgba(255,255,255,.08);
-          color: rgba(255,255,255,.75);
-        }
-
-        /* ══ Main area ══ */
-        .al-main {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          overflow: hidden;
-          min-width: 0;       /* critical: prevents flex child overflow */
-        }
-
-        .al-topbar {
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          gap: 10px;
-          padding: 12px 24px;
-          background: #EDE8DC;
-          flex-shrink: 0;
-        }
-
-        .al-topbar-btn {
-          width: 34px;
-          height: 34px;
-          border-radius: 50%;
-          border: none;
-          background: rgba(26,50,99,.08);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          color: #1A3263;
-          transition: background .15s;
-        }
-        .al-topbar-btn:hover { background: rgba(26,50,99,.14); }
-
-        .al-content {
-          flex: 1;
-          overflow-y: auto;
-          overflow-x: hidden;
-          width: 100%;
-        }
-        .al-content::-webkit-scrollbar { width: 5px; }
-        .al-content::-webkit-scrollbar-track { background: transparent; }
-        .al-content::-webkit-scrollbar-thumb {
-          background: rgba(26,50,99,.15);
-          border-radius: 99px;
-        }
       `}</style>
 
-      <div className="al-root">
-
+      {/* ── Root ── */}
+      <div className="flex h-screen w-screen overflow-hidden bg-[#EDE8DC] font-['Outfit',sans-serif]">
+        
         {/* ── Sidebar ── */}
-        <aside className="al-sidebar">
-          <div className="al-brand">
-            <div className="al-brand-name">Atlas</div>
-            <div className="al-brand-role">Admin Console</div>
-            <div className="al-brand-org">NIT Calicut</div>
+        <aside 
+          className={`flex h-screen shrink-0 flex-col bg-[#1A3263] transition-all duration-300 ease-in-out ${
+            isCollapsed ? 'w-[72px]' : 'w-[200px]'
+          }`}
+        >
+          {/* Brand & Toggle Area */}
+          <div className={`flex items-center border-b border-white/[.08] pb-[18px] pt-[22px] ${
+            isCollapsed ? 'justify-center px-0' : 'justify-between px-[18px]'
+          }`}>
+            
+            {/* Hide text when collapsed */}
+            {!isCollapsed && (
+              <div className="overflow-hidden whitespace-nowrap">
+                <div className="text-[22px] font-[800] leading-none tracking-[-0.02em] text-[#FAB95B]">
+                  Atlas
+                </div>
+                <div className="mt-1 text-[10px] font-medium uppercase tracking-[0.1em] text-white/40">
+                  Admin Console
+                </div>
+              </div>
+            )}
+
+            {/* Toggle Button */}
+            <button 
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="flex h-[32px] w-[32px] shrink-0 cursor-pointer items-center justify-center rounded-lg bg-white/[.05] text-white/50 transition-colors hover:bg-white/[.12] hover:text-white/[.85]"
+              title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            >
+              {isCollapsed ? <Menu size={18} /> : <ChevronLeft size={18} />}
+            </button>
           </div>
 
-          <nav className="al-nav">
+          {/* Navigation Links */}
+          <nav className="flex flex-1 flex-col gap-[4px] overflow-y-auto overflow-x-hidden px-[8px] py-[10px] [&::-webkit-scrollbar]:hidden">
             {navItems.map(({ label, icon: Icon, to }) => {
               const active = location.pathname === to;
               return (
                 <button
                   key={to}
-                  className={`al-nav-btn${active ? ' active' : ''}`}
+                  title={isCollapsed ? label : undefined} // Tooltip for collapsed state
+                  className={`flex items-center rounded-[9px] transition-colors duration-150 ${
+                    isCollapsed 
+                      ? 'justify-center py-[10px]' 
+                      : 'w-full gap-[9px] px-[11px] py-[9px] text-left text-[13px] whitespace-nowrap'
+                  } ${
+                    active
+                      ? 'bg-[#FAB95B] font-semibold text-[#1A3263]'
+                      : 'font-normal text-white/50 hover:bg-white/[.08] hover:text-white/[.85]'
+                  }`}
                   onClick={() => navigate(to)}
                 >
-                  <Icon size={16} strokeWidth={active ? 2.2 : 1.8} />
-                  {label}
+                  <Icon size={isCollapsed ? 20 : 16} strokeWidth={active ? 2.2 : 1.8} className="shrink-0" />
+                  {!isCollapsed && <span>{label}</span>}
                 </button>
               );
             })}
           </nav>
 
-          <div className="al-signout-wrap">
-            <button className="al-signout-btn" onClick={handleSignOut}>
-              <LogOut size={16} strokeWidth={1.8} />
-              Sign Out
+          {/* ── Sidebar Bottom Area ── */}
+          <div className={`flex border-t border-white/[.07] pb-[18px] pt-[12px] transition-all ${
+            isCollapsed ? 'flex-col items-center gap-3 px-2' : 'flex-col gap-2 px-[8px]'
+          }`}>
+            
+            {/* Action Buttons (Bell/User) */}
+            <div className={`flex ${isCollapsed ? 'flex-col gap-3' : 'items-center justify-around px-2 mb-1'}`}>
+              <button title="Notifications" className="flex h-[34px] w-[34px] shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/[.05] text-white/50 transition-colors duration-150 hover:bg-white/[.12] hover:text-white/[.85]">
+                <Bell size={16} strokeWidth={1.8} />
+              </button>
+              <button title="Profile" className="flex h-[34px] w-[34px] shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/[.05] text-white/50 transition-colors duration-150 hover:bg-white/[.12] hover:text-white/[.85]">
+                <User size={16} strokeWidth={1.8} />
+              </button>
+            </div>
+
+            {/* Sign Out */}
+            <button
+              title={isCollapsed ? "Sign Out" : undefined}
+              className={`flex cursor-pointer items-center rounded-[9px] bg-transparent text-white/40 transition-colors duration-150 hover:bg-white/[.08] hover:text-white/[.75] ${
+                isCollapsed ? 'justify-center p-[10px]' : 'w-full gap-[9px] px-[11px] py-[9px] text-[13px]'
+              }`}
+              onClick={handleSignOut}
+            >
+              <LogOut size={isCollapsed ? 18 : 16} strokeWidth={1.8} className="shrink-0" />
+              {!isCollapsed && <span>Sign Out</span>}
             </button>
           </div>
         </aside>
 
         {/* ── Main ── */}
-        <div className="al-main">
-          <div className="al-topbar">
-            <button className="al-topbar-btn">
-              <Bell size={16} strokeWidth={1.8} />
-            </button>
-            <button className="al-topbar-btn">
-              <User size={16} strokeWidth={1.8} />
-            </button>
-          </div>
-
-          <main className="al-content">
+        <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
+          {/* Changed: overflow-x-hidden is now overflow-x-auto */}
+          <main className="flex flex-1 flex-col h-full w-full overflow-hidden o [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#1A3263]/15 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-[5px] [&::-webkit-scrollbar]:h-[5px]">
             <Outlet />
           </main>
         </div>
-
       </div>
     </>
   );

@@ -7,10 +7,12 @@ import locationImage from "../../assets/image.png"
 type Props = {
   onRouteRequest: (start: Location, end: Location) => void
   onClose: () => void
+  onStartNavigation?: () => void
   mapDestination?: Location | null
+  hasRoute?: boolean
 }
 
-export default function RoutePanel({ onRouteRequest, onClose, mapDestination }: Props) {
+export default function RoutePanel({ onRouteRequest, onClose, onStartNavigation, mapDestination, hasRoute }: Props) {
   const [start, setStart] = useState<Location | null>(null)
   const [end, setEnd] = useState<Location | null>(null)
 
@@ -211,62 +213,110 @@ export default function RoutePanel({ onRouteRequest, onClose, mapDestination }: 
         )}
       </div>
 
-      {/* Find Route Button and Conditional Indoor Nav Button */}
+      {/* Actions */}
       <div className="p-6 mt-auto shrink-0 flex flex-col gap-3">
-        <button
-          disabled={!start || !end}
-          onClick={() => {
-            if (start && end) {
-              onRouteRequest(start, end)
-              onClose()
-            }
-          }}
-          className="
-            w-full flex items-center justify-between
-            px-6 py-4
-            rounded-full
-            bg-[#e9e4d9]
-            text-[#1A3263]
-            text-sm font-bold tracking-wide
-            shadow-md
-            transition-all duration-200
-            hover:bg-[#f0b35a]
-            hover:shadow-2xl
-            active:scale-[0.96]
-            disabled:bg-[#547792]/20 disabled:text-[#547792]/50 disabled:cursor-not-allowed
-          "
-        >
-          Find Route
-
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            viewBox="0 0 24 24"
+        {!hasRoute ? (
+          <button
+            disabled={!start || !end}
+            onClick={() => {
+              if (start && end) {
+                onRouteRequest(start, end)
+                // Don't close panel yet; let them see route and start navigation!
+              }
+            }}
+            className="
+              w-full flex items-center justify-between
+              px-6 py-4
+              rounded-full
+              bg-[#e9e4d9]
+              text-[#1A3263]
+              text-sm font-bold tracking-wide
+              shadow-md
+              transition-all duration-200
+              hover:bg-[#f0b35a]
+              hover:shadow-2xl
+              active:scale-[0.96]
+              disabled:bg-[#547792]/20 disabled:text-[#547792]/50 disabled:cursor-not-allowed
+            "
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
-        </button>
+            Find Route
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </button>
+        ) : (
+          <button
+            onClick={() => {
+              if (onStartNavigation) onStartNavigation()
+              onClose()
+            }}
+            className="
+              w-full flex items-center justify-between
+              px-6 py-4
+              rounded-full
+              bg-[#FAB95B]
+              text-[#1A3263]
+              text-sm font-bold tracking-wide
+              shadow-[0_0_20px_rgba(250,185,91,0.4)]
+              transition-all duration-200
+              hover:bg-[#f9aa3d]
+              hover:shadow-[0_0_25px_rgba(250,185,91,0.6)]
+              hover:-translate-y-[2px]
+              active:scale-[0.96]
+            "
+          >
+            Start Navigation
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 animate-pulse"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </button>
+        )}
 
         {end && end.category && end.buildingName && (
           <button
             onClick={() => {
-              navigate(`/indoor-navigation/${end.buildingName.toLowerCase()}?floor=${end.floor || 1}`)
+              const buildingSlug = end.buildingName?.toLowerCase();
+              const params = new URLSearchParams();
+              if (end.buildingEntranceLat != null && end.buildingEntranceLng != null) {
+                params.set('startLng', String(end.buildingEntranceLng));
+                params.set('startLat', String(end.buildingEntranceLat));
+                params.set('startFloor', '1');
+              }
+              if (end.latitude != null && end.longitude != null) {
+                params.set('endLng', String(end.longitude));
+                params.set('endLat', String(end.latitude));
+                params.set('endFloor', String(end.floor || 1));
+              }
+              navigate(`/indoor-navigation/${buildingSlug}?${params.toString()}`);
               onClose()
             }}
             className="
               w-full flex items-center justify-center gap-2
               px-6 py-4
               rounded-full
-              bg-[#1A3263]
-              text-[#e9e4d9]
-              border border-[#547792]
+              bg-transparent
+              text-[#FAB95B]
+              border border-[#FAB95B]
               text-sm font-bold tracking-wide
               shadow-md
               transition-all duration-200
-              hover:bg-[#547792]
+              hover:bg-[#FAB95B]/10
               hover:shadow-xl
               active:scale-[0.96]
             "

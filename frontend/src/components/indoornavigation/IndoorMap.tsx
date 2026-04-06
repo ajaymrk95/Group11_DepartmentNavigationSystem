@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Polyline } from "react-leaflet";
+import { MapContainer, TileLayer, Polyline, CircleMarker, Tooltip, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { GeoJsonObject } from "geojson";
+import { AnimatedPolyline } from "../../utils/indoormap/mapStyles";
 
 import type { IndoorMapProps } from "../../types/types";
 import { useBuildingData } from "../../hooks/useBuildingData";
@@ -9,20 +10,21 @@ import { useFloorData } from "../../hooks/useFloorData";
 import { routeStyle } from "../../utils/indoormap/mapStyles";
 import { MapBoundsController } from "./MapBoundsController";
 import { RoomLabels } from "./RoomLabels";
+import { stairIcon, startIcon, endIcon } from "../../utils/indoormap/mapIcons";
 import FloorToggle from "./FloorToggle";
 import { MapLayers } from "./MapLayers";
+import { useFloor } from "../../context/FloorContext";
 
-const MAP_CENTER: [number, number] = [11.322591, 75.93372];
 
-export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapProps) {
+export function IndoorMap({ building, route, routeSegments, fromCoords, toCoords, fromFloor, toFloor, onDataLoad }: IndoorMapProps) {
     if (!building) return null;
 
-    const [floor, setFloor] = useState<number>(floorNo ?? 1);
+    const { floor, setFloor } = useFloor();
 
     const { data: buildingData, loading: buildingLoading, error: buildingError } =
         useBuildingData(building);
 
-    const { units, paths, pois, loading: floorLoading, error: floorError } =
+    const { units, paths, loading: floorLoading, error: floorError } =
         useFloorData(buildingData?.id ?? null, floor, building);
 
     const loading = buildingLoading || floorLoading;
@@ -34,10 +36,9 @@ export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapPro
                 buildingOutline: buildingData.outline,
                 units,
                 paths,
-                pois,
             });
         }
-    }, [buildingData, units, paths, pois, loading, error, onDataLoad]);
+    }, [buildingData, units, paths, loading, error, onDataLoad]);
 
     if (loading) {
         return (
@@ -55,15 +56,15 @@ export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapPro
         );
     }
 
-    const allLayers = [buildingData?.outline, units, paths, pois].filter(
+    const allLayers = [buildingData?.outline, units, paths].filter(
         Boolean
     ) as GeoJsonObject[];
 
     return (
         <div className="h-full w-full rounded-lg shadow-lg overflow-hidden">
             <MapContainer
-                center={MAP_CENTER}
-                zoom={20}
+                center={[0, 0]}
+                zoom={2}
                 className="h-full w-full"
                 zoomControl
                 attributionControl={false}
@@ -81,7 +82,6 @@ export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapPro
                     buildingOutline={buildingData?.outline ?? null}
                     units={units}
                     paths={paths}
-                    pois={pois}
                 />
                 <RoomLabels key={`labels-${floor}`} units={units} />
                 <MapBoundsController geojsonData={allLayers} />
@@ -90,8 +90,45 @@ export function IndoorMap({ building, floorNo, route, onDataLoad }: IndoorMapPro
                     onChange={setFloor}
                     floors={buildingData?.floors ?? 1}
                 />
+
                 {route && route.length > 0 && (
+                    <AnimatedPolyline positions={route} />
+                )}
+
+                {/* {route && route.length > 0 && (
                     <Polyline positions={route} pathOptions={routeStyle} />
+                )} */}
+
+                {fromCoords && fromFloor === floor && (
+                    <Marker
+                        position={[fromCoords[1], fromCoords[0]]}
+                        icon={startIcon()}
+                    />
+                )}
+
+                {toCoords && toFloor === floor && (
+                    <Marker
+                        position={[toCoords[1], toCoords[0]]}
+                        icon={endIcon()}
+                    />
+                )}
+
+                {routeSegments && routeSegments[floor] && toFloor !== null && toFloor !== floor && (
+                    <>
+                        {toFloor > floor && routeSegments[floor + 1] && (
+                            <Marker
+                                position={routeSegments[floor][routeSegments[floor].length - 1]}
+                                icon={stairIcon("up")}
+                            />
+                        )}
+
+                        {toFloor < floor && routeSegments[floor - 1] && (
+                            <Marker
+                                position={routeSegments[floor][routeSegments[floor].length - 1]}
+                                icon={stairIcon("down")}
+                            />
+                        )}
+                    </>
                 )}
             </MapContainer>
         </div>
