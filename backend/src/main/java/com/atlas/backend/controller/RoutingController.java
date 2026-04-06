@@ -1,5 +1,6 @@
 package com.atlas.backend.controller;
 
+import com.atlas.backend.dto.FloorRouteResponse;
 import com.atlas.backend.dto.RouteResponse;
 import com.atlas.backend.service.RoutingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class RoutingController {
         }
     }
 
-    @GetMapping("/indoor")
+    @GetMapping("/indoors")
     public RouteResponse getRoute(@RequestParam Long buildingId,
             @RequestParam Integer floor,
             @RequestParam double startLat,
@@ -38,5 +39,19 @@ public class RoutingController {
             @RequestParam double endLng) {
                 System.out.println(startLat);
         return routingService.calculateFloorRoute(startLat, startLng, endLat, endLng, buildingId, floor);
+    }
+
+    @GetMapping("/indoor")
+    public FloorRouteResponse getRoute(@RequestParam Long buildingId,
+            @RequestParam int startFloor,
+            @RequestParam double startLat,
+            @RequestParam double startLng,
+            @RequestParam int endFloor,
+            @RequestParam double endLat,
+            @RequestParam double endLng) {
+        return routingService.calculateMultiFloorRoute(
+                startLat, startLng, startFloor,
+                endLat, endLng, endFloor,
+                buildingId);
     }
 }

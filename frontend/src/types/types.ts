@@ -18,12 +18,13 @@ export type RouteLatLngs = [number, number][];
 
 export interface IndoorMapProps {
     building: string | undefined;
-    floorNo?: number;
-    /** Rendered as a highlighted polyline when provided */
     route?: RouteLatLngs | null;
-    /** Called once whenever floor data finishes loading */
+    routeSegments: Record<number, RouteLatLngs>;
+    fromCoords: [number, number] | null;
+    toCoords: [number, number] | null;
+    fromFloor: number | null;
+    toFloor: number | null;
     onDataLoad?: (data: FloorData) => void;
-    /** Slot for extra UI rendered inside the header (e.g. route controls) */
     headerSlot?: React.ReactNode;
 }
 
@@ -33,7 +34,8 @@ export interface RouteControlsProps {
     noRouteFound: boolean;
     setFrom: (value: string) => void;
     setTo: (value: string) => void;
-    onFindPath: (fromCoords: [number, number], toCoords: [number, number]) => void;
+    onFindPath: (fromCoords: [number, number], toCoords: [number, number], fromFloor: number,
+        toFloor: number) => void;
     buildingId: number;
     buildingEntries: [number, number][];
 }
@@ -87,13 +89,13 @@ export type Location = {
 
 export type Room = {
     id: number;
-  name: string;
-  roomNo: string | null;
-  category: string;
-  floor: number;
-  isAccessible: boolean;
-  description: string | null;
-  tags: string[];
-  buildingId: number;
-  buildingName: string;
+    name: string;
+    roomNo: string | null;
+    category: string;
+    floor: number;
+    isAccessible: boolean;
+    description: string | null;
+    tags: string[];
+    buildingId: number;
+    buildingName: string;
 }

@@ -13,8 +13,6 @@ export function useFloorData(buildingId: number | null, floor: number, building:
         error: null,
     });
 
-    const BASE_PATH = `/${building}/floor${floor}`;
-
     useEffect(() => {
         if (!buildingId) return;
 

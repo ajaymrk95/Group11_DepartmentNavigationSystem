@@ -4,6 +4,7 @@ interface PointOption {
     value: string;
     label: string;
     coordinates: [number, number];
+    floor: number;
 }
 
 interface Props {
@@ -11,7 +12,7 @@ interface Props {
     value: string;
     buildingId: number;
     buildingEntries: [number, number][];
-    onChange: (value: string, coordinates: [number, number]) => void;
+    onChange: (value: string, coordinates: [number, number], floor: number) => void;
 }
 
 export function SearchablePointInput({ label, value, buildingId, buildingEntries, onChange }: Props) {
@@ -19,6 +20,8 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
     const [options, setOptions] = useState<PointOption[]>([]);
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
+
+    const [isSelecting, setIsSelecting] = useState(false);
 
     // Close on outside click
     useEffect(() => {
@@ -33,6 +36,11 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
 
     // Fetch suggestions on query change
     useEffect(() => {
+        if (isSelecting) {
+            setIsSelecting(false); // Reset flag and skip
+            return;
+        }
+
         if (query.trim().length < 1) {
             setOptions([]);
             setOpen(false);
@@ -59,6 +67,7 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
                             value: `building-entry-${i}`,
                             label: `Building Entry ${i + 1}`,
                             coordinates: coords,
+                            floor: 1
                         });
                     });
 
@@ -69,6 +78,7 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
                                     value: `room-${room.id}-entry-${i}`,
                                     label: `${room.name} (Floor ${room.floor}) — Door ${i + 1}`,
                                     coordinates: coords,
+                                    floor: room.floor
                                 });
                             });
                         }
@@ -98,6 +108,9 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
                         setOpen(true);
                     }}
                     onFocus={() => query.length > 0 && setOpen(true)}
+                    onBlur={() => {
+                        setTimeout(() => setOpen(false), 200);
+                    }}
                     placeholder="Search room..."
                     className="border border-gray-300 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
                 />
@@ -106,11 +119,15 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
                         {options.map((o) => (
                             <li
                                 key={o.value}
-                                onMouseDown={(e) => e.preventDefault()} // prevent blur before click
+                                // onMouseDown={(e) => e.preventDefault()} // prevent blur before click
                                 onClick={() => {
+                                    setIsSelecting(true); // Tell the effect NOT to fetch
                                     setQuery(o.label);
-                                    onChange(o.value, o.coordinates);  // ← pass coordinates
+                                    onChange(o.value, o.coordinates, o.floor);  // ← pass coordinates
                                     setOpen(false);
+
+                                    const inputElement = ref.current?.querySelector("input");
+                                    inputElement?.blur();
                                 }}
                                 className="px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"
                             >

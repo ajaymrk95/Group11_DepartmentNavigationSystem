@@ -5,7 +5,7 @@ import MapView from "../components/navcomponents/MapView"
 import LocateButton from "../components/navcomponents/LocateButton"
 import SearchBar from "../components/searchcomponents/SearchBar"
 import { useCurrentLocation } from "../hooks/useCurrentLocation"
-import locationImage from "../assets/image.png"
+import TileSwitcher from "../components/searchcomponents/TileSwitcher"
 
 const DEFAULT_CENTER: [number, number] = [11.3210, 75.9346]
 
@@ -23,6 +23,12 @@ export default function OutdoorNav() {
   const [end, setEnd] = useState<Location | null>(null)
   const [routeCoords, setRouteCoords] = useState<[number, number][]>([])
   const [distanceText, setDistanceText] = useState("")
+
+  // ✅ NEW: tile state
+  const [tileType, setTileType] = useState<"light" | "standard" | "satelite">("light")
+
+  
+  // State to hold the destination clicked directly from the map pins
   const [clickedDestination, setClickedDestination] = useState<Location | null>(null)
   const [isPanelOpen, setIsPanelOpen] = useState(true)
   const [isNavigating, setIsNavigating] = useState(false)
@@ -73,7 +79,12 @@ export default function OutdoorNav() {
   return (
     <div className="h-screen w-screen flex overflow-hidden font-[Outfit] relative bg-[#E8E2DB]">
 
-      {/* ── Side Panel ── */}
+        {/* ✅ TILE SWITCHER (TOP RIGHT) */}
+      <div className="absolute top-4 right-4 z-[3000]">
+        <TileSwitcher tileType={tileType} setTileType={setTileType} />
+      </div>
+
+      {/* SIDEBAR: 30% width on Desktop, Full screen slide-over on Mobile */}
       <div className={`
         absolute md:relative top-0 left-0 h-full z-[3000] md:z-10
         w-full md:w-[380px] md:min-w-[380px] shrink-0
@@ -302,7 +313,11 @@ export default function OutdoorNav() {
           destination={end}
           routeCoords={routeCoords}
           currentLocation={currentLocation}
-          onSetMapDestination={loc => { setClickedDestination(loc); setIsPanelOpen(true) }}
+          onSetMapDestination={(loc) => {
+            setClickedDestination(loc)
+            setIsPanelOpen(true) 
+          }}
+         tileType={tileType}
         />
 
         <LocateButton onClick={() => { if (currentLocation) setCenter(currentLocation) }} />

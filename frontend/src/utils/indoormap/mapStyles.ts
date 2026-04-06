@@ -1,5 +1,9 @@
 import type { Feature } from "geojson";
 import type { PathOptions } from "leaflet";
+import { useEffect, useRef } from "react";
+import { useMap } from "react-leaflet";
+import L from "leaflet";
+import type { RouteLatLngs } from "../../types/types";
 
 export const buildingOutlineStyle: PathOptions = {
     fillColor: "#E8E2DB",
@@ -10,9 +14,9 @@ export const buildingOutlineStyle: PathOptions = {
 };
 
 export const routeStyle: PathOptions = {
-    color: "#ef4444",
+    color: "#3b82f6",
     weight: 5,
-    opacity: 0.8,
+    opacity: 0.85,
     lineCap: "round" as const,
     lineJoin: "round" as const,
 };
@@ -88,4 +92,51 @@ export function getPathStyle(feature: Feature | undefined): PathOptions {
                 lineJoin: "round",
             };
     }
+}
+
+interface AnimatedPolylineProps {
+    positions: RouteLatLngs;
+}
+
+export function AnimatedPolyline({ positions }: AnimatedPolylineProps) {
+    const map = useMap();
+    const polylineRef = useRef<L.Polyline | null>(null);
+    const animRef = useRef<number | null>(null);
+
+    useEffect(() => {
+        if (!positions || positions.length === 0) return;
+
+        const polyline = L.polyline(positions, {
+            color: "#3b82f6",
+            weight: 5,
+            opacity: 0.85,
+            lineCap: "round",
+            lineJoin: "round",
+            dashArray: "12, 8",
+            dashOffset: "0",
+        });
+
+        polyline.addTo(map);
+        polylineRef.current = polyline;
+
+        let offset = 0;
+
+        function animate() {
+            offset -= 1;
+            const el = polyline.getElement() as SVGPathElement | null;
+            if (el) {
+                el.style.strokeDashoffset = String(offset);
+            }
+            animRef.current = requestAnimationFrame(animate);
+        }
+
+        animRef.current = requestAnimationFrame(animate);
+
+        return () => {
+            if (animRef.current) cancelAnimationFrame(animRef.current);
+            map.removeLayer(polyline);
+        };
+    }, [map, positions]);
+
+    return null;
 }

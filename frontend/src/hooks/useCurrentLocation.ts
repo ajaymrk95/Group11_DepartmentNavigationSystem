@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 
 export function useCurrentLocation() {
   const [location, setLocation] = useState<[number, number] | null>(null)
+  const [heading, setHeading] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -13,6 +14,9 @@ export function useCurrentLocation() {
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         setLocation([pos.coords.latitude, pos.coords.longitude])
+        if (pos.coords.heading !== null && !isNaN(pos.coords.heading)) {
+          setHeading(pos.coords.heading)
+        }
       },
       (err) => {
         setError(err.message)
@@ -27,5 +31,5 @@ export function useCurrentLocation() {
     return () => navigator.geolocation.clearWatch(watchId)
   }, [])
 
-  return { location, error }
+  return { location, heading, error }
 }

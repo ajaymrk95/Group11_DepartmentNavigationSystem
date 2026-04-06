@@ -2,6 +2,7 @@ import { useState } from "react"
 import type { Location } from "../types/types"
 import RoutePanel from "../components/searchcomponents/RoutePanel"
 import MobileLocationSheet from "../components/searchcomponents/MobileLocationSheet"
+import TileSwitcher from "../components/searchcomponents/TileSwitcher"
 
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 import MapRecenter from "../components/searchcomponents/MapRecenter"
@@ -10,6 +11,16 @@ import "leaflet/dist/leaflet.css"
 export default function SearchLocation() {
 
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null)
+
+  // ✅ NEW: tile state
+  const [tileType, setTileType] = useState<"light" | "standard" | "satelite">("light")
+
+  // ✅ NEW: tile layers
+  const tileLayers = {
+    light: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+    standard: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    satelite: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+  }
 
   return (
     <>
@@ -99,6 +110,10 @@ export default function SearchLocation() {
 
       <div className="sl-root">
 
+        <div className="hidden md:block absolute top-4 right-4 z-[1000]">
+          <TileSwitcher tileType={tileType} setTileType={setTileType} />
+        </div>
+
         {/* MAP */}
         <MapContainer
           center={[11.3215, 75.9339]}
@@ -107,7 +122,7 @@ export default function SearchLocation() {
         >
           <TileLayer
             attribution="© OpenStreetMap contributors"
-            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+            url={tileLayers[tileType]}
           />
 
           <MapRecenter location={selectedLocation} />
@@ -132,6 +147,8 @@ export default function SearchLocation() {
           <MobileLocationSheet
             selectedLocation={selectedLocation}
             onSelectLocation={setSelectedLocation}
+            tileType={tileType}              // ✅ NEW
+            setTileType={setTileType}        // ✅ NEW
           />
         </div>
 
