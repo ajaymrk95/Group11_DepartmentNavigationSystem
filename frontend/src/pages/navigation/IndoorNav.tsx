@@ -5,9 +5,13 @@ import { useNavigation } from "../../hooks/useNavigate";
 import { useBuildingData } from "../../hooks/useBuildingData";
 import { HomeIcon } from "../../components/icons/HomeIcon";
 import { FloorProvider } from "../../context/FloorContext";
+import { useEffect } from "react";
 
 // ── Inner component — lives inside FloorProvider so useFloor() works ──
-function NavigationContent({ building }: { building: string }) {
+function NavigationContent({ 
+    building,
+    urlFromCoords, urlToCoords, urlFromFloor, urlToFloor
+ }: any) {
     const navigate = useNavigate();
     const { data: buildingData } = useBuildingData(building);
 
@@ -17,8 +21,22 @@ function NavigationContent({ building }: { building: string }) {
 
     const { from, to, route, routeSegments,
         noRouteFound, fromCoords, toCoords, fromFloor, toFloor,
-        setFrom, setTo, onDataLoad, findPath 
+        setFrom, setTo, onDataLoad, findPath
     } = useNavigation();
+
+    useEffect(() => {
+        // Only trigger if we have building data AND all necessary URL coordinates
+        if (buildingData?.id && urlFromCoords && urlToCoords && urlFromFloor !== null && urlToFloor !== null) {
+            findPath(
+                urlFromCoords,
+                urlToCoords,
+                urlFromFloor,
+                urlToFloor,
+                buildingData.id
+            );
+
+        }
+    }, [buildingData, urlFromCoords, urlToCoords]);
 
     return (
         <div className="w-full h-screen flex flex-col bg-gray-100">
@@ -76,11 +94,29 @@ export function NavigationPage() {
     const [searchParams] = useSearchParams();
     const initialFloor = Number(searchParams.get("floor")) || 1;
 
+    const startLng = searchParams.get("startLng");
+    const startLat = searchParams.get("startLat");
+    const endLng = searchParams.get("endLng");
+    const endLat = searchParams.get("endLat");
+    const startFloor = searchParams.get("startFloor");
+    const endFloor = searchParams.get("endFloor");
+
+    const urlFromCoords: [number, number] | null = (startLng && startLat) ? [Number(startLng), Number(startLat)] : null;
+    const urlToCoords: [number, number] | null = (endLng && endLat) ? [Number(endLng), Number(endLat)] : null;
+    const urlFromFloor = startFloor ? Number(startFloor) : null;
+    const urlToFloor = endFloor ? Number(endFloor) : null;
+
     if (!building) return null;
 
     return (
         <FloorProvider initialFloor={initialFloor}>
-            <NavigationContent building={building} />
+            <NavigationContent
+                building={building}
+                urlFromCoords={urlFromCoords}
+                urlToCoords={urlToCoords}
+                urlFromFloor={urlFromFloor}
+                urlToFloor={urlToFloor}
+            />
         </FloorProvider>
     );
 }

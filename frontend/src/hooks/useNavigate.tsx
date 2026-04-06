@@ -18,7 +18,7 @@ export interface NavigationState {
     setTo: (name: string) => void;
     onDataLoad: (data: FloorData) => void;
     findPath: (fromCoords: [number, number], toCoords: [number, number],
-        fromFloor: number, toFloor: number) => void;
+        fromFloor: number, toFloor: number, overrideBuildingId?: number) => void;
 }
 
 export function useNavigation(initialFrom = "", initialTo = ""): NavigationState {
@@ -52,9 +52,15 @@ export function useNavigation(initialFrom = "", initialTo = ""): NavigationState
         fromCoords: [number, number],
         toCoords: [number, number],
         fromFloor: number,
-        toFloor: number
+        toFloor: number,
+        overrideBuildingId?: number 
     ) => {
-        if (!buildingId) { setNoRouteFound(true); return; }
+        const idToUse = overrideBuildingId || buildingId;
+
+        if (!idToUse) {
+            console.error("No building ID available for routing");
+            return;
+        }
 
         setFromCoords(fromCoords);
         setToCoords(toCoords);
@@ -63,7 +69,7 @@ export function useNavigation(initialFrom = "", initialTo = ""): NavigationState
 
 
         try {
-            const url = `${BASE_URL}/routes/indoor?buildingId=${buildingId}` +
+            const url = `${BASE_URL}/routes/indoor?buildingId=${idToUse}` +
                 `&startLng=${fromCoords[0]}&startLat=${fromCoords[1]}&startFloor=${fromFloor}` +
                 `&endLng=${toCoords[0]}&endLat=${toCoords[1]}&endFloor=${toFloor}`;
 
@@ -96,6 +102,6 @@ export function useNavigation(initialFrom = "", initialTo = ""): NavigationState
     return {
         from, to, route, routeSegments,
         noRouteFound, fromCoords, toCoords, fromFloor, toFloor,
-        setFrom, setTo, onDataLoad, findPath
+        setFrom, setTo, onDataLoad, findPath,
     };
 }
