@@ -236,7 +236,21 @@ export default function OutdoorNav() {
             )}
 
             {end?.buildingName && (
-              <button onClick={() => navigate(`/indoor-navigation/${end.buildingName!.toLowerCase()}?floor=${end.floor || 1}`)}
+              <button onClick={() => {
+                const buildingSlug = end.buildingName!.toLowerCase();
+                const params = new URLSearchParams();
+                if (end.buildingEntranceLat != null && end.buildingEntranceLng != null) {
+                  params.set('startLng', String(end.buildingEntranceLng));
+                  params.set('startLat', String(end.buildingEntranceLat));
+                  params.set('startFloor', '1');
+                }
+                if (end.latitude != null && end.longitude != null) {
+                  params.set('endLng', String(end.longitude));
+                  params.set('endLat', String(end.latitude));
+                  params.set('endFloor', String(end.floor || 1));
+                }
+                navigate(`/indoor-navigation/${buildingSlug}?${params.toString()}`);
+              }}
                 className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-transparent text-[#FAB95B] border border-[rgba(250,185,91,0.4)] text-sm font-bold border-solid cursor-pointer transition-all duration-200 hover:bg-[rgba(250,185,91,0.1)] hover:border-[#FAB95B]">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18M3 15h18"/></svg>
                 Indoor Navigation

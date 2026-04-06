@@ -85,6 +85,8 @@ export type Location = {
     description: string | null;
     locationType?: "ROOM" | "BUILDING";  // add this
     buildingName?: string | null;
+    buildingEntranceLat?: number | null;
+    buildingEntranceLng?: number | null;
 }
 
 export type Room = {

@@ -99,6 +99,8 @@ export default function SearchBar({
           floor: loc.floor ?? null,
           locationType: loc.locationType ?? undefined,
           buildingName: loc.buildingName ?? null,
+          buildingEntranceLat: loc.buildingEntranceLat ?? null,
+          buildingEntranceLng: loc.buildingEntranceLng ?? null,
         }
         onSelect(mapped)
         setQuery(mapped.name)
@@ -129,6 +131,8 @@ export default function SearchBar({
         floor: loc.floor ?? null,
         locationType: loc.locationType ?? undefined,
         buildingName: loc.buildingName ?? null,
+        buildingEntranceLat: loc.buildingEntranceLat ?? null,
+        buildingEntranceLng: loc.buildingEntranceLng ?? null,
       }))
       setResults(mapped)
     } catch (err) {
