@@ -148,7 +148,7 @@ export default function Logs() {
       </div>
 
       {/* ── Panel ── */}
-      <div style={{ background: "#fff", borderRadius: 14, boxShadow: "0 1px 4px rgba(26,50,99,.07)", overflow: "hidden" }}>
+      <div style={{ background: "#fff", borderRadius: 14, boxShadow: "0 1px 4px rgba(26,50,99,.07)", overflowX: "auto" }}>
 
         {error && (
           <div style={{ padding: "12px 20px", fontSize: 13, color: "#dc2626", background: "#fef2f2", borderBottom: "1px solid #fee2e2" }}>⚠ {error}</div>
@@ -165,7 +165,7 @@ export default function Logs() {
         )}
 
         {fetched && !loading && rows.length > 0 && (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table style={{ width: "100%", minWidth: 700, borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#f7f4ef", borderBottom: "1px solid #ede8dc" }}>
                 {["#", "Action", "Entity", "ID", "Details", "Timestamp"].map((h) => (
