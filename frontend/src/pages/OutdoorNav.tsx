@@ -6,6 +6,7 @@ import LocateButton from "../components/navcomponents/LocateButton"
 import SearchBar from "../components/searchcomponents/SearchBar"
 import { useCurrentLocation } from "../hooks/useCurrentLocation"
 import TileSwitcher from "../components/searchcomponents/TileSwitcher"
+import locationImage from "../assets/image.png"
 
 const DEFAULT_CENTER: [number, number] = [11.3210, 75.9346]
 
