@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 
 const ArrowSVG = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" viewBox="0 0 120 120" fill="currentColor">
+  <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 120 120" fill="currentColor">
     <path d="M38.008 32.4701C37.2012 32.534 36.4519 32.9125 35.9218 33.5239C35.3916 34.1354 35.1231 34.9307 35.1741 35.7384C35.2252 36.546 35.5917 37.3013 36.1947 37.8411C36.7976 38.3809 37.5886 38.662 38.397 38.6237L61.5967 37.1515L33.5095 68.5786C32.9646 69.1883 32.6842 69.9895 32.73 70.806C32.7758 71.6224 33.1441 72.3873 33.7538 72.9322C34.3635 73.4771 35.1648 73.7575 35.9812 73.7117C36.7977 73.6659 37.5625 73.2976 38.1074 72.6879L66.1823 41.2746L67.3112 64.4652C67.3637 65.2728 67.7316 66.0274 68.3354 66.5661C68.9393 67.1049 69.7308 67.3846 70.5391 67.345C71.3474 67.3054 72.1077 66.9495 72.656 66.3543C73.2043 65.7591 73.4965 64.9721 73.4697 64.1633L72.0146 34.2259C71.9895 33.7159 71.8634 33.216 71.6434 32.7551C71.4235 32.2943 71.1142 31.8817 70.7334 31.5414C70.3527 31.2012 69.9081 30.9399 69.4256 30.7729C68.943 30.6059 68.4321 30.5365 67.9224 30.5686L38.008 32.4701Z" fill="currentColor"/>
   </svg>
 );
 
 const CompassSmall = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 197 197" fill="#9DBAD0">
+  <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 197 197" fill="#9DBAD0">
     <g clipPath="url(#clip-small)">
       <path d="M192.336 92.5281L171.521 87.3261C169.156 71.7685 161.879 57.3747 150.752 46.2475C139.625 35.1203 125.231 27.843 109.673 25.4789L104.471 4.70151C104.138 3.37036 103.369 2.18884 102.287 1.34462C101.205 0.500395 99.872 0.0418701 98.4997 0.0418701C97.1274 0.0418701 95.7944 0.500395 94.7125 1.34462C93.6306 2.18884 92.8617 3.37036 92.5281 4.70151L87.3261 25.5173C71.7685 27.8815 57.3747 35.1588 46.2475 46.286C35.1203 57.4131 27.843 71.807 25.4789 87.3646L4.70151 92.5666C3.37036 92.9002 2.18884 93.669 1.34462 94.7509C0.500395 95.8329 0.0418701 97.1658 0.0418701 98.5382C0.0418701 99.9105 0.500395 101.243 1.34462 102.325C2.18884 103.407 3.37036 104.176 4.70151 104.51L25.5173 109.712C27.8815 125.269 35.1588 139.663 46.286 150.79C57.4131 161.917 71.807 169.195 87.3646 171.559L92.5666 192.375C92.9002 193.706 93.669 194.887 94.7509 195.732C95.8329 196.576 97.1658 197.034 98.5382 197.034C99.9105 197.034 101.243 196.576 102.325 195.732C103.407 194.887 104.176 193.706 104.51 192.375L109.712 171.559C125.269 169.195 139.663 161.917 150.79 150.79C161.917 139.663 169.195 125.269 171.559 109.712L192.375 104.51C193.706 104.176 194.887 103.407 195.732 102.325C196.576 101.243 197.034 99.9105 197.034 98.5382C197.034 97.1658 196.576 95.8329 195.732 94.7509C194.887 93.669 193.706 92.9002 192.375 92.5666L192.336 92.5281ZM158.346 84.0633L122.047 74.952L112.967 38.6532C123.977 41.3032 134.041 46.9431 142.049 54.9507C150.056 62.9584 155.696 73.0224 158.346 84.0325V84.0633ZM84.0325 38.6609L74.952 74.952L38.6532 84.0325C41.3032 73.0224 46.9431 62.9584 54.9507 54.9507C62.9584 46.9431 73.0224 41.3032 84.0325 38.6532V38.6609ZM38.6301 112.975L74.952 122.047L84.0325 158.346C73.0224 155.696 62.9584 150.056 54.9507 142.049C46.9431 134.041 41.3032 123.977 38.6532 112.967L38.6301 112.975ZM112.944 158.377L122.024 122.078L158.323 112.998C155.67 123.999 150.031 134.055 142.028 142.056C134.025 150.058 123.969 155.695 112.967 158.346L112.944 158.377Z" fill="#9DBAD0"/>
     </g>
@@ -15,8 +15,8 @@ const CompassSmall = () => (
   </svg>
 );
 
-const CompassLarge = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="110" height="110" viewBox="0 0 197 197" fill="none">
+const CompassLarge = ({ size }: { size: number }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 197 197" fill="none">
     <g clipPath="url(#clip-large)">
       <path d="M192.336 92.5281L171.521 87.3261C169.156 71.7685 161.879 57.3747 150.752 46.2475C139.625 35.1203 125.231 27.843 109.673 25.4789L104.471 4.70151C104.138 3.37036 103.369 2.18884 102.287 1.34462C101.205 0.500395 99.872 0.0418701 98.4997 0.0418701C97.1274 0.0418701 95.7944 0.500395 94.7125 1.34462C93.6306 2.18884 92.8617 3.37036 92.5281 4.70151L87.3261 25.5173C71.7685 27.8815 57.3747 35.1588 46.2475 46.286C35.1203 57.4131 27.843 71.807 25.4789 87.3646L4.70151 92.5666C3.37036 92.9002 2.18884 93.669 1.34462 94.7509C0.500395 95.8329 0.0418701 97.1658 0.0418701 98.5382C0.0418701 99.9105 0.500395 101.243 1.34462 102.325C2.18884 103.407 3.37036 104.176 4.70151 104.51L25.5173 109.712C27.8815 125.269 35.1588 139.663 46.286 150.79C57.4131 161.917 71.807 169.195 87.3646 171.559L92.5666 192.375C92.9002 193.706 93.669 194.887 94.7509 195.732C95.8329 196.576 97.1658 197.034 98.5382 197.034C99.9105 197.034 101.243 196.576 102.325 195.732C103.407 194.887 104.176 193.706 104.51 192.375L109.712 171.559C125.269 169.195 139.663 161.917 150.79 150.79C161.917 139.663 169.195 125.269 171.559 109.712L192.375 104.51C193.706 104.176 194.887 103.407 195.732 102.325C196.576 101.243 197.034 99.9105 197.034 98.5382C197.034 97.1658 196.576 95.8329 195.732 94.7509C194.887 93.669 193.706 92.9002 192.375 92.5666L192.336 92.5281ZM158.346 84.0633L122.047 74.952L112.967 38.6532C123.977 41.3032 134.041 46.9431 142.049 54.9507C150.056 62.9584 155.696 73.0224 158.346 84.0325V84.0633ZM84.0325 38.6609L74.952 74.952L38.6532 84.0325C41.3032 73.0224 46.9431 62.9584 54.9507 54.9507C62.9584 46.9431 73.0224 41.3032 84.0325 38.6532V38.6609ZM38.6301 112.975L74.952 122.047L84.0325 158.346C73.0224 155.696 62.9584 150.056 54.9507 142.049C46.9431 134.041 41.3032 123.977 38.6532 112.967L38.6301 112.975ZM112.944 158.377L122.024 122.078L158.323 112.998C155.67 123.999 150.031 134.055 142.028 142.056C134.025 150.058 123.969 155.695 112.967 158.346L112.944 158.377Z" fill="black"/>
     </g>
@@ -67,9 +67,10 @@ const Dashboard = () => {
       </svg>
 
       {/* ── Topbar ── */}
-      <div className="bg-[#0B2D72] flex items-center justify-between px-10 h-16 relative z-10 shrink-0">
-        <div className="flex items-center gap-9">
+      <div className="bg-[#0B2D72] flex items-center justify-between px-5 md:px-10 h-14 md:h-16 relative z-10 shrink-0">
+        <div className="flex items-center gap-4 md:gap-9">
           <CompassSmall />
+          {/* Nav links: hidden on mobile */}
           <div className="flex items-center gap-8">
             {["About", "Help", "Team"].map(label => (
               <button key={label} className="text-[15px] font-medium text-[#E8E2DB] bg-none border-none font-[Outfit] cursor-pointer transition-colors duration-200 hover:text-[#9DBAD0] tracking-[0.01em]">
@@ -80,7 +81,7 @@ const Dashboard = () => {
         </div>
         <button
           onClick={() => navigate("/admin-login")}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-full border-none bg-[#E8E2DB] text-[#1A3263] font-[Outfit] text-sm font-semibold cursor-pointer transition-all duration-[220ms] hover:bg-[#FAB95B] tracking-[0.01em]"
+          className="flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 rounded-full border-none bg-[#E8E2DB] text-[#1A3263] font-[Outfit] text-sm font-semibold cursor-pointer transition-all duration-[220ms] hover:bg-[#FAB95B] tracking-[0.01em]"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
@@ -90,39 +91,50 @@ const Dashboard = () => {
       </div>
 
       {/* ── Hero ── */}
-      <div className="flex-1 flex flex-col items-center justify-start pt-[60px] px-20 relative z-[5]">
-        <CompassLarge />
+      <div className="flex-1 flex flex-col items-center justify-start pt-8 md:pt-[60px] px-5 md:px-20 relative z-[5]">
 
-        {/* Title row with flanking text */}
-        <div className="w-full max-w-[1100px] grid grid-cols-[1fr_auto_1fr] items-center gap-10 -mt-5">
+        {/* Compass: smaller on mobile */}
+        <div className="block md:hidden"><CompassLarge size={70} /></div>
+        <div className="hidden md:block"><CompassLarge size={110} /></div>
+
+        {/* Desktop: 3-col flanking layout */}
+        <div className="hidden md:grid w-full max-w-[1100px] grid-cols-[1fr_auto_1fr] items-center gap-10 -mt-5">
           <p className="text-[15px] font-light text-[#0B2D72] leading-[1.65] opacity-70 text-left pt-2.5">
             Navigate faculty offices, laboratories,<br/>
             and classrooms with ease.<br/>
             Find your way inside the CS Department.
           </p>
-
           <h1 className="text-[clamp(80px,12vw,140px)] font-black text-black tracking-tight leading-none text-center">
             ATLAS
           </h1>
-
           <p className="text-[15px] font-light text-[#0B2D72] leading-[1.65] opacity-70 text-right pt-2.5">
             GPS detection, QR scanning,<br/>
             and shortest-path routing<br/>
             all in one place.
           </p>
         </div>
+
+        {/* Mobile: stacked title + subtitle */}
+        <div className="flex md:hidden flex-col items-center text-center -mt-2">
+          <h1 className="text-[72px] font-black text-black tracking-tight leading-none">
+            ATLAS
+          </h1>
+          <p className="text-[14px] font-light text-[#0B2D72] leading-[1.65] opacity-70 mt-3 max-w-[280px]">
+            Navigate faculty offices, labs, and classrooms. Indoor routing made simple.
+          </p>
+        </div>
       </div>
 
       {/* ── Action Cards ── */}
-      <div className="w-full max-w-[1100px] mx-auto mt-12 mb-16 px-20 grid grid-cols-2 gap-5 relative z-[5]">
+      <div className="w-full max-w-[1100px] mx-auto mt-8 md:mt-12 mb-10 md:mb-16 px-5 md:px-20 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 relative z-[5]">
 
         {/* View Map */}
         <button
           onClick={() => navigate("/search-location")}
-          className="group rounded-3xl p-9 pb-8 cursor-pointer text-left relative border-[3px] border-[rgba(0,0,0,0.15)] bg-[#E8E2DB] transition-all duration-[250ms] outline-none hover:bg-[#1A3263] hover:border-[#1A3263] hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(26,50,99,0.25)]"
+          className="group rounded-2xl md:rounded-3xl p-6 md:p-9 md:pb-8 cursor-pointer text-left relative border-[3px] border-[rgba(0,0,0,0.15)] bg-[#E8E2DB] transition-all duration-[250ms] outline-none hover:bg-[#1A3263] hover:border-[#1A3263] hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(26,50,99,0.25)]"
         >
-          <div className="flex items-start justify-between mb-5">
-            <svg className="text-[#1A3263] transition-colors duration-[250ms] group-hover:text-white" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex items-start justify-between mb-4 md:mb-5">
+            <svg className="text-[#1A3263] transition-colors duration-[250ms] group-hover:text-white" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
               <line x1="9" y1="3" x2="9" y2="18"/>
               <line x1="15" y1="6" x2="15" y2="21"/>
@@ -131,10 +143,10 @@ const Dashboard = () => {
               <ArrowSVG />
             </span>
           </div>
-          <div className="text-[26px] font-bold text-[#1A3263] mb-3 tracking-[-0.01em] transition-colors duration-[250ms] group-hover:text-[#FAB95B]">
+          <div className="text-[22px] md:text-[26px] font-bold text-[#1A3263] mb-2 md:mb-3 tracking-[-0.01em] transition-colors duration-[250ms] group-hover:text-[#FAB95B]">
             View Map
           </div>
-          <p className="text-[13.5px] font-light leading-[1.65] text-[#547792] transition-colors duration-[250ms] group-hover:text-[rgba(255,255,255,0.55)]">
+          <p className="text-[13px] md:text-[13.5px] font-light leading-[1.65] text-[#547792] transition-colors duration-[250ms] group-hover:text-[rgba(255,255,255,0.55)]">
             Explore floors, entrances, corridors, and the full department layout. Get a bird's-eye view of every room and hallway.
           </p>
         </button>
@@ -142,20 +154,20 @@ const Dashboard = () => {
         {/* Start Navigating */}
         <button
           onClick={() => navigate("/outdoor-navigation")}
-          className="group rounded-3xl p-9 pb-8 cursor-pointer text-left relative border-[3px] border-[rgba(0,0,0,0.15)] bg-[#E8E2DB] transition-all duration-[250ms] outline-none hover:bg-[#1A3263] hover:border-[#1A3263] hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(26,50,99,0.25)]"
+          className="group rounded-2xl md:rounded-3xl p-6 md:p-9 md:pb-8 cursor-pointer text-left relative border-[3px] border-[rgba(0,0,0,0.15)] bg-[#E8E2DB] transition-all duration-[250ms] outline-none hover:bg-[#1A3263] hover:border-[#1A3263] hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(26,50,99,0.25)]"
         >
-          <div className="flex items-start justify-between mb-5">
-            <svg className="text-[#1A3263] transition-colors duration-[250ms] group-hover:text-white" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex items-start justify-between mb-4 md:mb-5">
+            <svg className="text-[#1A3263] transition-colors duration-[250ms] group-hover:text-white" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <polygon points="3 11 22 2 13 21 11 13 3 11"/>
             </svg>
             <span className="text-[#1A3263] transition-all duration-[250ms] group-hover:text-[#E8E2DB] group-hover:translate-x-[3px] group-hover:-translate-y-[3px]">
               <ArrowSVG />
             </span>
           </div>
-          <div className="text-[26px] font-bold text-[#1A3263] mb-3 tracking-[-0.01em] transition-colors duration-[250ms] group-hover:text-[#FAB95B]">
+          <div className="text-[22px] md:text-[26px] font-bold text-[#1A3263] mb-2 md:mb-3 tracking-[-0.01em] transition-colors duration-[250ms] group-hover:text-[#FAB95B]">
             Start Navigating
           </div>
-          <p className="text-[13.5px] font-light leading-[1.65] text-[#547792] transition-colors duration-[250ms] group-hover:text-[rgba(255,255,255,0.55)]">
+          <p className="text-[13px] md:text-[13.5px] font-light leading-[1.65] text-[#547792] transition-colors duration-[250ms] group-hover:text-[rgba(255,255,255,0.55)]">
             Get step-by-step directions from your location to your destination. Shortest path, indoor routing made simple.
           </p>
         </button>
