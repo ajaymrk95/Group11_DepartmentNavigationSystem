@@ -291,7 +291,19 @@ export default function RoutePanel({ onRouteRequest, onClose, onStartNavigation,
         {end && end.category && end.buildingName && (
           <button
             onClick={() => {
-              navigate(`/indoor-navigation/${end.buildingName?.toLowerCase()}?floor=${end.floor || 1}`)
+              const buildingSlug = end.buildingName?.toLowerCase();
+              const params = new URLSearchParams();
+              if (end.buildingEntranceLat != null && end.buildingEntranceLng != null) {
+                params.set('startLng', String(end.buildingEntranceLng));
+                params.set('startLat', String(end.buildingEntranceLat));
+                params.set('startFloor', '1');
+              }
+              if (end.latitude != null && end.longitude != null) {
+                params.set('endLng', String(end.longitude));
+                params.set('endLat', String(end.latitude));
+                params.set('endFloor', String(end.floor || 1));
+              }
+              navigate(`/indoor-navigation/${buildingSlug}?${params.toString()}`);
               onClose()
             }}
             className="
