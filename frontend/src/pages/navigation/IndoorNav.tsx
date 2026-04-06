@@ -50,7 +50,7 @@ function NavigationContent({
                         <HomeIcon className="w-10 h-10" />
                     </button>
                     <h1 className="text-3xl font-bold text-[#E8E2DB]">
-                        {building}
+                        {buildingData?.name ?? building}
                     </h1>
                 </div>
                 <div className="flex-1">
