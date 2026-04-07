@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { GeoJsonObject } from "geojson";
 import type { BuildingData } from "../types/types";
 
-const BASE_URL = "http://localhost:8080/api";
+const BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 export function useBuildingData(building: string) {
     const [data, setData] = useState<BuildingData | null>(null);

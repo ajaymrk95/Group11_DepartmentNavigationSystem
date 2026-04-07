@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import type { FloorData, RouteLatLngs } from "../types/types";
 import { useFloor } from "../context/FloorContext";
 
-const BASE_URL = "http://localhost:8080/api";
+const BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 export interface NavigationState {
     from: string;

@@ -4,7 +4,7 @@ import type { Location } from "../../types/types"
 import SearchBar from "./SearchBar"
 import locationImage from "../../assets/image.png"
 
-const API_BASE = "http://localhost:8080"
+const API_BASE = import.meta.env.VITE_API_URL
 
 type Props = {
   selectedLocation: Location | null

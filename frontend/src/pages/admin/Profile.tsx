@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { User, Lock, Mail, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
 
-const BASE  = "http://localhost:8080";
+const BASE  = import.meta.env.VITE_API_URL;
 const token = () => localStorage.getItem("token") ?? "";
 const authH = (): Record<string, string> => ({
   "Content-Type": "application/json",
