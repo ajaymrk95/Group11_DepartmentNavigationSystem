@@ -1,8 +1,12 @@
 package com.atlas.backend.controller;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,6 +14,8 @@ import com.atlas.backend.entity.Admin;
 import com.atlas.backend.dto.LoginRequest;
 import com.atlas.backend.dto.ForgotPasswordRequest;
 import com.atlas.backend.dto.ResetPasswordRequest;
+import com.atlas.backend.dto.UpdateEmailRequest;
+import com.atlas.backend.dto.UpdatePasswordRequest;
 import com.atlas.backend.service.AdminService;
 
 @RestController
@@ -57,5 +63,43 @@ public class AdminController {
             return ResponseEntity.ok("Password has been successfully reset.");
         }
         return ResponseEntity.status(400).body("Invalid or expired reset token.");
+    }
+
+    // ── Profile endpoints ─────────────────────────────────────────────────────
+
+    @GetMapping("/profile")
+    public ResponseEntity<?> getProfile() {
+        return adminService.getProfile()
+                .<ResponseEntity<?>>map(admin -> ResponseEntity.ok(
+                        Map.of("username", admin.getUsername() != null ? admin.getUsername() : "",
+                               "email",    admin.getEmail()    != null ? admin.getEmail()    : "")))
+                .orElseGet(() -> ResponseEntity.status(404).body("Admin not found."));
+    }
+
+    @PutMapping("/profile/email")
+    public ResponseEntity<?> updateEmail(@RequestBody UpdateEmailRequest request) {
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            return ResponseEntity.badRequest().body("Email is required.");
+        }
+        boolean success = adminService.updateEmail(request.getEmail().trim());
+        if (success) {
+            return ResponseEntity.ok("Email updated successfully.");
+        }
+        return ResponseEntity.status(409).body("Email is already in use.");
+    }
+
+    @PutMapping("/profile/password")
+    public ResponseEntity<?> updatePassword(@RequestBody UpdatePasswordRequest request) {
+        if (request.getCurrentPassword() == null || request.getNewPassword() == null) {
+            return ResponseEntity.badRequest().body("Both currentPassword and newPassword are required.");
+        }
+        if (request.getNewPassword().length() < 6) {
+            return ResponseEntity.badRequest().body("New password must be at least 6 characters.");
+        }
+        boolean success = adminService.updatePassword(request.getCurrentPassword(), request.getNewPassword());
+        if (success) {
+            return ResponseEntity.ok("Password updated successfully.");
+        }
+        return ResponseEntity.status(400).body("Current password is incorrect.");
     }
 }

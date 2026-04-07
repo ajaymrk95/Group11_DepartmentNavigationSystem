@@ -78,4 +78,43 @@ public class AdminService {
         }
         return false;
     }
+
+    // ── Profile management ────────────────────────────────────────────────────
+
+    /** Returns the single admin record (there is always exactly one). */
+    public Optional<Admin> getProfile() {
+        return adminRepository.findAll().stream().findFirst();
+    }
+
+    /**
+     * Update the admin's email address.
+     * Returns false if the email is already taken by this or another record.
+     */
+    public boolean updateEmail(String newEmail) {
+        Optional<Admin> existing = adminRepository.findByEmail(newEmail);
+        Optional<Admin> adminOpt = getProfile();
+        if (adminOpt.isEmpty()) return false;
+        Admin admin = adminOpt.get();
+        // Allow saving the same email; reject only if it belongs to a different row
+        if (existing.isPresent() && !existing.get().getId().equals(admin.getId())) {
+            return false; // duplicate
+        }
+        admin.setEmail(newEmail);
+        adminRepository.save(admin);
+        return true;
+    }
+
+    /**
+     * Update the admin's password after verifying the current one.
+     * Returns false if the current password doesn't match.
+     */
+    public boolean updatePassword(String currentPassword, String newPassword) {
+        Optional<Admin> adminOpt = getProfile();
+        if (adminOpt.isEmpty()) return false;
+        Admin admin = adminOpt.get();
+        if (!admin.getPassword().equals(currentPassword)) return false;
+        admin.setPassword(newPassword);
+        adminRepository.save(admin);
+        return true;
+    }
 }
