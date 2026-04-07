@@ -21,6 +21,7 @@ const navItems = [
   { label: 'Faculty',      icon: Users,           to: '/admin/faculty' },
   { label: 'Path',         icon: Map,             to: '/admin/Path' },
   { label: 'Logs',         icon: ScrollText,      to: '/admin/logs' },
+  { label: 'Profile',      icon: User,            to: '/admin/profile' },
 ];
 
 export default function AdminLayout() {
@@ -137,8 +138,7 @@ export default function AdminLayout() {
 
         {/* ── Main ── */}
         <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
-          {/* Changed: overflow-x-hidden is now overflow-x-auto */}
-          <main className="flex flex-1 flex-col h-full w-full overflow-hidden o [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#1A3263]/15 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-[5px] [&::-webkit-scrollbar]:h-[5px]">
+          <main className="flex flex-1 flex-col h-full w-full overflow-y-auto [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#1A3263]/15 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-[5px] [&::-webkit-scrollbar]:h-[5px]">
             <Outlet />
           </main>
         </div>

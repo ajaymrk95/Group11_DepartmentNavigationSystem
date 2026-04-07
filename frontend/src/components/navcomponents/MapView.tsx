@@ -7,7 +7,7 @@ import MapRecenter from "./MapRecenter"
 
 type TileType = "light" | "standard" | "satelite"
 
-import { useState, useEffect } from "react" 
+import { useState, useEffect } from "react"
 
 type Props = {
   center: [number, number]
@@ -15,10 +15,43 @@ type Props = {
   destination: Location | null
   routeCoords: [number, number][]
   currentLocation?: [number, number] | null
-  onSetMapDestination: (loc: Location) => void  
+  onSetMapDestination: (loc: Location) => void
 
   tileType: TileType
 }
+
+/** Red filled circle icon for current location */
+const locationCircleIcon = L.divIcon({
+  html: `
+    <div style="
+      position:relative;
+      width:52px;
+      height:52px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    ">
+      <span style="
+        position:absolute;
+        inset:0;
+        border-radius:50%;
+        background:rgba(240,59,49,0.18);
+        animation:locationPulse 1.8s ease-out infinite;
+      "></span>
+      <div style="
+        width:18px;
+        height:18px;
+        border-radius:50%;
+        background:#F03B31;
+        border:3px solid #fff;
+        box-shadow:0 2px 8px rgba(240,59,49,0.6);
+      "></div>
+    </div>`,
+  className: "",
+  iconSize: [52, 52],
+  iconAnchor: [26, 26],
+  popupAnchor: [0, -26],
+})
 
 // ✅ NEW: tile mapping
 const tileLayers = {
@@ -45,21 +78,28 @@ const greenIcon = new L.Icon({
   popupAnchor: [1, -34],
 })
 
-// Red for Current Location
-const redIcon = new L.Icon({
-  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-})
-
-function MapView({ center, start, destination, routeCoords, currentLocation, onSetMapDestination, tileType}: Props) {
+function MapView({ center, start, destination, routeCoords, currentLocation, onSetMapDestination, tileType }: Props) {
+  /* Inject the keyframe animation once into the document */
+  useEffect(() => {
+    const styleId = "location-pulse-style"
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement("style")
+      style.id = styleId
+      style.textContent = `
+        @keyframes locationPulse {
+          0%   { transform: scale(0.6); opacity: 0.9; }
+          70%  { transform: scale(1.8); opacity: 0; }
+          100% { transform: scale(1.8); opacity: 0; }
+        }
+      `
+      document.head.appendChild(style)
+    }
+  }, [])
 
   const [locations, setLocations] = useState<Location[]>([])
   
   useEffect(() => {
-    fetch("http://localhost:8080/locations")
+    fetch("http://10.212.245.96:8080/locations")
       .then(res => res.json())
       .then(data => {
         const mapped: Location[] = data
@@ -140,7 +180,7 @@ function MapView({ center, start, destination, routeCoords, currentLocation, onS
         )}
 
         {currentLocation && (
-          <Marker position={currentLocation} icon={redIcon}>
+          <Marker position={currentLocation} icon={locationCircleIcon}>
             <Popup><span className="font-bold text-red-600">You are here</span></Popup>
           </Marker>
         )}
