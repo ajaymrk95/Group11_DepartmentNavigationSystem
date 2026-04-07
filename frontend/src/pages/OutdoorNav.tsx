@@ -18,6 +18,65 @@ function getDistanceInMeters(lat1: number, lon1: number, lat2: number, lon2: num
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
+function getBearing(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const toRad = (d: number) => d * Math.PI / 180
+  const dLon = toRad(lon2 - lon1)
+  const y = Math.sin(dLon) * Math.cos(toRad(lat2))
+  const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) - Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLon)
+  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360
+}
+
+type TurnInfo = {
+  direction: 'straight' | 'left' | 'right' | 'arrive'
+  turnIndex: number
+}
+
+function getNextTurn(routeCoords: [number, number][], cur: [number, number]): TurnInfo {
+  if (routeCoords.length < 3) return { direction: 'straight', turnIndex: 0 }
+
+  let closest = 0, minD = Infinity
+  for (let i = 0; i < routeCoords.length; i++) {
+    const d = Math.hypot(cur[0] - routeCoords[i][0], cur[1] - routeCoords[i][1])
+    if (d < minD) { minD = d; closest = i }
+  }
+
+  for (let i = closest; i < routeCoords.length - 2; i++) {
+    const b1 = getBearing(
+      routeCoords[i][0], routeCoords[i][1],
+      routeCoords[i + 1][0], routeCoords[i + 1][1]
+    )
+
+    const b2 = getBearing(
+      routeCoords[i + 1][0], routeCoords[i + 1][1],
+      routeCoords[i + 2][0], routeCoords[i + 2][1]
+    )
+
+    let diff = b2 - b1
+    if (diff > 180) diff -= 360
+    if (diff < -180) diff += 360
+
+    if (diff > 25) return { direction: 'right', turnIndex: i + 1 }
+    if (diff < -25) return { direction: 'left', turnIndex: i + 1 }
+  }
+
+  return { direction: 'arrive', turnIndex: routeCoords.length - 1 }
+}
+
+function getDistanceAlongRoute(
+  routeCoords: [number, number][],
+  startIndex: number,
+  endIndex: number
+): number {
+  let dist = 0
+  for (let i = startIndex; i < endIndex; i++) {
+    dist += getDistanceInMeters(
+      routeCoords[i][0], routeCoords[i][1],
+      routeCoords[i + 1][0], routeCoords[i + 1][1]
+    )
+  }
+  return dist
+}
+
 export default function OutdoorNav() {
   const navigate = useNavigate()
   const [start, setStart] = useState<Location | null>(null)
@@ -34,6 +93,7 @@ export default function OutdoorNav() {
   const [isPanelOpen, setIsPanelOpen] = useState(true)
   const [isNavigating, setIsNavigating] = useState(false)
   const [activeDistanceMeters, setActiveDistanceMeters] = useState<number | null>(null)
+  const [turnInfo, setTurnInfo] = useState<TurnInfo>({ direction: 'straight', turnIndex: 0 })
   const [isLoadingRoute, setIsLoadingRoute] = useState(false)
   const [routeError, setRouteError] = useState("")
   const { location: currentLocation } = useCurrentLocation()
@@ -46,11 +106,21 @@ export default function OutdoorNav() {
   useEffect(() => {
     if (isNavigating && currentLocation) {
       setCenter(currentLocation)
-      if (end?.latitude && end?.longitude) {
-        setActiveDistanceMeters(getDistanceInMeters(currentLocation[0], currentLocation[1], end.latitude, end.longitude))
+      if (routeCoords.length > 0) {
+        const info = getNextTurn(routeCoords, currentLocation)
+        setTurnInfo(info)
+
+        let closest = 0, minD = Infinity
+        for (let i = 0; i < routeCoords.length; i++) {
+          const d = Math.hypot(currentLocation[0] - routeCoords[i][0], currentLocation[1] - routeCoords[i][1])
+          if (d < minD) { minD = d; closest = i }
+        }
+
+        const distToTurn = getDistanceAlongRoute(routeCoords, closest, info.turnIndex)
+        setActiveDistanceMeters(distToTurn)
       }
     }
-  }, [currentLocation, isNavigating, end])
+  }, [currentLocation, isNavigating, end, routeCoords])
 
   const handleSwap = () => { const t = start; setStart(end); setEnd(t) }
 
@@ -80,9 +150,25 @@ export default function OutdoorNav() {
   return (
     <div className="h-screen w-screen flex overflow-hidden font-[Outfit] relative bg-[#E8E2DB]">
 
-        {/* ✅ TILE SWITCHER (TOP RIGHT) */}
-      <div className="absolute top-4 right-4 z-[3000]">
+      {/* ✅ TOP RIGHT CONTROLS */}
+      <div className="absolute top-4 right-4 z-[3000] flex items-center gap-2">
+
+        {/* Tile switcher (left) */}
         <TileSwitcher tileType={tileType} setTileType={setTileType} />
+
+        {/* Search button (right) */}
+        {!isPanelOpen && (
+          <button
+            onClick={() => setIsPanelOpen(true)}
+            className="bg-[#0B2D72] text-[#F6E7BC] px-4 py-2.5 rounded-full shadow-xl font-semibold border border-[rgba(255,255,255,0.1)] flex items-center gap-2 hover:bg-[#1A3263] transition-colors text-sm"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="M21 21l-4.3-4.3"/>
+            </svg>
+            Search
+          </button>
+        )}
       </div>
 
       {/* SIDEBAR: 30% width on Desktop, Full screen slide-over on Mobile */}
@@ -262,18 +348,8 @@ export default function OutdoorNav() {
 
       {/* ── Map area ── */}
       <div className="flex-1 relative h-full">
-
-        {/* Mobile: open panel button */}
-        {!isPanelOpen && (
-          <button onClick={() => setIsPanelOpen(true)}
-            className="md:hidden absolute top-5 left-5 z-[2000] bg-[#0B2D72] text-[#F6E7BC] px-5 py-3 rounded-full shadow-xl font-semibold border border-[rgba(255,255,255,0.1)] flex items-center gap-2 hover:bg-[#1A3263] transition-colors">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
-            Search Route
-          </button>
-        )}
-
         {/* ── Status pill (idle / has route) ── */}
-        {!isNavigating && (
+        {/* {!isNavigating && (
           <div className="absolute top-5 left-1/2 -translate-x-1/2 z-[2000] pointer-events-none">
             <div className={`flex items-center gap-2 px-5 py-2.5 rounded-full shadow-xl backdrop-blur-sm text-sm font-semibold whitespace-nowrap transition-all duration-300 ${
               hasRoute
@@ -287,40 +363,59 @@ export default function OutdoorNav() {
               )}
             </div>
           </div>
-        )}
+        )} */}
 
-        {/* ── Active navigation overlay ── */}
-        {isNavigating && (
-          <div className="absolute top-5 left-1/2 -translate-x-1/2 z-[2000] w-[90%] max-w-[420px]">
-            <div className="bg-[#0B2D72] border border-[rgba(255,255,255,0.1)] rounded-3xl shadow-2xl overflow-hidden">
-              {/* Amber accent bar */}
-              <div className="h-1 w-full bg-[#FAB95B]" />
-              <div className="p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-bold text-[#FAB95B] tracking-widest uppercase">Navigating To</span>
-                  <button onClick={() => { setIsNavigating(false); setRouteCoords([]); setStart(null); setEnd(null); setDistanceText("") }}
-                    className="text-[rgba(246,231,188,0.5)] hover:text-[#ff6b7a] hover:bg-[rgba(255,107,122,0.1)] transition-colors text-xs bg-[rgba(255,255,255,0.06)] px-3 py-1 rounded-full border-none cursor-pointer font-semibold tracking-wider">
+        {/* ── Compact navigation bar ── */}
+        {isNavigating && (() => {
+          const distLabel = activeDistanceMeters !== null
+            ? (activeDistanceMeters < 1000 ? Math.round(activeDistanceMeters) + ' m' : (activeDistanceMeters / 1000).toFixed(1) + ' km')
+            : '…'
+          const turnIcon = {
+            left:     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A3263" strokeWidth="2.5"><path d="M9 15l-6-6 6-6"/><path d="M20 21v-7a4 4 0 00-4-4H3"/></svg>,
+            right:    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A3263" strokeWidth="2.5"><path d="M15 15l6-6-6-6"/><path d="M4 21v-7a4 4 0 014-4h13"/></svg>,
+            arrive:   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A3263" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+            straight: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A3263" strokeWidth="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>,
+          }[turnInfo.direction]
+          const turnLabel = { left: 'Turn left', right: 'Turn right', arrive: 'Arriving', straight: 'Go straight' }[turnInfo.direction]
+          const endNav = () => { setIsNavigating(false); setRouteCoords([]); setStart(null); setEnd(null); setDistanceText('') }
+          return (
+            <>
+              {/* Mobile: bottom bar */}
+              <div className="md:hidden absolute bottom-20 left-3 right-3 z-[2000]">
+                <div className="bg-[#0B2D72]/95 backdrop-blur-sm border border-[rgba(255,255,255,0.12)] rounded-2xl shadow-2xl flex items-center gap-3 px-3 py-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-[#FAB95B] flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(250,185,91,0.35)]">
+                    {turnIcon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-[#F6E7BC] text-[13px] font-semibold">{turnLabel} in</span>
+                      <span className="text-[#FAB95B] text-base font-black leading-none">{distLabel}</span>
+                      <span className="text-[rgba(246,231,188,0.5)] text-[11px]">{distanceText} total</span>
+                    </div>
+                    <div className="text-[rgba(246,231,188,0.45)] text-[11px] truncate mt-0.5">{end?.name}</div>
+                  </div>
+                  <button onClick={endNav}
+                    className="shrink-0 bg-[rgba(255,107,122,0.15)] border border-[rgba(255,107,122,0.35)] text-[#ff6b7a] text-xs font-bold px-3 py-1.5 rounded-xl cursor-pointer hover:bg-[rgba(255,107,122,0.28)] transition-colors">
                     End
                   </button>
                 </div>
-                <div className="text-[#F6E7BC] text-xl font-bold leading-snug mb-4 truncate">{end?.name}</div>
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-[#FAB95B] flex items-center justify-center shadow-[0_0_20px_rgba(250,185,91,0.5)] shrink-0">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1A3263" strokeWidth="2.5" className="animate-pulse"><path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
-                  </div>
-                  <div>
-                    <div className="text-[#F6E7BC] text-3xl font-black tracking-tight leading-none">
-                      {activeDistanceMeters !== null
-                        ? (activeDistanceMeters < 1000 ? Math.round(activeDistanceMeters) + " m" : (activeDistanceMeters/1000).toFixed(2) + " km")
-                        : "Tracking…"}
-                    </div>
-                    <div className="text-[rgba(246,231,188,0.45)] text-xs font-semibold uppercase tracking-widest mt-1">Straight-line distance</div>
-                  </div>
-                </div>
               </div>
-            </div>
-          </div>
-        )}
+              {/* Desktop: top-center pill */}
+              <div className="hidden md:flex absolute top-5 left-1/2 -translate-x-1/2 z-[2000] items-center gap-2.5 bg-[#0B2D72]/95 backdrop-blur-sm border border-[rgba(255,255,255,0.12)] rounded-full shadow-2xl px-4 py-2">
+                <div className="w-7 h-7 rounded-full bg-[#FAB95B] flex items-center justify-center shrink-0">
+                  {turnIcon}
+                </div>
+                <span className="text-[#FAB95B] font-black text-sm whitespace-nowrap">{distLabel}</span>
+                <span className="text-[#F6E7BC] text-sm font-semibold whitespace-nowrap">· {turnLabel} ·</span>
+                <span className="text-[rgba(246,231,188,0.55)] text-sm truncate max-w-[150px]">{end?.name}</span>
+                <button onClick={endNav}
+                  className="shrink-0 bg-[rgba(255,107,122,0.15)] border border-[rgba(255,107,122,0.35)] text-[#ff6b7a] text-xs font-bold px-3 py-1 rounded-full cursor-pointer hover:bg-[rgba(255,107,122,0.28)] transition-colors">
+                  End
+                </button>
+              </div>
+            </>
+          )
+        })()}
 
         <MapView
           center={center}
@@ -330,9 +425,9 @@ export default function OutdoorNav() {
           currentLocation={currentLocation}
           onSetMapDestination={(loc) => {
             setClickedDestination(loc)
-            setIsPanelOpen(true) 
+            setIsPanelOpen(true)
           }}
-         tileType={tileType}
+          tileType={tileType}
         />
 
         <LocateButton onClick={() => { if (currentLocation) setCenter(currentLocation) }} />
