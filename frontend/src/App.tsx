@@ -3,7 +3,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminLogin from "./pages/AdminLogin";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import OutdoorNav from "./pages/navigation/outdoornav/OutdoorNav"
+import OutdoorNav from "./pages/OutdoorNav"
 import AddLocation from "./pages/AddLocation";
 import AddLocations from "./pages/admin/AddLocations";
 import Path from "./pages/admin/Path";
