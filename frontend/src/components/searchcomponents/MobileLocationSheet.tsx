@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom"
 import locationImage from "../../assets/image.png"
 import TileSwitcher from "./TileSwitcher"
 
-const API_BASE = "http://10.212.245.96:8080"
+const API_BASE = "http://localhost:8080"
 
 type Props = {
   selectedLocation: Location | null

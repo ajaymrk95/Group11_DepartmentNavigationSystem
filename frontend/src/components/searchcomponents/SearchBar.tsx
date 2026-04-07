@@ -78,7 +78,7 @@ export default function SearchBar({
       setQrError(null)
       try {
         const res = await fetch(
-          `http://10.212.245.96:8080/locations/search?q=${encodeURIComponent(qrValue)}`
+          `http://localhost:8080/locations/search?q=${encodeURIComponent(qrValue)}`
         )
         const data = await res.json()
         if (!data.length) {
@@ -117,7 +117,7 @@ export default function SearchBar({
 
   async function fetchResults(value: string) {
     try {
-      const res = await fetch(`http://10.212.245.96:8080/locations/search?q=${encodeURIComponent(value)}`)
+      const res = await fetch(`http://localhost:8080/locations/search?q=${encodeURIComponent(value)}`)
       const data = await res.json()
       const mapped = data.map((loc: any) => ({
         id: loc.id,
@@ -169,7 +169,7 @@ export default function SearchBar({
     onSelect(loc)
 
     if (loc.id !== -1 && loc.locationType) {
-      fetch(`http://10.212.245.96:8080/locations/visit?id=${loc.id}&locationType=${loc.locationType}`, {
+      fetch(`http://localhost:8080/locations/visit?id=${loc.id}&locationType=${loc.locationType}`, {
         method: "POST",
       }).catch(err => console.error("Failed to record visit", err))
     }
@@ -192,7 +192,7 @@ export default function SearchBar({
     }
     return (
       <svg
-        xmlns="http://www.w3.org/2000/svg"
+        xmlns="http://localhost:8080"
         className="w-5 h-5 text-gray-500"
         fill="none"
         stroke="currentColor"
