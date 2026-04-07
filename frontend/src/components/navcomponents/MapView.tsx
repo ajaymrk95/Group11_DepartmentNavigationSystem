@@ -99,7 +99,7 @@ function MapView({ center, start, destination, routeCoords, currentLocation, onS
   const [locations, setLocations] = useState<Location[]>([])
   
   useEffect(() => {
-    fetch("http://10.212.245.96:8080/locations")
+    fetch("http://localhost:8080/locations")
       .then(res => res.json())
       .then(data => {
         const mapped: Location[] = data
