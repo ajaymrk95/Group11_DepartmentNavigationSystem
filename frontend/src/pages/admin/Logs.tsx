@@ -40,7 +40,7 @@ export default function Logs() {
   async function fetchData() {
     setLoading(true); setError(null);
     try {
-      const res = await fetch("http://localhost:8080/api/logs", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/logs`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token") ?? ""}` },
       });
       if (!res.ok) throw new Error(`Error ${res.status}`);

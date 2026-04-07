@@ -176,7 +176,7 @@ function AddOutdoorModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
     try { geom = JSON.parse(geomText); } catch { setError("Invalid JSON for geometry."); return; }
     setSaving(true);
     try {
-      const res = await fetch("http://localhost:8080/api/paths/outdoor", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/paths/outdoor`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, roadType, isOneway, geom }),
@@ -245,7 +245,7 @@ function AddIndoorModal({ buildingId, floor, onClose, onSaved }: {
     try { geom = JSON.parse(geomText); } catch { setError("Invalid JSON for geometry."); return; }
     setSaving(true);
     try {
-      const res = await fetch("http://localhost:8080/api/paths/indoor", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/paths/indoor`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, roadType, isOneway, buildingId, floor, geom }),
@@ -394,7 +394,7 @@ export default function PathsPage() {
   // ── Fetch outdoor paths ───────────────────────────────────────────────────
   const fetchOutdoor = useCallback(() => {
     setLoadingOutdoor(true);
-    fetch("http://localhost:8080/api/paths?outdoor=true")
+    fetch(`${import.meta.env.VITE_API_URL}/api/paths?outdoor=true`)
       .then((r) => r.json())
       .then((data: PathFeature[]) => setOutdoorPaths(data))
       .catch(console.error)
@@ -409,7 +409,7 @@ export default function PathsPage() {
   // ── Fetch buildings ───────────────────────────────────────────────────────
   useEffect(() => {
     if (mode !== "indoor") return;
-    fetch("http://localhost:8080/api/buildings")
+    fetch(`${import.meta.env.VITE_API_URL}/api/buildings`)
       .then((r) => r.json())
       .then((data: any[]) => {
         const parsedBuildings: Building[] = data.map(b => ({
@@ -431,8 +431,8 @@ export default function PathsPage() {
     if (!selectedBuilding) return;
     setLoadingIndoor(true);
     Promise.all([
-      fetch(`http://localhost:8080/api/paths?buildingId=${selectedBuilding.id}&floor=${selectedFloor}`).then((r) => r.json()),
-      fetch(`http://localhost:8080/api/rooms?buildingId=${selectedBuilding.id}&floor=${selectedFloor}`).then((r) => r.json()),
+      fetch(`${import.meta.env.VITE_API_URL}/api/paths?buildingId=${selectedBuilding.id}&floor=${selectedFloor}`).then((r) => r.json()),
+      fetch(`${import.meta.env.VITE_API_URL}/api/rooms?buildingId=${selectedBuilding.id}&floor=${selectedFloor}`).then((r) => r.json()),
     ])
       .then(([paths, roomsGeoJson]) => {
         setIndoorPaths(paths as PathFeature[]);
@@ -450,7 +450,7 @@ export default function PathsPage() {
   const togglePath = useCallback(async (path: PathFeature) => {
     setTogglingId(path.id);
     try {
-      await fetch(`http://localhost:8080/api/paths/${path.id}/accessible`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/paths/${path.id}/accessible`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isAccessible: !path.isAccessible }),

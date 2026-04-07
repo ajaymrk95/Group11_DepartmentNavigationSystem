@@ -15,7 +15,7 @@ const AdminLogin = () => {
     if (!username.trim()) { setError("Username is required."); return; }
     if (!password.trim()) { setError("Password is required."); return; }
     try {
-      const response = await fetch("http://localhost:8080/api/admin/login", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),

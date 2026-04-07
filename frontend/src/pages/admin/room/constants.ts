@@ -1,6 +1,6 @@
 import React from "react";
 
-export const API = "http://localhost:8080/api/rooms";
+export const API = `${import.meta.env.VITE_API_URL}/api/rooms`;
 
 // ─── Category colours ─────────────────────────────────────────────────────────
 export const catColor: Record<string, { bg: string; color: string }> = {

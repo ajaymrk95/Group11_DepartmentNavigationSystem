@@ -33,7 +33,7 @@ const EMPTY_FORM: Faculty = {
   roomId: null,
 };
 
-const API = "http://localhost:8080/api/faculties";
+const API = `${import.meta.env.VITE_API_URL}/api/faculties`;
 
 // ── Reusable input class ─────────────────────────────────────────────────────
 const inputCls = "w-full px-3.5 py-2.5 rounded-xl text-sm border-[1.5px] border-[rgba(26,50,99,0.12)] outline-none font-[Outfit] text-[#1A3263] bg-white focus:border-[#0AC4E0] transition-colors duration-150";
@@ -73,7 +73,7 @@ export default function Faculty() {
 
   async function fetchRooms() {
     try {
-      const res = await fetch("http://localhost:8080/api/rooms/all");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/rooms/all`);
       if (res.ok) setRooms(await res.json());
     } catch { setError("Could not load rooms."); }
   }

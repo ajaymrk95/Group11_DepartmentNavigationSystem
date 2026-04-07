@@ -64,11 +64,10 @@ export default function OutdoorNav() {
     setRouteError("")
     setDistanceText("Calculating…")
     try {
-      const route = await fetchRoute(start, end)
-      setRouteCoords(
-        route.coordinates.map((c: number[]) => [c[1], c[0]] as [number, number])
-      )
-
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/routes/navigate?startLat=${start.latitude}&startLng=${start.longitude}&endLat=${end.latitude}&endLng=${end.longitude}`)
+      if (!res.ok) throw new Error("Route not found.")
+      const route = await res.json()
+      setRouteCoords(route.coordinates.map((c: number[]) => [c[1], c[0]] as [number, number]))
       const d = route.properties.distanceMeters
       setRouteDistanceMeters(d)
       setDistanceText(
