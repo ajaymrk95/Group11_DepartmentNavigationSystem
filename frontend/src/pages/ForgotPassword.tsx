@@ -20,7 +20,7 @@ const ForgotPassword = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch("http://localhost:8080/api/admin/forgot-password", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

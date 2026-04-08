@@ -12,7 +12,7 @@ interface Building {
   entries: string | null;
 }
 
-const BASE  = "http://localhost:8080";
+const BASE  = import.meta.env.VITE_API_URL;
 const API   = `${BASE}/api/buildings`;
 const token = () => localStorage.getItem("token") ?? "";
 const authH = (): Record<string, string> => ({

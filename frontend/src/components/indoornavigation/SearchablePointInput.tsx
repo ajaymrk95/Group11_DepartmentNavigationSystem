@@ -53,7 +53,7 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
         }
 
         const timeout = setTimeout(() => {
-            const url = `http://localhost:8080/api/rooms/search?buildingId=${buildingId}&q=${encodeURIComponent(query)}`;
+            const url = `${import.meta.env.VITE_API_URL}/api/rooms/search?buildingId=${buildingId}&q=${encodeURIComponent(query)}`;
             console.log("Fetching:", url);
 
             fetch(url)

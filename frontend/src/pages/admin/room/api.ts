@@ -3,7 +3,7 @@ import type { Room } from "../../../types/types";
 
 // ─── Buildings ────────────────────────────────────────────────────────────────
 export const fetchBuildings = (): Promise<{ id: number; name: string }[]> =>
-  fetch("http://localhost:8080/api/buildings").then((r) => r.json());
+  fetch(`${import.meta.env.VITE_API_URL}/api/buildings`).then((r) => r.json());
 
 // ─── Rooms ────────────────────────────────────────────────────────────────────
 export const fetchRooms = (): Promise<Room[]> =>

@@ -99,7 +99,7 @@ function MapView({ center, start, destination, routeCoords, currentLocation, onS
   const [locations, setLocations] = useState<Location[]>([])
   
   useEffect(() => {
-    fetch("http://localhost:8080/locations")
+    fetch(`${import.meta.env.VITE_API_URL}/locations`)
       .then(res => res.json())
       .then(data => {
         const mapped: Location[] = data

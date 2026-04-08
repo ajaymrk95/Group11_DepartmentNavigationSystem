@@ -5,6 +5,8 @@ import java.util.UUID;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
+import org.mindrot.jbcrypt.BCrypt;
 
 import com.atlas.backend.entity.Admin;
 import com.atlas.backend.repository.AdminRepository;
@@ -14,6 +16,9 @@ public class AdminService {
 
     private final AdminRepository adminRepository;
     private final JavaMailSender mailSender;
+
+    @Value("${app.frontend.url:https://group11-department-navigation-syste.vercel.app}")
+    private String frontendUrl;
 
     public AdminService(AdminRepository adminRepository, JavaMailSender mailSender){
         this.adminRepository = adminRepository;
@@ -25,7 +30,17 @@ public class AdminService {
         Optional<Admin> admin = adminRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
 
         if(admin.isPresent()){
-            return admin.get().getPassword().equals(password);
+            String storedPassword = admin.get().getPassword();
+            // Automatically upgrade plain-text passwords to BCrypt when they log in
+            if (storedPassword != null && !storedPassword.startsWith("$2a$") && !storedPassword.startsWith("$2b$") && !storedPassword.startsWith("$2y$")) {
+                if (storedPassword.equals(password)) {
+                    admin.get().setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+                    adminRepository.save(admin.get());
+                    return true;
+                }
+                return false;
+            }
+            return BCrypt.checkpw(password, storedPassword);
         }
 
         return false;
@@ -55,7 +70,7 @@ public class AdminService {
             message.setTo(toEmail);
             message.setSubject("Password Reset Request - Atlas Admin");
             
-            String resetUrl = "http://localhost:5173/admin/reset-password?token=" + token;
+            String resetUrl = frontendUrl + "/admin/reset-password?token=" + token;
             message.setText("Hello,\n\nTo reset your admin password, please click the link below:\n\n" 
                             + resetUrl 
                             + "\n\nIf you did not request a password reset, please ignore this email.");
@@ -71,7 +86,7 @@ public class AdminService {
         Optional<Admin> adminOpt = adminRepository.findByResetToken(token);
         if (adminOpt.isPresent()) {
             Admin admin = adminOpt.get();
-            admin.setPassword(newPassword);
+            admin.setPassword(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
             admin.setResetToken(null); // invalidate token
             adminRepository.save(admin);
             return true;
@@ -112,8 +127,36 @@ public class AdminService {
         Optional<Admin> adminOpt = getProfile();
         if (adminOpt.isEmpty()) return false;
         Admin admin = adminOpt.get();
-        if (!admin.getPassword().equals(currentPassword)) return false;
-        admin.setPassword(newPassword);
+        String storedPassword = admin.getPassword();
+        
+        boolean currentMatches = false;
+        if (storedPassword != null && !storedPassword.startsWith("$2a$") && !storedPassword.startsWith("$2b$") && !storedPassword.startsWith("$2y$")) {
+            currentMatches = storedPassword.equals(currentPassword);
+        } else {
+            currentMatches = BCrypt.checkpw(currentPassword, storedPassword);
+        }
+        
+        if (!currentMatches) return false;
+        
+        admin.setPassword(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
+        adminRepository.save(admin);
+        return true;
+    }
+
+    /**
+     * Update the admin's username.
+     * Returns false if the username is already taken by this or another record.
+     */
+    public boolean updateUsername(String newUsername) {
+        Optional<Admin> existing = adminRepository.findByUsername(newUsername);
+        Optional<Admin> adminOpt = getProfile();
+        if (adminOpt.isEmpty()) return false;
+        Admin admin = adminOpt.get();
+        // Allow saving the same username; reject only if it belongs to a different row
+        if (existing.isPresent() && !existing.get().getId().equals(admin.getId())) {
+            return false; // duplicate 
+        }
+        admin.setUsername(newUsername);
         adminRepository.save(admin);
         return true;
     }
