@@ -40,7 +40,9 @@ public class AdminService {
                 }
                 return false;
             }
-            return BCrypt.checkpw(password, storedPassword);
+            boolean match = BCrypt.checkpw(password, storedPassword);
+            System.out.println("DEBUG LOGIN: BCrypt.checkpw result: " + match);
+            return match;
         }
 
         return false;
