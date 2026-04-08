@@ -102,4 +102,16 @@ public class AdminController {
         }
         return ResponseEntity.status(400).body("Current password is incorrect.");
     }
+
+    @PutMapping("/profile/username")
+    public ResponseEntity<?> updateUsername(@RequestBody com.atlas.backend.dto.UpdateUsernameRequest request) {
+        if (request.getUsername() == null || request.getUsername().isBlank()) {
+            return ResponseEntity.badRequest().body("Username is required.");
+        }
+        boolean success = adminService.updateUsername(request.getUsername().trim());
+        if (success) {
+            return ResponseEntity.ok("Username updated successfully.");
+        }
+        return ResponseEntity.status(409).body("Username is already in use.");
+    }
 }

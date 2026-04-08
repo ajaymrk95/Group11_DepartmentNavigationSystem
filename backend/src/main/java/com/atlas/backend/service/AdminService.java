@@ -117,4 +117,22 @@ public class AdminService {
         adminRepository.save(admin);
         return true;
     }
+
+    /**
+     * Update the admin's username.
+     * Returns false if the username is already taken by this or another record.
+     */
+    public boolean updateUsername(String newUsername) {
+        Optional<Admin> existing = adminRepository.findByUsername(newUsername);
+        Optional<Admin> adminOpt = getProfile();
+        if (adminOpt.isEmpty()) return false;
+        Admin admin = adminOpt.get();
+        // Allow saving the same username; reject only if it belongs to a different row
+        if (existing.isPresent() && !existing.get().getId().equals(admin.getId())) {
+            return false; // duplicate
+        }
+        admin.setUsername(newUsername);
+        adminRepository.save(admin);
+        return true;
+    }
 }

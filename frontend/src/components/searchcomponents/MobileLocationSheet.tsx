@@ -177,25 +177,6 @@ export default function MobileLocationSheet({ selectedLocation, onSelectLocation
           {/* ✅ TILE SWITCHER HERE */}
           <TileSwitcher tileType={tileType} setTileType={setTileType} />
 
-          {/* Find Location — only at peek */}
-          {/* {!isExpanded && (
-            <button
-              onClick={openSearch}
-              className="
-                flex items-center gap-2 px-4 py-2.5 rounded-full
-                bg-[#0B2D72] text-[#F6E7BC]
-                text-xs font-bold tracking-wide shadow-lg
-                transition-all duration-200
-                hover:bg-[#FAB95B] hover:text-[#1A3263] active:scale-95
-              "
-            >
-              Find Location
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z" />
-              </svg>
-            </button>
-          )} */}
-
           <button
             onClick={goToNavigate}
             className="
