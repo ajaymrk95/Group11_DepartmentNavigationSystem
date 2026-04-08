@@ -10,7 +10,6 @@ import RouteInputs from "./navigation/outdoornav/components/RouteInputs"
 import NavigationOverlay from "./navigation/outdoornav/components/NavigationOverlay"
 import TopControls from "./navigation/outdoornav/components/TopControls"
 import DestinationInfo from "./navigation/outdoornav/components/DestinationInfo"
-import { fetchRoute } from "./navigation/outdoornav/services/routeService"
 
 const DEFAULT_CENTER: [number, number] = [11.3210, 75.9346]
 
