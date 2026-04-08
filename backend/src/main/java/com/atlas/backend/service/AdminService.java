@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.mindrot.jbcrypt.BCrypt;
 
 import com.atlas.backend.entity.Admin;
@@ -15,6 +16,9 @@ public class AdminService {
 
     private final AdminRepository adminRepository;
     private final JavaMailSender mailSender;
+
+    @Value("${app.frontend.url:https://group11-department-navigation-syste.vercel.app}")
+    private String frontendUrl;
 
     public AdminService(AdminRepository adminRepository, JavaMailSender mailSender){
         this.adminRepository = adminRepository;
@@ -66,7 +70,7 @@ public class AdminService {
             message.setTo(toEmail);
             message.setSubject("Password Reset Request - Atlas Admin");
             
-            String resetUrl = "http://localhost:5173/admin/reset-password?token=" + token;
+            String resetUrl = frontendUrl + "/admin/reset-password?token=" + token;
             message.setText("Hello,\n\nTo reset your admin password, please click the link below:\n\n" 
                             + resetUrl 
                             + "\n\nIf you did not request a password reset, please ignore this email.");
