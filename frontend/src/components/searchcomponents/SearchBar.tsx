@@ -42,12 +42,13 @@ export default function SearchBar({
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
   const [qrError, setQrError] = useState<string | null>(null)
+  const [gpsAlert, setGpsAlert] = useState<string | null>(null)
 
   const navigate = useNavigate()
   const location = useLocation()
 
-  const { location: currentCoords } = useCurrentLocation()
-  const myLocation: Location | null = showMyLocation && currentCoords
+  const { location: currentCoords, error: locationError } = useCurrentLocation()
+  const myLocation: Location | null = currentCoords
     ? {
         id: -1,
         name: "My Location",
@@ -244,10 +245,22 @@ export default function SearchBar({
           <button
             type="button"
             className="ml-2 flex-shrink-0 text-[#1a305b] hover:text-[#547792]"
-            onClick={() => navigate("/qr-scanner")}
+            onClick={() => {
+              if (myLocation) {
+                handleSelect(myLocation);
+              } else {
+                if (locationError) {
+                  setGpsAlert(`Unable to get location: ${locationError}`);
+                } else {
+                  setGpsAlert("Still waiting for location... please ensure location access is allowed and try again in a few seconds.");
+                }
+              }
+            }}
+            title="Use My Location"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 3h6v2H5v4H3V3zm16 0h-6v2h4v4h2V3zM3 21h6v-2H5v-4H3v6zm18-6h-2v4h-4v2h6v-6zM7 7h4v4H7V7zm6 0h4v4h-4V7zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z" />
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 2v2m0 16v2m10-10h-2M4 12H2m18 0a8 8 0 1 1-16 0 8 8 0 0 1 16 0z" />
             </svg>
           </button>
         )}
@@ -288,6 +301,35 @@ export default function SearchBar({
         }
       `}</style>
 
+      {gpsAlert && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-[#1A3263] border-2 border-[#FAB95B] rounded-2xl p-6 shadow-2xl max-w-sm w-full relative" style={{ animation: "qrSlideIn 0.3s ease" }}>
+            <div className="absolute top-4 right-4 cursor-pointer text-[#547792] hover:text-[#FAB95B] transition-colors" onClick={() => setGpsAlert(null)}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-[#FAB95B]/10 rounded-full flex items-center justify-center mb-4 border border-[#FAB95B]/30">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#FAB95B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-[#E8E2DB] mb-2">Location Unavailable</h3>
+              <p className="text-sm text-[#E8E2DB]/80 leading-relaxed">
+                {gpsAlert}
+              </p>
+              <button 
+                onClick={() => setGpsAlert(null)}
+                className="mt-6 px-6 py-2 bg-[#FAB95B] text-[#1A3263] font-bold rounded-xl hover:bg-[#f0b35a] transition-colors w-full"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showFilters && !isRoutingMode && (
         <>
           <div className="mt-5 mb-2 text-sm font-semibold text-[#1a305b]">Filters</div>
@@ -318,7 +360,7 @@ export default function SearchBar({
       {isRoutingMode ? (
         open && (query || activeFilter) && (
           <div className="absolute mt-2 w-full bg-white border border-[#547792]/20 rounded-xl shadow-2xl max-h-60 overflow-y-auto z-[9999]">
-            {[...(myLocation ? [myLocation] : []), ...results].map((loc, index) => (
+            {[...(showMyLocation && myLocation ? [myLocation] : []), ...results].map((loc, index) => (
               <div
                 key={index}
                 className="px-5 py-3 text-base text-[#1a305b] cursor-pointer hover:bg-[#e9e4d9] transition-colors border-b border-gray-100 last:border-0"
@@ -327,7 +369,7 @@ export default function SearchBar({
                 {loc.name}
               </div>
             ))}
-            {results.length === 0 && !myLocation && (
+            {results.length === 0 && !(showMyLocation && myLocation) && (
               <div className="px-5 py-3 text-base text-[#547792]/70 italic">No locations found</div>
             )}
           </div>

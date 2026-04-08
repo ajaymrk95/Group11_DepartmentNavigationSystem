@@ -83,8 +83,10 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
                 ST_Y(ST_GeometryN(r.entries, 1)) AS lat,
                 ST_X(ST_GeometryN(r.entries, 1)) AS lng,
                 r.visit_count,
-                'ROOM' AS location_type
+                'ROOM' AS location_type,
+                b.name AS building_name
             FROM rooms r
+            LEFT JOIN buildings b ON b.id = r.building_id
             WHERE r.visit_count > 0
             UNION ALL
             SELECT
@@ -98,7 +100,8 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
                 ST_Y(ST_GeometryN(b.entries, 1)) AS lat,
                 ST_X(ST_GeometryN(b.entries, 1)) AS lng,
                 b.visit_count,
-                'BUILDING' AS location_type
+                'BUILDING' AS location_type,
+                b.name AS building_name
             FROM buildings b
             WHERE b.visit_count > 0
         ) combined
