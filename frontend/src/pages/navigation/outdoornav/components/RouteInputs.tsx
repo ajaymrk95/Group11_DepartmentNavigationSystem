@@ -30,7 +30,7 @@ export default function RouteInputs({
           showQr
           useQrResult
           showFilters={false}
-          showMyLocation
+          showMyLocation={false}
         />
       </div>
 
