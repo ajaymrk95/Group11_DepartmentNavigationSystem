@@ -4,6 +4,7 @@ import SearchBar from "./SearchBar"
 import { useNavigate } from "react-router-dom"
 import locationImage from "../../assets/image.png"
 import TileSwitcher from "./TileSwitcher"
+import TrendingDropdown from "./TrendingDropdown"
 
 const API_BASE = import.meta.env.VITE_API_URL
 
@@ -237,7 +238,7 @@ export default function MobileLocationSheet({ selectedLocation, onSelectLocation
         {/* Body — only visible when expanded */}
         {isExpanded && (
           <div className="
-            flex-1 overflow-y-auto px-5 pb-2 pt-1
+            flex-1 overflow-y-auto px-5 pb-[100px] pt-1
             flex flex-col gap-4
             [scrollbar-width:thin]
             [scrollbar-color:rgba(246,231,188,0.15)_transparent]
@@ -285,109 +286,13 @@ export default function MobileLocationSheet({ selectedLocation, onSelectLocation
             {/* STATE 2 — Location selected: collapsible dropdown ABOVE card */}
             {selectedLocation && (
               <div className="flex flex-col gap-3">
-
-                {/* Collapsible dropdown toggle */}
-                {trendingLocations.length > 0 && (
-                  <div className="flex flex-col gap-1">
-                    <button
-                      onClick={() => setTrendingOpen(prev => !prev)}
-                      className="
-                        w-full flex items-center justify-between
-                        px-4 py-3 rounded-xl
-                        bg-white/5 border border-white/10
-                        hover:bg-white/10 hover:border-[#FAB95B]/40
-                        transition-all duration-200
-                      "
-                    >
-                      <div className="flex items-center gap-2">
-                        <svg className="w-4 h-4 text-[#FAB95B]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span className="text-[10px] font-semibold tracking-[0.14em] uppercase text-[#0AC4E0]">
-                          Frequently Visited
-                        </span>
-                      </div>
-                      <svg
-                        className={`w-4 h-4 text-[rgba(246,231,188,0.5)] transition-transform duration-300 ${trendingOpen ? "rotate-180" : ""}`}
-                        fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-
-                    {/* Dropdown — max 5 items, scrollable */}
-                    <div
-                      className="overflow-hidden transition-all duration-300 ease-in-out"
-                      style={{ maxHeight: trendingOpen ? `${ITEM_HEIGHT * MAX_VISIBLE}px` : "0px" }}
-                    >
-                      <div
-                        className="
-                          flex flex-col gap-1 overflow-y-auto
-                          [&::-webkit-scrollbar]:w-1
-                          [&::-webkit-scrollbar-track]:bg-transparent
-                          [&::-webkit-scrollbar-thumb]:bg-white/10
-                          [&::-webkit-scrollbar-thumb]:rounded-full
-                        "
-                        style={{ maxHeight: `${ITEM_HEIGHT * MAX_VISIBLE}px` }}
-                      >
-                        {trendingLocations.map(location => (
-                          <TrendingItem
-                            key={`${location.locationType}-${location.id}`}
-                            location={location}
-                            onClick={handleTrendingClick}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Selected location card — below the dropdown */}
-                <div className="bg-[#EDE8DC] rounded-2xl overflow-hidden border border-[rgba(200,192,176,0.5)] shadow-[0_8px_24px_rgba(0,0,0,0.25)] flex-shrink-0 transition-transform duration-200 hover:-translate-y-0.5">
-                  <div className="h-[130px] overflow-hidden">
-                    <img
-                      src={locationImage}
-                      alt="Location"
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-[1.04]"
-                    />
-                  </div>
-                  <div className="px-4 py-3.5 flex flex-col gap-1.5">
-                    <div className="text-[15px] font-bold text-[#1A3263] tracking-[-0.01em]">
-                      {selectedLocation.name}
-                    </div>
-                    <div className="flex gap-3.5">
-                      {selectedLocation.room && (
-                        <span className="text-[11px] font-semibold text-[rgba(26,50,99,0.5)] tracking-[0.04em] uppercase">
-                          Room {selectedLocation.room}
-                        </span>
-                      )}
-                      {selectedLocation.floor != null && (
-                        <span className="text-[11px] font-semibold text-[rgba(26,50,99,0.5)] tracking-[0.04em] uppercase">
-                          Floor {selectedLocation.floor}
-                        </span>
-                      )}
-                    </div>
-                    {selectedLocation.description && (
-                      <p className="text-xs text-[rgba(26,50,99,0.65)] leading-[1.55]">
-                        {selectedLocation.description}
-                      </p>
-                    )}
-                    {selectedLocation.tag && selectedLocation.tag.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 pt-0.5">
-                        {selectedLocation.tag.map((tag: string) => (
-                          <span
-                            key={tag}
-                            className="text-[10px] font-medium bg-[rgba(26,50,99,0.08)] text-[#1A3263] border border-[rgba(26,50,99,0.12)] px-2.5 py-0.5 rounded-full"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
+                <TrendingDropdown
+                  trendingLocations={trendingLocations}
+                  trendingOpen={trendingOpen}
+                  setTrendingOpen={setTrendingOpen}
+                  onClick={handleTrendingClick}
+                  selectedLocation={selectedLocation}
+                />
               </div>
             )}
 
