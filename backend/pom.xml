@@ -79,6 +79,13 @@
         <version>4.0.0</version>
     </dependency>
 
+    <!-- jBCrypt for password hashing -->
+    <dependency>
+        <groupId>org.mindrot</groupId>
+        <artifactId>jbcrypt</artifactId>
+        <version>0.4</version>
+    </dependency>
+
     <!-- FIXED: single correct test dependency -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
