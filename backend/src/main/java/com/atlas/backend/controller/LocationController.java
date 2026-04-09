@@ -29,6 +29,11 @@ public class LocationController {
         return service.searchLocations(q);
     }
 
+    @GetMapping("/buildings")
+    public List<SearchLocationDTO> getAllBuildings() {
+        return service.getAllBuildings();
+    }
+
     @GetMapping
     public List<LocationDTO> getAllLocations() {
         return service.getAllLocations();

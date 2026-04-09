@@ -22,8 +22,7 @@ const filters = [
   "Classroom",
   "Toilet",
   "Office",
-  "Indoor",
-  "Outdoor",
+  "Buildings",
 ]
 
 export default function SearchBar({
@@ -165,8 +164,34 @@ export default function SearchBar({
   async function handleFilter(filter: string) {
     onFocusSearch?.()
     setActiveFilter(filter)
-    setOpen(true)          // ← fix: was missing, results never showed
-    await fetchResults(filter)
+    setOpen(true)
+    if (filter === "Buildings") {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/locations/buildings`)
+        const data = await res.json()
+        const mapped = data.map((loc: any) => ({
+          id: loc.id,
+          name: loc.name,
+          category: loc.category ?? null,
+          room: loc.room ?? null,
+          description: loc.description ?? null,
+          latitude: loc.latitude ?? null,
+          longitude: loc.longitude ?? null,
+          tag: loc.tag || [],
+          floor: loc.floor ?? null,
+          locationType: loc.locationType ?? undefined,
+          buildingName: loc.buildingName ?? null,
+          buildingEntranceLat: loc.buildingEntranceLat ?? null,
+          buildingEntranceLng: loc.buildingEntranceLng ?? null,
+        }))
+        setResults(mapped)
+      } catch (err) {
+        console.error("Failed to fetch buildings:", err)
+        setResults([])
+      }
+    } else {
+      await fetchResults(filter)
+    }
   }
 
   function handleSelect(loc: Location) {
