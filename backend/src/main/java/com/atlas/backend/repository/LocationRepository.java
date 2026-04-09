@@ -115,6 +115,26 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     List<Object[]> findTrending(@Param("limit") int limit);
 
     @Query(value = """
+        SELECT 
+            b.id,
+            b.name,
+            NULL AS room_no,
+            NULL AS category,
+            b.floors,
+            b.description,
+            b.tags,
+            ST_Y(ST_GeometryN(b.entries, 1)) AS lat,
+            ST_X(ST_GeometryN(b.entries, 1)) AS lng,
+            b.visit_count,
+            b.name AS building_name,
+            ST_Y(ST_GeometryN(b.entries, 1)) AS b_ent_lat,
+            ST_X(ST_GeometryN(b.entries, 1)) AS b_ent_lng
+        FROM buildings b
+        ORDER BY b.name ASC
+        """, nativeQuery = true)
+    List<Object[]> findAllBuildings();
+
+    @Query(value = """
         SELECT le.entrances
         FROM location_entrances le
         JOIN buildings b ON b.id = le.location_id

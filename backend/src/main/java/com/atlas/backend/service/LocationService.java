@@ -30,6 +30,10 @@ public class LocationService {
         return Stream.concat(rooms.stream(), buildings.stream()).toList();
     }
 
+    public List<SearchLocationDTO> getAllBuildings() {
+        return mapRows(repository.findAllBuildings(), "BUILDING");
+    }
+
     /**
      * Records a visit (click) on a location.
      * The frontend passes back the id and locationType ("ROOM" or "BUILDING")
