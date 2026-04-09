@@ -1,92 +1,75 @@
 import { X } from "lucide-react";
 import { S } from "./constants";
 
-type FileUploadBoxProps = {
+type Props = {
   label: string;
-  hint: string;
-  accept: string;
-  file: File | null;
+  value: string;
   error: string;
-  onChange: (f: File | null) => void;
+  example: string;
+  onChange: (val: string) => void;
 };
 
 export default function FileUploadBox({
   label,
-  hint,
-  accept,
-  file,
+  value,
   error,
+  example,
   onChange,
-}: FileUploadBoxProps) {
+}: Props) {
   const hasError = !!error;
 
   return (
     <div style={S.formGroup}>
-      {label && <label style={S.label}>{label}</label>}
+      {/* Label */}
+      <label style={{ ...S.label, marginBottom: 6 }}>{label}</label>
 
-      {file ? (
-        <div
+      {/* Single Textarea */}
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={example} // ✅ FIX: example inside
+        spellCheck={false}
+        style={{
+          width: "100%",
+          minHeight: 140,
+          padding: "14px 16px",
+          fontSize: 13,
+          fontFamily: "monospace",
+          color: "#1A3263",
+          background: "#ffffff",
+          border: `1.5px solid ${hasError ? "#ff3b30" : "#dde6f0"}`,
+          borderRadius: 12,
+          outline: "none",
+          resize: "vertical",
+          lineHeight: 1.5,
+        }}
+      />
+
+      {/* Clear */}
+      {value && (
+        <button
+          onClick={() => onChange("")}
           style={{
-            border: `1.5px solid ${hasError ? "#ff3b30" : "#34c759"}`,
-            borderRadius: 10,
-            padding: "12px 14px",
+            marginTop: 6,
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            color: "#9aafbf",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            background: hasError ? "#fff5f5" : "#f0fdf4",
-          }}
-        >
-          <span
-            style={{
-              fontSize: 13,
-              color: hasError ? "#ff3b30" : "#1e8e3e",
-              fontWeight: 500,
-            }}
-          >
-            ✓ {file.name}
-          </span>
-          <button
-            onClick={() => onChange(null)}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: "#9aafbf",
-              display: "flex",
-              padding: 2,
-            }}
-            title="Remove file"
-          >
-            <X size={15} />
-          </button>
-        </div>
-      ) : (
-        <label
-          style={{
-            border: `1.5px dashed ${hasError ? "#ff3b30" : "#dde6f0"}`,
-            borderRadius: 10,
-            padding: "14px 16px",
-            display: "flex",
-            flexDirection: "column",
             gap: 4,
-            cursor: "pointer",
-            background: hasError ? "#fff5f5" : "#fafcff",
+            fontSize: 12,
           }}
         >
-          <input
-            type="file"
-            accept={accept}
-            style={{ display: "none" }}
-            onChange={(e) => onChange(e.target.files?.[0] ?? null)}
-          />
-          <span style={{ fontSize: 13, color: hasError ? "#ff3b30" : "#547792" }}>
-            📁 {hint}
-          </span>
-        </label>
+          <X size={14} /> Clear
+        </button>
       )}
 
+      {/* Error */}
       {error && (
-        <p style={{ fontSize: 12, color: "#ff3b30", margin: "4px 0 0" }}>{error}</p>
+        <p style={{ fontSize: 12, color: "#ff3b30", marginTop: 4 }}>
+          {error}
+        </p>
       )}
     </div>
   );
