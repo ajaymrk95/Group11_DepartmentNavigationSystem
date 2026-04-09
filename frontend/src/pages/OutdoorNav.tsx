@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { useState, useEffect } from "react"
 import type { Location } from "../types/types"
 import MapView from "../components/navcomponents/MapView"
@@ -15,6 +15,7 @@ const DEFAULT_CENTER: [number, number] = [11.3210, 75.9346]
 export default function OutdoorNav() {
 
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [start, setStart] = useState<Location | null>(null)
   const [end, setEnd] = useState<Location | null>(null)
   const [routeCoords, setRouteCoords] = useState<[number, number][]>([])
@@ -30,10 +31,72 @@ export default function OutdoorNav() {
   const [routeDistanceMeters, setRouteDistanceMeters] = useState<number | null>(null)
   const { location: currentLocation } = useCurrentLocation()
   const [center, setCenter] = useState<[number, number]>(DEFAULT_CENTER)
+  const [autoStart, setAutoStart] = useState(false) // true when coming from indoor nav continue flow
 
   useEffect(() => {
     if (clickedDestination) setEnd(clickedDestination)
   }, [clickedDestination])
+
+  // ── Pre-fill start+end from continueStart/End* params (coming from indoor nav "Go Outdoor") ──
+  useEffect(() => {
+    const startLat = searchParams.get('continueStartLat')
+    const startLng = searchParams.get('continueStartLng')
+    const endLat = searchParams.get('continueEndLat')
+    const endLng = searchParams.get('continueEndLng')
+    if (!endLat || !endLng) return
+
+    // Pre-fill end
+    const name = searchParams.get('continueEndName') ?? 'Destination'
+    const type = searchParams.get('continueEndType') as 'ROOM' | 'BUILDING' | null
+    const buildingName = searchParams.get('continueEndBuilding')
+    const floor = searchParams.get('continueEndFloor')
+    const entranceLat = searchParams.get('continueEndEntranceLat')
+    const entranceLng = searchParams.get('continueEndEntranceLng')
+    const endLoc: Location = {
+      id: -1,
+      name,
+      category: null,
+      room: null,
+      latitude: Number(endLat),
+      longitude: Number(endLng),
+      tag: [],
+      floor: floor ? Number(floor) : null,
+      description: null,
+      locationType: type ?? undefined,
+      buildingName: buildingName ?? null,
+      buildingEntranceLat: entranceLat ? Number(entranceLat) : null,
+      buildingEntranceLng: entranceLng ? Number(entranceLng) : null,
+    }
+    setEnd(endLoc)
+
+    // Pre-fill start (building entrance from the indoor leg)
+    if (startLat && startLng) {
+      const startLoc: Location = {
+        id: -2,
+        name: 'Building Entrance',
+        category: null,
+        room: null,
+        latitude: Number(startLat),
+        longitude: Number(startLng),
+        tag: [],
+        floor: 1,
+        description: null,
+      }
+      setStart(startLoc)
+      setAutoStart(true) // mark for auto-starting navigation once route loads
+      fetchRoute(startLoc, endLoc)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // ── Auto-start navigation when route loads in continue flow ──
+  useEffect(() => {
+    if (autoStart && routeCoords.length > 0) {
+      setIsNavigating(true)
+      setIsPanelOpen(false)
+      setAutoStart(false) // consume the flag
+    }
+  }, [autoStart, routeCoords])
 
   useEffect(() => {
     if (isNavigating && currentLocation) {
@@ -56,13 +119,24 @@ export default function OutdoorNav() {
 
   const handleSwap = () => { const t = start; setStart(end); setEnd(t) }
 
-  async function handleRoute() {
-    if (!start || !end) return
+  async function fetchRoute(s: Location, e: Location) {
     setIsLoadingRoute(true)
     setRouteError("")
     setDistanceText("Calculating…")
+
+    // When start is a ROOM (with entrance still available), use entrance —
+    // but in the continue flow start.locationType is undefined (plain entrance), so just use coords directly
+    const startLat = s.locationType === "ROOM" && s.buildingEntranceLat != null
+      ? s.buildingEntranceLat
+      : s.latitude
+    const startLng = s.locationType === "ROOM" && s.buildingEntranceLng != null
+      ? s.buildingEntranceLng
+      : s.longitude
+    const endLat = e.latitude
+    const endLng = e.longitude
+
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/routes/navigate?startLat=${start.latitude}&startLng=${start.longitude}&endLat=${end.latitude}&endLng=${end.longitude}`)
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/routes/navigate?startLat=${startLat}&startLng=${startLng}&endLat=${endLat}&endLng=${endLng}`)
       if (!res.ok) throw new Error("Route not found.")
       const route = await res.json()
       setRouteCoords(route.coordinates.map((c: number[]) => [c[1], c[0]] as [number, number]))
@@ -78,6 +152,63 @@ export default function OutdoorNav() {
     } finally {
       setIsLoadingRoute(false)
     }
+  }
+
+  async function handleRoute() {
+    if (!start || !end) return
+
+    // ── Case: both are rooms in the SAME building → go directly to indoor nav ──
+    if (
+      start.locationType === "ROOM" &&
+      end.locationType === "ROOM" &&
+      start.buildingName &&
+      start.buildingName === end.buildingName
+    ) {
+      const buildingSlug = start.buildingName.toLowerCase()
+      const params = new URLSearchParams()
+      if (start.latitude != null && start.longitude != null) {
+        params.set('startLat', String(start.latitude))
+        params.set('startLng', String(start.longitude))
+        params.set('startFloor', String(start.floor || 1))
+      }
+      if (end.latitude != null && end.longitude != null) {
+        params.set('endLat', String(end.latitude))
+        params.set('endLng', String(end.longitude))
+        params.set('endFloor', String(end.floor || 1))
+      }
+      navigate(`/indoor-navigation/${buildingSlug}?${params.toString()}`)
+      return
+    }
+
+    // ── Case: start is a ROOM going to a different building/location ──
+    if (start.locationType === "ROOM" && start.buildingName && start.buildingEntranceLat != null && start.buildingEntranceLng != null) {
+      const buildingSlug = start.buildingName.toLowerCase()
+      const params = new URLSearchParams()
+      if (start.latitude != null && start.longitude != null) {
+        params.set('startLat', String(start.latitude))
+        params.set('startLng', String(start.longitude))
+        params.set('startFloor', String(start.floor || 1))
+      }
+      params.set('endLat', String(start.buildingEntranceLat))
+      params.set('endLng', String(start.buildingEntranceLng))
+      params.set('endFloor', '1')
+      if (end.latitude != null && end.longitude != null) {
+        params.set('nextOutdoorEndLat', String(end.latitude))
+        params.set('nextOutdoorEndLng', String(end.longitude))
+        params.set('nextOutdoorEndName', end.name)
+        if (end.locationType === 'ROOM' && end.buildingName) {
+          params.set('nextOutdoorEndType', 'ROOM')
+          params.set('nextOutdoorEndBuilding', end.buildingName)
+          if (end.buildingEntranceLat != null) params.set('nextOutdoorEndEntranceLat', String(end.buildingEntranceLat))
+          if (end.buildingEntranceLng != null) params.set('nextOutdoorEndEntranceLng', String(end.buildingEntranceLng))
+          params.set('nextOutdoorEndFloor', String(end.floor || 1))
+        }
+      }
+      navigate(`/indoor-navigation/${buildingSlug}?${params.toString()}`)
+      return
+    }
+
+    await fetchRoute(start, end)
   }
 
   const hasRoute = routeCoords.length > 0
@@ -168,6 +299,7 @@ export default function OutdoorNav() {
           </div>
 
           <DestinationInfo
+            start={start}
             end={end}
             distanceText={distanceText}
             distanceMeters={routeDistanceMeters}
@@ -244,6 +376,7 @@ export default function OutdoorNav() {
             turnInfo={turnInfo}
             distance={activeDistanceMeters}
             totalDistanceText={distanceText}
+            start={start}
             end={end}
             onEnd={() => {
               setIsNavigating(false)

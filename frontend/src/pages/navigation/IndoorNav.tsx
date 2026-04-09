@@ -94,7 +94,8 @@ function BuildingSwitcher({ current, buildings }: { current: string; buildings: 
 // ── Inner component — lives inside FloorProvider so useFloor() works ──
 function NavigationContent({
     building,
-    urlFromCoords, urlToCoords, urlFromFloor, urlToFloor
+    urlFromCoords, urlToCoords, urlFromFloor, urlToFloor,
+    nextOutdoor
 }: any) {
     const navigate = useNavigate();
     const { data: buildingData } = useBuildingData(building);
@@ -129,6 +130,26 @@ function NavigationContent({
             findPath(urlFromCoords, urlToCoords, urlFromFloor, urlToFloor, buildingData.id);
         }
     }, [buildingData, urlFromCoords, urlToCoords]);
+
+    // Build the outdoor nav URL for the "Continue" step
+    // urlToCoords = [lng, lat] of the building entrance (this is where outdoor nav starts from)
+    const outdoorContinueUrl = nextOutdoor ? (() => {
+        const startLat = urlToCoords ? urlToCoords[1] : null
+        const startLng = urlToCoords ? urlToCoords[0] : null
+        const destLat = nextOutdoor.lat
+        const destLng = nextOutdoor.lng
+        let url = `/outdoor-navigation?continueStartLat=${startLat}&continueStartLng=${startLng}`
+        url += `&continueEndLat=${destLat}&continueEndLng=${destLng}`
+        url += `&continueEndName=${encodeURIComponent(nextOutdoor.name)}`
+        if (nextOutdoor.type === 'ROOM' && nextOutdoor.building) {
+            url += `&continueEndType=ROOM`
+            url += `&continueEndBuilding=${encodeURIComponent(nextOutdoor.building)}`
+            url += `&continueEndFloor=${nextOutdoor.floor ?? 1}`
+            if (nextOutdoor.entranceLat != null) url += `&continueEndEntranceLat=${nextOutdoor.entranceLat}`
+            if (nextOutdoor.entranceLng != null) url += `&continueEndEntranceLng=${nextOutdoor.entranceLng}`
+        }
+        return url
+    })() : null
 
     return (
         <div className="w-full h-screen flex flex-col font-[Outfit] bg-[#0B2D72] overflow-hidden">
@@ -191,7 +212,7 @@ function NavigationContent({
             </header>
 
             {/* ── Map area ── */}
-            <div className="flex-1 min-h-0 min-w-0 bg-[#f0f2f5]">
+            <div className="flex-1 min-h-0 min-w-0 bg-[#f0f2f5] relative">
                 <IndoorMap
                     building={building}
                     route={route}
@@ -202,6 +223,27 @@ function NavigationContent({
                     toFloor={toFloor}
                     onDataLoad={onDataLoad}
                 />
+
+                {/* ── Step 2 continuation banner ── */}
+                {outdoorContinueUrl && (
+                    <div className="absolute bottom-6 left-4 right-4 z-[3000] flex justify-center">
+                        <div className="bg-[#0B2D72]/95 backdrop-blur-md border border-[#FAB95B]/40 rounded-2xl shadow-2xl px-5 py-4 flex items-center justify-between gap-4 max-w-lg w-full">
+                            <div className="flex flex-col min-w-0">
+                                <span className="text-[10px] font-bold tracking-[0.18em] uppercase text-[#FAB95B]/70">Step 1 of 2 — Exit building</span>
+                                <span className="text-[#F6E7BC] text-[13px] font-semibold truncate mt-0.5">
+                                    Then head to <span className="text-[#FAB95B]">{nextOutdoor?.name}</span>
+                                </span>
+                            </div>
+                            <button
+                                onClick={() => navigate(outdoorContinueUrl)}
+                                className="shrink-0 flex items-center gap-2 bg-[#FAB95B] text-[#1A3263] text-[13px] font-bold px-4 py-2.5 rounded-xl hover:bg-[#f9aa3d] transition-colors shadow-md"
+                            >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11" /></svg>
+                                Go Outdoor
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -211,7 +253,6 @@ function NavigationContent({
 export function NavigationPage() {
     const { building } = useParams<{ building: string }>();
     const [searchParams] = useSearchParams();
-    const initialFloor = Number(searchParams.get("floor")) || 1;
 
     const startLng = searchParams.get("startLng");
     const startLat = searchParams.get("startLat");
@@ -220,10 +261,28 @@ export function NavigationPage() {
     const startFloor = searchParams.get("startFloor");
     const endFloor = searchParams.get("endFloor");
 
+    // Show the starting floor first (so user sees their room, e.g. floor 4 for ELHC 404)
+    // Falls back to explicit "floor" param, then startFloor, then 1
+    const initialFloor = Number(searchParams.get("floor")) || (startFloor ? Number(startFloor) : 1);
+
     const urlFromCoords: [number, number] | null = (startLng && startLat) ? [Number(startLng), Number(startLat)] : null;
     const urlToCoords: [number, number] | null = (endLng && endLat) ? [Number(endLng), Number(endLat)] : null;
     const urlFromFloor = startFloor ? Number(startFloor) : null;
     const urlToFloor = endFloor ? Number(endFloor) : null;
+
+    // ── Next outdoor step (encoded when start was a room and we need to continue outdoors) ──
+    const nextOutdoorEndLat = searchParams.get("nextOutdoorEndLat");
+    const nextOutdoorEndLng = searchParams.get("nextOutdoorEndLng");
+    const nextOutdoor = nextOutdoorEndLat && nextOutdoorEndLng ? {
+        lat: Number(nextOutdoorEndLat),
+        lng: Number(nextOutdoorEndLng),
+        name: searchParams.get("nextOutdoorEndName") ?? "Destination",
+        type: searchParams.get("nextOutdoorEndType"),
+        building: searchParams.get("nextOutdoorEndBuilding"),
+        entranceLat: searchParams.get("nextOutdoorEndEntranceLat") ? Number(searchParams.get("nextOutdoorEndEntranceLat")) : null,
+        entranceLng: searchParams.get("nextOutdoorEndEntranceLng") ? Number(searchParams.get("nextOutdoorEndEntranceLng")) : null,
+        floor: searchParams.get("nextOutdoorEndFloor") ? Number(searchParams.get("nextOutdoorEndFloor")) : 1,
+    } : null;
 
     if (!building) return null;
 
@@ -235,6 +294,7 @@ export function NavigationPage() {
                 urlToCoords={urlToCoords}
                 urlFromFloor={urlFromFloor}
                 urlToFloor={urlToFloor}
+                nextOutdoor={nextOutdoor}
             />
         </FloorProvider>
     );
