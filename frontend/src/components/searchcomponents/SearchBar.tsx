@@ -170,14 +170,29 @@ export default function SearchBar({
   }
 
   function handleSelect(loc: Location) {
-    setQuery(loc.name)
+    const activeSearch = activeFilter || query;
+    let finalTags = loc.tag || [];
+    
+    if (activeSearch && finalTags.length > 0) {
+      const lowerSearch = activeSearch.toLowerCase();
+      const matched = finalTags.filter(t => t.toLowerCase().includes(lowerSearch));
+      if (matched.length > 0) {
+        finalTags = [matched[0]];
+      } else {
+        finalTags = [];
+      }
+    }
+
+    const modifiedLoc: Location = { ...loc, tag: finalTags };
+
+    setQuery(modifiedLoc.name)
     setResults([])
     setActiveFilter(null)
     setOpen(false)
-    onSelect(loc)
+    onSelect(modifiedLoc)
 
-    if (loc.id !== -1 && loc.locationType) {
-      fetch(`${import.meta.env.VITE_API_URL}/locations/visit?id=${loc.id}&locationType=${loc.locationType}`, {
+    if (modifiedLoc.id !== -1 && modifiedLoc.locationType) {
+      fetch(`${import.meta.env.VITE_API_URL}/locations/visit?id=${modifiedLoc.id}&locationType=${modifiedLoc.locationType}`, {
         method: "POST",
       }).catch(err => console.error("Failed to record visit", err))
     }

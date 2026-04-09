@@ -246,6 +246,7 @@ export default function MobileLocationSheet({ selectedLocation, onSelectLocation
             <SearchBar
               onSelect={handleSelect}
               onFocusSearch={handleSearchFocus}
+              selectedLoc={selectedLocation}
             />
 
             {/* STATE 1 — Nothing selected: plain visible list */}

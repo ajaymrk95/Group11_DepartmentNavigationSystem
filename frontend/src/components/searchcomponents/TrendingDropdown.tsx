@@ -115,73 +115,68 @@ export default function TrendingDropdown({
 
       {/* Selected Location Card */}
       {selectedLocation && (
-        <div className="bg-[#EDE8DC] rounded-2xl overflow-hidden border border-[rgba(200,192,176,0.5)] shadow-[0_8px_24px_rgba(0,0,0,0.25)] flex-shrink-0 transition-transform duration-200 hover:-translate-y-0.5 mt-2">
-          
-          <div className="h-[130px] overflow-hidden">
+        <div className="bg-[#F8F6F0] rounded-3xl overflow-hidden shadow-[0_8px_30px_rgba(26,50,99,0.08)] border border-[#1A3263]/5 flex-shrink-0 transition-transform duration-300 hover:-translate-y-1 w-full max-w-sm">
+          <div className="h-[190px] w-full overflow-hidden relative">
             <img
               src={locationImage}
               alt="Location"
-              className="w-full h-full object-cover transition-transform duration-300 hover:scale-[1.04]"
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
           </div>
 
-          <div className="px-4 py-3.5 flex flex-col gap-1.5">
-            <div className="text-[15px] font-bold text-[#1A3263]">
-              {selectedLocation.name}
-            </div>
-
-            <div className="flex gap-3.5">
-              {selectedLocation.room && (
-                <span className="text-[11px] font-semibold text-[rgba(26,50,99,0.5)] uppercase">
-                  Room {selectedLocation.room}
-                </span>
-              )}
-              {selectedLocation.floor != null && (
-                <span className="text-[11px] font-semibold text-[rgba(26,50,99,0.5)] uppercase">
-                  Floor {selectedLocation.floor}
-                </span>
-              )}
-            </div>
-
-            {selectedLocation.description && (
-              <p className="text-xs text-[rgba(26,50,99,0.65)]">
-                {selectedLocation.description}
-              </p>
-            )}
-
-            {selectedLocation.tag && selectedLocation.tag.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-0.5">
-                {selectedLocation.tag.map((tag: string) => (
-                  <span
-                    key={tag}
-                    className="text-[10px] font-medium bg-[rgba(26,50,99,0.08)] text-[#1A3263] border border-[rgba(26,50,99,0.12)] px-2.5 py-0.5 rounded-full"
-                  >
-                    {tag}
-                  </span>
-                ))}
+          <div className="p-5 flex flex-col gap-4">
+            <div className="flex justify-between items-start gap-4">
+              <div className="flex flex-col gap-1">
+                <h3 className="text-[18px] font-extrabold text-[#1A3263] leading-tight">
+                  {selectedLocation.name}
+                </h3>
+                <div className="flex flex-wrap items-center gap-1.5 text-[12px] font-semibold text-[#1A3263]/70">
+                  {selectedLocation.room && (
+                    <span className="uppercase">Room {selectedLocation.room}</span>
+                  )}
+                  {selectedLocation.room && selectedLocation.floor != null && (
+                    <span className="text-[10px] opacity-50">•</span>
+                  )}
+                  {selectedLocation.floor != null && (
+                    <span className="uppercase">Floor {selectedLocation.floor}</span>
+                  )}
+                  {selectedLocation.floor != null && selectedLocation.buildingName && (
+                    <span className="text-[10px] opacity-50">•</span>
+                  )}
+                  {selectedLocation.buildingName && (
+                    <span className="text-[#1A3263]/90">
+                      {selectedLocation.buildingName}
+                    </span>
+                  )}
+                </div>
               </div>
-            )}
 
-            {/* ✅ Indoor Navigation Button (FIXED) */}
+              {selectedLocation.tag && selectedLocation.tag.length > 0 && (
+                <span className="text-[10px] uppercase tracking-wider font-bold bg-[#1A3263]/10 text-[#1A3263] px-3 py-1.5 rounded-full whitespace-nowrap">
+                  {selectedLocation.tag[0]}
+                </span>
+              )}
+            </div>
+
             {(() => {
-              const locType = selectedLocation.locationType?.toUpperCase()
+              const locType = selectedLocation.locationType?.toUpperCase();
               const buildingSlug =
                 locType === "BUILDING"
                   ? selectedLocation.name.toLowerCase()
-                  : selectedLocation.buildingName?.toLowerCase() ?? null
+                  : selectedLocation.buildingName?.toLowerCase() ?? null;
 
-              if (!buildingSlug) return null
+              if (!buildingSlug) return null;
 
               const handleIndoorClick = () => {
-                const params = new URLSearchParams()
+                const params = new URLSearchParams();
 
                 if (
                   selectedLocation.buildingEntranceLat != null &&
                   selectedLocation.buildingEntranceLng != null
                 ) {
-                  params.set("startLng", String(selectedLocation.buildingEntranceLng))
-                  params.set("startLat", String(selectedLocation.buildingEntranceLat))
-                  params.set("startFloor", "1")
+                  params.set("startLng", String(selectedLocation.buildingEntranceLng));
+                  params.set("startLat", String(selectedLocation.buildingEntranceLat));
+                  params.set("startFloor", "1");
                 }
 
                 if (
@@ -189,33 +184,24 @@ export default function TrendingDropdown({
                   selectedLocation.latitude != null &&
                   selectedLocation.longitude != null
                 ) {
-                  params.set("endLng", String(selectedLocation.longitude))
-                  params.set("endLat", String(selectedLocation.latitude))
-                  params.set("endFloor", String(selectedLocation.floor ?? 1))
+                  params.set("endLng", String(selectedLocation.longitude));
+                  params.set("endLat", String(selectedLocation.latitude));
+                  params.set("endFloor", String(selectedLocation.floor ?? 1));
                 }
 
-                navigate(`/indoor-navigation/${buildingSlug}?${params.toString()}`)
-              }
+                navigate(`/indoor-navigation/${buildingSlug}?${params.toString()}`);
+              };
 
               return (
-                <div className="pt-2 pb-1">
+                <div className="pt-1">
                   <button
                     onClick={handleIndoorClick}
-                    className="
-                      w-full flex items-center justify-center gap-2
-                      px-4 py-3 rounded-xl
-                      bg-[#1A3263] text-[#F6E7BC]
-                      text-[13.5px] font-bold
-                      border border-[rgba(246,231,188,0.15)]
-                      transition-all duration-200
-                      hover:bg-[#0B2D72] hover:border-[rgba(250,185,91,0.5)] hover:text-[#FAB95B]
-                      active:scale-[0.97]
-                    "
+                    className="w-full bg-[#1A3263] text-[#F6E7BC] py-3.5 rounded-2xl text-[13.5px] font-bold tracking-wide shadow-lg shadow-[#1A3263]/20 transition-all active:scale-[0.98] hover:bg-[#0B2D72]"
                   >
                     Indoor Map
                   </button>
                 </div>
-              )
+              );
             })()}
           </div>
         </div>
