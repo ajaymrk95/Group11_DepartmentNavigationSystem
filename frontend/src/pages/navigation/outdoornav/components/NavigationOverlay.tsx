@@ -6,6 +6,7 @@ type Props = {
   turnInfo: TurnInfo
   distance: number | null
   totalDistanceText: string
+  start?: Location | null
   end: Location | null
   onEnd: () => void
 }
@@ -14,6 +15,7 @@ export default function NavigationOverlay({
   turnInfo,
   distance,
   totalDistanceText,
+  start: _start,
   end,
   onEnd
 }: Props) {
@@ -102,7 +104,7 @@ export default function NavigationOverlay({
                 }}
                 className="flex-1 bg-[#FAB95B] text-[#1A3263] text-sm font-bold py-2.5 rounded-xl hover:bg-[#f9aa3d] transition-colors"
               >
-                Indoor Map
+                Go inside
               </button>
             )}
 
@@ -158,7 +160,7 @@ export default function NavigationOverlay({
                   }}
                   className="bg-[#FAB95B] text-[#1A3263] text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-[#f9aa3d] transition-colors"
                 >
-                  Indoor Map
+                  Go Inside
                 </button>
               )}
 

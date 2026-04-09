@@ -1,7 +1,9 @@
+import { useNavigate } from "react-router-dom"
 import type { Location } from "../../../../types/types"
 import locationImage from "../../../../assets/image.png"
 
 type Props = {
+  start?: Location | null
   end: Location | null
   distanceText: string
   distanceMeters: number | null
@@ -19,42 +21,65 @@ function formatWalkTime(meters: number): string {
 }
 
 export default function DestinationInfo({
+  start,
   end,
   distanceText,
   distanceMeters,
   isLoadingRoute
 }: Props) {
+  const navigate = useNavigate()
   const walkTime = distanceMeters != null ? formatWalkTime(distanceMeters) : null
+
+  // Whether to show the indoor nav button:
+  // end must be a ROOM, have a buildingName,
+  // AND it's NOT a same-building start→end (that case is handled in OutdoorNav before routing)
+  const showIndoorNavBtn =
+    end?.locationType === "ROOM" &&
+    !!end.buildingName &&
+    !(start?.locationType === "ROOM" && start.buildingName === end.buildingName)
+
+  const handleIndoorNav = () => {
+    if (!end?.buildingName) return
+    const buildingSlug = end.buildingName.toLowerCase()
+    const params = new URLSearchParams()
+    if (end.buildingEntranceLat != null && end.buildingEntranceLng != null) {
+      params.set('startLat', String(end.buildingEntranceLat))
+      params.set('startLng', String(end.buildingEntranceLng))
+      params.set('startFloor', '1')
+    }
+    if (end.latitude != null && end.longitude != null) {
+      params.set('endLat', String(end.latitude))
+      params.set('endLng', String(end.longitude))
+      params.set('endFloor', String(end.floor || 1))
+    }
+    navigate(`/indoor-navigation/${buildingSlug}?${params.toString()}`)
+  }
 
   return (
     <>
       {/* Destination card */}
       {end && (
         <div className="mx-6 mt-5 rounded-2xl overflow-hidden border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] shrink-0">
-          
+
           <div className="h-36 overflow-hidden relative">
             <img src={locationImage} alt="Location" className="w-full h-full object-cover opacity-80" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0B2D72] to-transparent" />
 
             <div className="absolute bottom-3 left-4 right-4">
               <div className="flex items-end justify-between">
-                
                 <h3 className="text-[#F6E7BC] font-bold text-base leading-tight truncate">
                   {end.name}
                 </h3>
-
                 {end.category && (
                   <span className="shrink-0 ml-2 px-2.5 py-0.5 rounded-full bg-[#FAB95B] text-[#1A3263] text-[10px] font-bold uppercase tracking-wide">
                     {end.category}
                   </span>
                 )}
-
               </div>
             </div>
           </div>
 
           <div className="px-4 py-3 flex flex-col gap-2">
-
             {end.category === "INDOOR" && (end.room || end.floor !== undefined) && (
               <div className="flex gap-3 text-[11px] text-[rgba(246,231,188,0.5)] font-mono">
                 {end.room && <span>Room {end.room}</span>}
@@ -80,8 +105,22 @@ export default function DestinationInfo({
                 ))}
               </div>
             )}
-
           </div>
+
+          {/* Indoor Nav button — end is a ROOM in a different building */}
+          {showIndoorNavBtn && (
+            <div className="px-4 pb-4">
+              <button
+                onClick={handleIndoorNav}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#FAB95B] text-[#FAB95B] text-sm font-bold hover:bg-[#FAB95B]/10 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+                Indoor Navigation
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -111,7 +150,6 @@ export default function DestinationInfo({
                 <span className="text-blue-100/80 text-sm font-medium">
                   Arrives in
                 </span>
-
                 {walkTime && (
                   <span className="text-[#FAB95B] text-2xl font-bold tracking-tight">
                     {walkTime}
@@ -120,8 +158,6 @@ export default function DestinationInfo({
               </div>
 
               <span className="text-blue-200/60 text-sm font-medium mt-0.5 flex items-center gap-1.5">
-                
-                {/* Location dot icon */}
                 <svg
                   className="w-3 h-3 text-blue-300/80"
                   fill="currentColor"
@@ -129,15 +165,12 @@ export default function DestinationInfo({
                 >
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/>
                 </svg>
-
                 {distanceText} • Walking
               </span>
             </div>
           </div>
-
-
-  </div>
-  )}
+        </div>
+      )}
     </>
   )
 }
