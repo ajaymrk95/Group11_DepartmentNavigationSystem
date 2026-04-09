@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom"
 import { useEffect, useState, useCallback } from "react"
 import type { Location } from "../../types/types"
 import SearchBar from "./SearchBar"
-import locationImage from "../../assets/image.png"
 import TrendingDropdown from "./TrendingDropdown"
 
 const API_BASE = import.meta.env.VITE_API_URL
@@ -29,6 +28,8 @@ export default function RoutePanel({ selectedLocation, onSelectLocation }: Props
   useEffect(() => {
     if (!selectedLocation) {
       setTrendingOpen(true)
+    } else {
+      setTrendingOpen(false)
     }
   }, [selectedLocation])
 
