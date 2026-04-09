@@ -135,7 +135,7 @@ export default function SearchLocation() {
         </MapContainer>
 
         {/* DESKTOP PANEL */}
-        <div className="hidden md:block absolute left-0 top-0 h-full w-[420px] z-50">
+        <div className="hidden md:block absolute left-0 top-0 h-full w-[380px] z-50">
           <RoutePanel
             selectedLocation={selectedLocation}
             onSelectLocation={setSelectedLocation}
