@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.atlas.backend.dto.LocationDTO;
+import com.atlas.backend.dto.SearchLocationDTO;
 import com.atlas.backend.entity.Location;
 import com.atlas.backend.entity.LocationCategory;
 import com.atlas.backend.repository.LocationRepository;
@@ -21,11 +22,11 @@ public class LocationService {
         this.repository = repository;
     }
 
-    public List<LocationDTO> searchLocations(String query) {
+    public List<SearchLocationDTO> searchLocations(String query) {
         if (query == null || query.trim().isEmpty()) return List.of();
         String q = query.trim();
-        List<LocationDTO> rooms = mapRows(repository.searchRooms(q), "ROOM");
-        List<LocationDTO> buildings = mapRows(repository.searchBuildings(q), "BUILDING");
+        List<SearchLocationDTO> rooms = mapRows(repository.searchRooms(q), "ROOM");
+        List<SearchLocationDTO> buildings = mapRows(repository.searchBuildings(q), "BUILDING");
         return Stream.concat(rooms.stream(), buildings.stream()).toList();
     }
 
@@ -74,12 +75,12 @@ public class LocationService {
     }
 
     // Maps rows from searchRooms / searchBuildings (locationType passed explicitly)
-    private List<LocationDTO> mapRows(List<Object[]> rows, String locationType) {
+    private List<SearchLocationDTO> mapRows(List<Object[]> rows, String locationType) {
         return rows.stream().map(row -> {
             List<String> tags = row[6] instanceof String[] arr
                     ? Arrays.asList(arr)
                     : List.of();
-            return new LocationDTO(
+            return new SearchLocationDTO(
                     ((Number) row[0]).longValue(),
                     (String) row[1],
                     safeParseCategory((String) row[3]),
@@ -91,7 +92,9 @@ public class LocationService {
                     (String) row[5],
                     locationType,
                     row[9] != null ? ((Number) row[9]).intValue() : null,  // visit_count
-                    (String) row[10]
+                    (String) row[10],
+                    row[11] != null ? ((Number) row[11]).doubleValue() : null,
+                    row[12] != null ? ((Number) row[12]).doubleValue() : null
             );
         }).toList();
     }
