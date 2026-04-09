@@ -108,22 +108,36 @@ export function startIcon() {
     return L.divIcon({
         className: "",
         html: `
-            <div style="
-                width: 18px;
-                height: 18px;
-                background: #16a34a;
-                border: 3px solid rgba(0, 20, 5, 0.85);
-                border-radius: 50%;
-                box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.3);
-                animation: start-pulse 2s infinite;
-            "></div>
             <style>
                 @keyframes start-pulse {
-                    0%   { box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.3); }
-                    50%  { box-shadow: 0 0 0 8px rgba(22, 163, 74, 0.1); }
-                    100% { box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.3); }
+                    0%   { box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.35); }
+                    50%  { box-shadow: 0 0 0 10px rgba(22, 163, 74, 0.08); }
+                    100% { box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.35); }
                 }
             </style>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="
+                    width: 18px;
+                    height: 18px;
+                    background: #16a34a;
+                    border: 3px solid rgba(0, 20, 5, 0.9);
+                    border-radius: 50%;
+                    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.35);
+                    animation: start-pulse 2s infinite;
+                "></div>
+                <div style="
+                    background: rgba(10,30,10,0.82);
+                    color: #4ade80;
+                    font-size: 9px;
+                    font-weight: 700;
+                    font-family: Outfit, sans-serif;
+                    padding: 2px 6px;
+                    border-radius: 6px;
+                    white-space: nowrap;
+                    letter-spacing: 0.04em;
+                    border: 1px solid rgba(22,163,74,0.35);
+                ">You are here</div>
+            </div>
         `,
         iconAnchor: [9, 9],
         iconSize: [18, 18],

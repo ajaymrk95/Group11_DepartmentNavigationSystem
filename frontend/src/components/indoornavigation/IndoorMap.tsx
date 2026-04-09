@@ -119,6 +119,7 @@ export function IndoorMap({ building, route, routeSegments, fromCoords, toCoords
                             <Marker
                                 position={routeSegments[floor][routeSegments[floor].length - 1]}
                                 icon={stairIcon("up")}
+                                eventHandlers={{ click: () => setFloor(floor + 1) }}
                             />
                         )}
 
@@ -126,6 +127,7 @@ export function IndoorMap({ building, route, routeSegments, fromCoords, toCoords
                             <Marker
                                 position={routeSegments[floor][routeSegments[floor].length - 1]}
                                 icon={stairIcon("down")}
+                                eventHandlers={{ click: () => setFloor(floor - 1) }}
                             />
                         )}
                     </>
