@@ -53,52 +53,36 @@ export default function RoutePanel({ selectedLocation, onSelectLocation }: Props
 
   return (
     <div className="
-      h-full w-full flex flex-col
+      h-full w-full flex flex-col relative
       bg-[#0B2D72]
       border-r border-[rgba(45,74,122,0.6)]
       shadow-[10px_0_35px_rgba(0,0,0,0.35)]
       font-[Outfit,sans-serif]
-      overflow-y-auto
       [scrollbar-width:thin]
       [scrollbar-color:rgba(246,231,188,0.15)_transparent]
     ">
 
-      {/* Header — main's UI */}
-      <div className="px-6 pt-7 pb-5 flex-shrink-0 border-b border-[rgba(246,231,188,0.08)]">
-        <div className="flex items-start justify-between gap-3">
+      {/* Header */}
+      <div className="px-8 pt-10 pb-8 flex-shrink-0 border-b border-[rgba(255,255,255,0.07)]">
+        <div className="flex items-center justify-between mb-1">
           <div>
-            <div className="text-[26px] font-extrabold text-[#F6E7BC] tracking-[-0.02em] leading-[1.1]">
-              View Map
-            </div>
-            <div className="text-[15px] font-normal text-[rgba(246,231,188,0.45)] mt-[5px] tracking-[0.01em]">
-              Search a location to explore
-            </div>
+            <h2 className="text-[#FAB95B] text-[28px] font-extrabold tracking-tight leading-none">View Map</h2>
+            <p className="text-[rgba(246,231,188,0.55)] text-[12px] mt-1.5 tracking-[0.2em] font-semibold uppercase">Search a location to explore</p>
           </div>
           <button
             onClick={() => navigate("/")}
             title="Go to Home"
-            className="
-              flex-shrink-0 mt-1
-              w-9 h-9 rounded-xl
-              flex items-center justify-center
-              bg-[rgba(246,231,188,0.08)] text-[rgba(246,231,188,0.6)]
-              border border-[rgba(246,231,188,0.1)]
-              transition-all duration-[180ms] ease-in-out
-              hover:bg-[rgba(246,231,188,0.15)] hover:text-[#F6E7BC] hover:border-[rgba(246,231,188,0.2)]
-              active:scale-95
-            "
+            className="w-10 h-10 rounded-full bg-[rgba(255,255,255,0.06)] text-[rgba(246,231,188,0.5)] flex items-center justify-center border-none cursor-pointer transition-colors duration-150 hover:bg-[rgba(250,185,91,0.2)] hover:text-[#FAB95B]"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/>
-              <path d="M9 21V12h6v9"/>
-            </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" /></svg>
           </button>
         </div>
       </div>
 
-      {/* Body */}
-      {/* Body */}
-      <div className="px-6 py-5 flex-1 flex flex-col gap-4 min-h-0">
+      {/* Body — scrollable area */}
+      <div className="px-6 py-5 flex flex-col gap-4 overflow-y-auto pb-36"
+        style={{ flex: "1 1 0", minHeight: 0 }}
+      >
 
       <SearchBar
         onSelect={onSelectLocation}
@@ -106,23 +90,18 @@ export default function RoutePanel({ selectedLocation, onSelectLocation }: Props
         selectedLoc={selectedLocation}
       />
 
-      {/* Frequently Visited — independent scrollable area */}
-      <div className="flex flex-col flex-1 min-h-0">
-        <div className="flex flex-col flex-1 min-h-0">
-          <TrendingDropdown
-            trendingLocations={trendingLocations}
-            trendingOpen={trendingOpen}
-            setTrendingOpen={setTrendingOpen}
-            onClick={handleTrendingClick}
-            selectedLocation={selectedLocation}
-          />
-        </div>
-      </div>
+      <TrendingDropdown
+        trendingLocations={trendingLocations}
+        trendingOpen={trendingOpen}
+        setTrendingOpen={setTrendingOpen}
+        onClick={handleTrendingClick}
+        selectedLocation={selectedLocation}
+      />
 
       </div>
 
-      {/* Footer — main's UI */}
-      <div className="px-6 pb-7 pt-5 flex-shrink-0 sticky bottom-0 z-10 pointer-events-none">
+      {/* Footer — pinned to bottom */}
+      <div className="absolute bottom-0 left-0 right-0 px-6 pb-7 pt-4 bg-gradient-to-t from-[#0B2D72] via-[#0B2D72]/95 to-transparent z-10">
         <button
           onClick={() => navigate("/outdoor-navigation")}
           className="
