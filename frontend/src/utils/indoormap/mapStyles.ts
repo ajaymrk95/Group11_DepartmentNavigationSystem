@@ -140,3 +140,4 @@ export function AnimatedPolyline({ positions }: AnimatedPolylineProps) {
 
     return null;
 }
+
