@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import Report from "./Report";
+import Report from "./report";
 
 const ArrowSVG = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 120 120" fill="currentColor">

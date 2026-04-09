@@ -60,7 +60,6 @@ function FitBounds({ paths, rooms, buildingGeom }: { paths: PathFeature[]; rooms
 
     const coords: [number, number][] = [];
 
-    // Include building bounds
     if (buildingGeom) {
       const extractPoly = (g: GeoJSON.Geometry) => {
         if (g.type === "Polygon") {
@@ -101,25 +100,25 @@ function FitBounds({ paths, rooms, buildingGeom }: { paths: PathFeature[]; rooms
 // ─── Color helpers ────────────────────────────────────────────────────────────
 
 const ROAD_COLORS: Record<string, string> = {
-  primary: "#d97563",
-  secondary: "#f5a563",
-  tertiary: "#84b494",
-  footway: "#6ba8c9",
-  path: "#6b7ba7",
-  service: "#9b9187",
-  corridor: "#4a7ba7",
-  stairs: "#d97563",
-  default: "#6b8fb9",
+  primary: "#e8a838",
+  secondary: "#e8a838",
+  tertiary: "#1e3a5f",
+  footway: "#1e3a5f",
+  path: "#1e3a5f",
+  service: "#6b7fa3",
+  corridor: "#1e3a5f",
+  stairs: "#c0392b",
+  default: "#1e3a5f",
 };
 
 const ROOM_CATEGORY_COLORS: Record<string, { fill: string; stroke: string }> = {
-  classroom: { fill: "#c5dced", stroke: "#4a7ba7" },
-  lab: { fill: "#d4c5e8", stroke: "#7b68ae" },
-  office: { fill: "#f5d5b8", stroke: "#d9823e" },
-  restroom: { fill: "#c9e4e8", stroke: "#4a9fb9" },
-  corridor: { fill: "#e8e4df", stroke: "#a89b8f" },
-  stairs: { fill: "#e8c5c0", stroke: "#d97563" },
-  default: { fill: "#dfe0e0", stroke: "#6b8fb9" },
+  classroom: { fill: "#dce8f5", stroke: "#4a7ba7" },
+  lab: { fill: "#e8ddf5", stroke: "#7b68ae" },
+  office: { fill: "#f5ead8", stroke: "#d9823e" },
+  restroom: { fill: "#d8eef5", stroke: "#4a9fb9" },
+  corridor: { fill: "#eceef0", stroke: "#8a96a8" },
+  stairs: { fill: "#f5ddd8", stroke: "#c0392b" },
+  default: { fill: "#e8eaec", stroke: "#6b8fb9" },
 };
 
 const ROAD_TYPES = Object.keys(ROAD_COLORS).filter((k) => k !== "default");
@@ -129,7 +128,7 @@ function roadColor(type: string) {
 }
 
 function roomColor(category: string, accessible: boolean) {
-  if (!accessible) return { fill: "#f5dcd7", stroke: "#d97563" };
+  if (!accessible) return { fill: "#f5dcd7", stroke: "#c0392b" };
   return ROOM_CATEGORY_COLORS[category?.toLowerCase()] ?? ROOM_CATEGORY_COLORS.default;
 }
 
@@ -195,7 +194,7 @@ function AddOutdoorModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <span className="modal-title">＋ Add Outdoor Path</span>
+          <span className="modal-title">Add Outdoor Path</span>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
         <div className="modal-body">
@@ -264,7 +263,7 @@ function AddIndoorModal({ buildingId, floor, onClose, onSaved }: {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <span className="modal-title">＋ Add Indoor Path</span>
+          <span className="modal-title">Add Indoor Path</span>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
         <div className="modal-body">
@@ -299,7 +298,7 @@ function AddIndoorModal({ buildingId, floor, onClose, onSaved }: {
   );
 }
 
-// ─── Building Card Selector ───────────────────────────────────────────────────
+// ─── Building Dropdown ────────────────────────────────────────────────────────
 
 function BuildingSelector({ buildings, selected, onSelect }: {
   buildings: Building[];
@@ -318,45 +317,27 @@ function BuildingSelector({ buildings, selected, onSelect }: {
   }, []);
 
   return (
-    <div className="bld-selector" ref={ref}>
-      <button className="bld-trigger" onClick={() => setOpen(!open)}>
+    <div className="atlas-dropdown" ref={ref}>
+      <button className="atlas-dropdown-trigger" onClick={() => setOpen(!open)}>
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <rect x="2" y="7" width="20" height="14" rx="1" />
           <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
         </svg>
-        <span className="bld-name">{selected?.name ?? "Select building"}</span>
-        {selected && (
-          <span className="bld-meta">{selected.floors}F · {selected.isAccessible ? "♿" : "⛔"}</span>
-        )}
-        <svg className={`bld-chevron ${open ? "open" : ""}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <span>{selected?.name ?? "Select building"}</span>
+        <svg className={`chevron ${open ? "open" : ""}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
           <polyline points="6 9 12 15 18 9" />
         </svg>
       </button>
-
       {open && (
-        <div className="bld-dropdown">
+        <div className="atlas-dropdown-menu">
           {buildings.map((b) => (
             <button
               key={b.id}
-              className={`bld-option ${selected?.id === b.id ? "active" : ""}`}
+              className={`atlas-dropdown-item ${selected?.id === b.id ? "active" : ""}`}
               onClick={() => { onSelect(b); setOpen(false); }}
             >
-              <div className="bld-opt-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="2" y="7" width="20" height="14" rx="1" />
-                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                </svg>
-              </div>
-              <div className="bld-opt-info">
-                <span className="bld-opt-name">{b.name}</span>
-                <span className="bld-opt-meta">{b.floors} floors · ID {b.id}</span>
-              </div>
-              {b.isAccessible && <span className="bld-accessible-badge">♿</span>}
-              {selected?.id === b.id && (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{color:"#4a7ba7",flexShrink:0}}>
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              )}
+              <span>{b.name}</span>
+              <span className="item-meta">{b.floors}F · ID {b.id}</span>
             </button>
           ))}
         </div>
@@ -388,6 +369,7 @@ export default function PathsPage() {
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const [showAddOutdoor, setShowAddOutdoor] = useState(false);
   const [showAddIndoor, setShowAddIndoor] = useState(false);
+  const [activeTab, setActiveTab] = useState<"paths" | "rooms">("paths");
 
   const listItemRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
@@ -477,57 +459,25 @@ export default function PathsPage() {
   const loading = mode === "outdoor" ? loadingOutdoor : loadingIndoor;
 
   const NITC_CENTER: [number, number] = [11.3218, 75.9337];
-
-  // Indoor map uses light blueprint theme
-  const indoorTileUrl = "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png";
   const outdoorTileUrl = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
 
   return (
-    <div className="paths-root">
+    <div className="atlas-root">
       {showAddOutdoor && <AddOutdoorModal onClose={() => setShowAddOutdoor(false)} onSaved={fetchOutdoor} />}
       {showAddIndoor && selectedBuilding && (
         <AddIndoorModal buildingId={selectedBuilding.id} floor={selectedFloor}
           onClose={() => setShowAddIndoor(false)} onSaved={fetchIndoor} />
       )}
 
-      {/* ── Top bar ──────────────────────────────────────────────────────── */}
-      <header className="topbar">
-        <div className="topbar-brand">
-          <div className="brand-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              <polyline points="9 22 9 12 15 12 15 22" />
-            </svg>
-          </div>
-          <div>
-            <div className="topbar-title">PATH MANAGER</div>
-            <div className="topbar-sub">
-              {displayPaths.length} paths · {displayPaths.filter((p) => p.isAccessible).length} accessible
-            </div>
-          </div>
+      {/* ── Page header ──────────────────────────────────────────────────── */}
+      <div className="page-header">
+        <div className="page-header-left">
+          <h1 className="page-title">Floor Layout</h1>
+          <p className="page-subtitle">Hover over map elements to preview · click for details</p>
         </div>
 
-        <div className="topbar-center">
-          <div className="mode-toggle">
-            <button className={`mode-btn ${mode === "outdoor" ? "active" : ""}`}
-              onClick={() => { setMode("outdoor"); setSelectedPathId(null); }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 17l5-10 4 6 3-4 6 8H3z" />
-              </svg>
-              Outdoor
-            </button>
-            <button className={`mode-btn ${mode === "indoor" ? "active" : ""}`}
-              onClick={() => { setMode("indoor"); setSelectedPathId(null); }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <path d="M9 3v18M3 9h18M3 15h18" />
-              </svg>
-              Indoor
-            </button>
-          </div>
-        </div>
-
-        <div className="topbar-right">
+        <div className="page-header-controls">
+          {/* Building selector (indoor only) */}
           {mode === "indoor" && buildings.length > 0 && (
             <BuildingSelector
               buildings={buildings}
@@ -535,74 +485,68 @@ export default function PathsPage() {
               onSelect={(b) => { setSelectedBuilding(b); setSelectedFloor(1); setSelectedPathId(null); }}
             />
           )}
-          <button className="add-path-btn"
-            onClick={() => mode === "outdoor" ? setShowAddOutdoor(true) : setShowAddIndoor(true)}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Add Path
-          </button>
-        </div>
-      </header>
 
-      {/* ── Indoor sub-bar: building card + floor tabs ─────────────────────── */}
-      {mode === "indoor" && selectedBuilding && (
-        <div className="indoor-subbar">
-          {/* Building info card */}
-          <div className="building-card">
-            <div className="building-card-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <rect x="2" y="7" width="20" height="14" rx="1" />
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-              </svg>
-            </div>
-            <div className="building-card-info">
-              <div className="building-card-name">{selectedBuilding.name}</div>
-              <div className="building-card-meta">
-                <span>{selectedBuilding.floors} floors</span>
-                <span className="dot" />
-                <span>ID #{selectedBuilding.id}</span>
-                <span className="dot" />
-                <span className={selectedBuilding.isAccessible ? "accessible-tag" : "blocked-tag"}>
-                  {selectedBuilding.isAccessible ? "♿ Accessible" : "⛔ Not accessible"}
-                </span>
-              </div>
-            </div>
-            <div className="building-card-stats">
-              <div className="bc-stat">
-                <div className="bc-stat-val">{indoorPaths.length}</div>
-                <div className="bc-stat-label">paths</div>
-              </div>
-              <div className="bc-stat">
-                <div className="bc-stat-val">{rooms.length}</div>
-                <div className="bc-stat-label">rooms</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Floor tabs */}
-          <div className="floor-strip">
-            <span className="floor-strip-label">FLOOR</span>
-            <div className="floor-tabs">
-              {Array.from({ length: selectedBuilding.floors }, (_, i) => i + 1).map((f) => (
-                <button key={f}
-                  className={`floor-tab ${selectedFloor === f ? "active" : ""}`}
-                  onClick={() => { setSelectedFloor(f); setSelectedPathId(null); }}>
-                  <span className="floor-num">{f}</span>
+          {/* Mode toggle (outdoor shows "Outdoor" pill, indoor shows floor dropdown + level tabs) */}
+          {mode === "indoor" && selectedBuilding ? (
+            <>
+              {/* Level label dropdown */}
+              <div className="atlas-dropdown">
+                <button className="atlas-dropdown-trigger">
+                  Level {selectedFloor} — {selectedFloor === 1 ? "Ground Floor" : `Floor ${selectedFloor}`}
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
                 </button>
-              ))}
+              </div>
+              {/* Level tabs */}
+              <div className="level-tabs">
+                {Array.from({ length: selectedBuilding.floors }, (_, i) => i + 1).map((f) => (
+                  <button
+                    key={f}
+                    className={`level-tab ${selectedFloor === f ? "active" : ""}`}
+                    onClick={() => { setSelectedFloor(f); setSelectedPathId(null); }}
+                  >
+                    L{f}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="level-tabs">
+              <button className="level-tab active">Outdoor</button>
             </div>
+          )}
+
+          {/* Outdoor / Indoor toggle */}
+          <div className="mode-tabs">
+            <button
+              className={`mode-tab ${mode === "outdoor" ? "active" : ""}`}
+              onClick={() => { setMode("outdoor"); setSelectedPathId(null); }}
+            >Outdoor</button>
+            <button
+              className={`mode-tab ${mode === "indoor" ? "active" : ""}`}
+              onClick={() => { setMode("indoor"); setSelectedPathId(null); }}
+            >Indoor</button>
           </div>
         </div>
-      )}
+      </div>
 
-      <div className="body">
-        {/* ── Map ──────────────────────────────────────────────────────────── */}
-        <div className={`map-wrapper ${mode === "indoor" ? "indoor-mode" : ""}`}>
+      {/* ── Main body ────────────────────────────────────────────────────── */}
+      <div className="atlas-body">
+        {/* ── Map area ─────────────────────────────────────────────────── */}
+        <div className="map-area">
+          {/* Breadcrumb overlay */}
+          <div className="map-breadcrumb">
+            {mode === "indoor" && selectedBuilding
+              ? `${selectedBuilding.name} · LEVEL ${selectedFloor} — ${selectedFloor === 1 ? "GROUND FLOOR" : `FLOOR ${selectedFloor}`}`
+              : "OUTDOOR · CAMPUS MAP"}
+          </div>
+
+          {/* Zoom controls are provided by Leaflet */}
+
           {loading && (
             <div className="map-loading">
-              <span className="spinner" />
-              Loading…
+              <span className="spinner" /> Loading…
             </div>
           )}
 
@@ -613,31 +557,20 @@ export default function PathsPage() {
               zoom={20}
               className="the-map"
               zoomControl={true}
-              attributionControl={false}
+              attributionControl={true}
               maxZoom={22}
               minZoom={20}
               zoomSnap={0.5}
               wheelPxPerZoomLevel={120}
             >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                opacity={0.15}
-              />
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" opacity={0.15} />
 
-              {/* ── Indoor: building outline (thick blueprint border) ── */}
               {selectedBuilding?.geom &&
                 polygonCoords(selectedBuilding.geom).map((ring, i) => (
                   <Polygon key={`bldg-outer-${i}`} positions={ring}
-                    pathOptions={{
-                      color: "#4a7ba7",
-                      fillColor: "#f0f4f8",
-                      fillOpacity: 0.3,
-                      weight: 2.5,
-                      dashArray: undefined,
-                    }} />
+                    pathOptions={{ color: "#1e3a5f", fillColor: "#e8eef5", fillOpacity: 0.3, weight: 2.5 }} />
                 ))}
 
-              {/* ── Indoor: rooms with category colors ── */}
               {rooms.map((room) => {
                 if (!room.geometry) return null;
                 const polys = polygonCoords(room.geometry);
@@ -645,28 +578,16 @@ export default function PathsPage() {
                 const isHovered = hoveredRoomId === room.id;
                 return polys.map((ring, i) => (
                   <Polygon key={`room-${room.id}-${i}`} positions={ring}
-                    pathOptions={{
-                      color: stroke,
-                      fillColor: fill,
-                      fillOpacity: isHovered ? 0.5 : 0.35,
-                      weight: isHovered ? 2 : 1.5,
-                    }}
-                    eventHandlers={{
-                      mouseover: () => setHoveredRoomId(room.id),
-                      mouseout: () => setHoveredRoomId(null),
-                    }}>
+                    pathOptions={{ color: stroke, fillColor: fill, fillOpacity: isHovered ? 0.5 : 0.35, weight: isHovered ? 2 : 1.5 }}
+                    eventHandlers={{ mouseover: () => setHoveredRoomId(room.id), mouseout: () => setHoveredRoomId(null) }}>
                     <Tooltip direction="center" permanent={false}>
                       <div style={{ fontWeight: 600 }}>{room.name || room.roomNo}</div>
-                      <div style={{ fontSize: "0.85em", opacity: 0.8 }}>
-                        Floor {room.floor} · {room.category}
-                        {!room.isAccessible && " · ⛔"}
-                      </div>
+                      <div style={{ fontSize: "0.85em", opacity: 0.8 }}>Floor {room.floor} · {room.category}{!room.isAccessible && " · ⛔"}</div>
                     </Tooltip>
                   </Polygon>
                 ));
               })}
 
-              {/* ── Indoor paths (drawn above rooms) ── */}
               {indoorPaths.map((path) => {
                 if (!path.geom) return null;
                 const lines = geomToLatLngs(path.geom);
@@ -674,12 +595,11 @@ export default function PathsPage() {
                 return lines.map((latlngs, i) => (
                   <Polyline key={`ip-${path.id}-${i}`} positions={latlngs}
                     pathOptions={{
-                      color: isSelected ? "#f5a563" : path.isAccessible ? roadColor(path.roadType) : "#d97563",
+                      color: isSelected ? "#e8a838" : path.isAccessible ? roadColor(path.roadType) : "#c0392b",
                       weight: isSelected ? 6 : 4,
                       opacity: isSelected ? 1 : path.isAccessible ? 0.9 : 0.4,
                       dashArray: path.isAccessible ? undefined : "5 5",
-                      lineCap: "round",
-                      lineJoin: "round",
+                      lineCap: "round", lineJoin: "round",
                     }}
                     eventHandlers={{ click: () => handlePathClick(path.id) }}>
                     <Tooltip sticky>
@@ -691,11 +611,7 @@ export default function PathsPage() {
                 ));
               })}
 
-              <FitBounds
-                paths={displayPaths}
-                rooms={rooms}
-                buildingGeom={selectedBuilding?.geom}
-              />
+              <FitBounds paths={displayPaths} rooms={rooms} buildingGeom={selectedBuilding?.geom} />
             </MapContainer>
           ) : (
             <MapContainer
@@ -706,14 +622,8 @@ export default function PathsPage() {
               className="the-map"
               zoomControl={true}
             >
-              <TileLayer
-                maxNativeZoom={19}
-                maxZoom={24}
-                url={outdoorTileUrl}
-                attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-              />
+              <TileLayer maxNativeZoom={19} maxZoom={24} url={outdoorTileUrl} attribution='&copy; <a href="https://carto.com/">CARTO</a>' />
 
-              {/* ── Outdoor paths ── */}
               {outdoorPaths.map((path) => {
                 if (!path.geom) return null;
                 const lines = geomToLatLngs(path.geom);
@@ -721,7 +631,7 @@ export default function PathsPage() {
                 return lines.map((latlngs, i) => (
                   <Polyline key={`${path.id}-${i}`} positions={latlngs}
                     pathOptions={{
-                      color: isSelected ? "#f5a563" : path.isAccessible ? roadColor(path.roadType) : "#d97563",
+                      color: isSelected ? "#e8a838" : path.isAccessible ? roadColor(path.roadType) : "#c0392b",
                       weight: isSelected ? 6 : path.isAccessible ? 4 : 2,
                       opacity: isSelected ? 1 : path.isAccessible ? 0.85 : 0.4,
                       dashArray: path.isAccessible ? undefined : "6 4",
@@ -736,168 +646,202 @@ export default function PathsPage() {
                 ));
               })}
 
-              <FitBounds
-                paths={displayPaths}
-              />
+              <FitBounds paths={displayPaths} />
             </MapContainer>
           )}
 
-          {/* Map mode badge */}
-          <div className="map-mode-badge">
-            {mode === "indoor" ? (
-              <><span className="badge-dot indoor" />2D Floor Plan · Floor {selectedFloor}</>
-            ) : (
-              <><span className="badge-dot outdoor" />Outdoor Map</>
-            )}
-          </div>
-
           {/* Legend */}
-          <div className="legend">
-            {mode === "indoor" ? (
+          <div className="atlas-legend">
+            <div className="legend-title">LEGEND</div>
+            {mode === "outdoor" ? (
               <>
-                <div className="legend-title">ROOMS</div>
-                {Object.entries(ROOM_CATEGORY_COLORS).filter(([k]) => k !== "default").map(([cat, { fill }]) => (
-                  <div className="legend-row" key={cat}>
-                    <span className="swatch-box" style={{ background: fill, opacity: 0.8 }} />
-                    <span style={{ textTransform: "capitalize" }}>{cat}</span>
-                  </div>
-                ))}
-                <div className="legend-divider" />
-                <div className="legend-title">PATHS</div>
-                <div className="legend-row">
-                  <span className="swatch" style={{ background: "#4a7ba7" }} />Corridor
-                </div>
-                <div className="legend-row">
-                  <span className="swatch" style={{ background: "#d97563", opacity: 0.6 }} />Blocked
-                </div>
+                <div className="legend-row"><span className="leg-line" style={{ background: "#e8a838" }} /><span>Entry</span></div>
+                <div className="legend-row"><span className="leg-line" style={{ background: "#1e3a5f" }} /><span>Path</span></div>
+                <div className="legend-row"><span className="leg-line" style={{ background: "#c0392b" }} /><span>Stairs</span></div>
+                <div className="legend-row"><span className="leg-line leg-dashed" style={{ borderColor: "#6b7fa3" }} /><span>Room entry</span></div>
               </>
             ) : (
               <>
-                <div className="legend-title">PATH TYPES</div>
-                {Object.entries(ROAD_COLORS).filter(([k]) => k !== "default").map(([type, color]) => (
-                  <div className="legend-row" key={type}>
-                    <span className="swatch" style={{ background: color }} />
-                    <span style={{ textTransform: "capitalize" }}>{type}</span>
-                  </div>
-                ))}
-                <div className="legend-divider" />
-                <div className="legend-row">
-                  <span className="swatch" style={{ background: "#d97563", opacity: 0.5 }} />Inaccessible
-                </div>
+                <div className="legend-row"><span className="leg-line" style={{ background: "#e8a838" }} /><span>Entry</span></div>
+                <div className="legend-row"><span className="leg-line" style={{ background: "#1e3a5f" }} /><span>Corridor</span></div>
+                <div className="legend-row"><span className="leg-line" style={{ background: "#c0392b" }} /><span>Stairs</span></div>
+                <div className="legend-row"><span className="leg-line leg-dashed" style={{ borderColor: "#6b7fa3" }} /><span>Room entry</span></div>
               </>
             )}
-            <div className="legend-hint">Click path to select</div>
           </div>
         </div>
 
-        {/* ── Sidebar ──────────────────────────────────────────────────────── */}
-        <aside className="sidebar">
-          <div className="sidebar-header">
-            <div>
-              <div className="sidebar-title">
-                {mode === "outdoor" ? "Outdoor Paths" : `Floor ${selectedFloor} Paths`}
-              </div>
-              {mode === "indoor" && selectedBuilding && (
-                <div className="sidebar-subtitle">{selectedBuilding.name}</div>
-              )}
-            </div>
-            <span className="badge">{displayPaths.length}</span>
+        {/* ── Right panel ──────────────────────────────────────────────── */}
+        <aside className="right-panel">
+          {/* Tab bar */}
+          <div className="panel-tabs">
+            <button
+              className={`panel-tab ${activeTab === "paths" ? "active" : ""}`}
+              onClick={() => setActiveTab("paths")}
+            >PATHS</button>
+            {mode === "indoor" && (
+              <button
+                className={`panel-tab ${activeTab === "rooms" ? "active" : ""}`}
+                onClick={() => setActiveTab("rooms")}
+              >ROOMS</button>
+            )}
           </div>
 
-          {selectedPathId !== null && (
-            <div className="selected-banner">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              Path #{selectedPathId} selected
-              <button className="clear-sel" onClick={() => setSelectedPathId(null)}>✕</button>
+          {/* Section header */}
+          {activeTab === "paths" && (
+            <div className="panel-section-header">
+              <div className="panel-section-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </div>
+              <span className="panel-section-title">NAVIGATION PATHS</span>
+              <span className="panel-count">{displayPaths.length}</span>
+            </div>
+          )}
+          {activeTab === "rooms" && (
+            <div className="panel-section-header">
+              <div className="panel-section-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <path d="M9 3v18M3 9h18" />
+                </svg>
+              </div>
+              <span className="panel-section-title">ROOMS</span>
+              <span className="panel-count">{rooms.length}</span>
             </div>
           )}
 
-          <div className="path-list">
-            {displayPaths.length === 0 && !loading && (
-              <div className="empty-state">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{opacity:0.3}}>
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-                <div>No paths found</div>
-              </div>
-            )}
-            {displayPaths.map((path) => {
-              const isSelected = selectedPathId === path.id;
-              return (
-                <div key={path.id}
-                  ref={(el) => { listItemRefs.current[path.id] = el; }}
-                  className={`path-row${!path.isAccessible ? " inaccessible" : ""}${isSelected ? " selected" : ""}`}
-                  onClick={() => setSelectedPathId(isSelected ? null : path.id)}>
-                  <div className="path-left">
-                    <span className="road-swatch" style={{ background: roadColor(path.roadType) }} />
-                    <div>
-                      <div className="path-name">{path.name || `Path #${path.id}`}</div>
-                      <div className="path-meta">
-                        {path.roadType}
-                        {path.isOneway && " · ↗"}
-                        {path.floor != null && ` · F${path.floor}`}
+          {/* Content */}
+          <div className="panel-list">
+            {activeTab === "paths" && (
+              <>
+                {displayPaths.length === 0 && !loading && (
+                  <div className="panel-empty">No paths found</div>
+                )}
+                {displayPaths.map((path) => {
+                  const isSelected = selectedPathId === path.id;
+                  const typeLabel = path.roadType === "corridor" ? "C" :
+                    path.roadType === "stairs" ? "S" :
+                    path.roadType === "footway" ? "F" :
+                    path.roadType === "primary" ? "P" : path.roadType[0]?.toUpperCase();
+                  return (
+                    <div
+                      key={path.id}
+                      ref={(el) => { listItemRefs.current[path.id] = el; }}
+                      className={`panel-item ${isSelected ? "selected" : ""} ${!path.isAccessible ? "inaccessible" : ""}`}
+                      onClick={() => setSelectedPathId(isSelected ? null : path.id)}
+                    >
+                      <div className="panel-item-left">
+                        <span
+                          className="path-dot"
+                          style={{ background: path.isAccessible ? roadColor(path.roadType) : "#c0392b" }}
+                        />
+                        <div className="panel-item-info">
+                          <div className="panel-item-name">
+                            {path.name || `Path ${path.id} · p${path.id}`}
+                          </div>
+                          <div className="panel-item-meta">
+                            {typeLabel}{path.isOneway ? " · ↗" : ""}{path.floor != null ? ` · F${path.floor}` : ""}
+                          </div>
+                        </div>
                       </div>
+                      <button
+                        className={`toggle-pill ${path.isAccessible ? "on" : "off"}`}
+                        onClick={(e) => { e.stopPropagation(); togglePath(path); }}
+                        disabled={togglingId === path.id}
+                        title={path.isAccessible ? "Click to block" : "Click to unblock"}
+                      >
+                        {togglingId === path.id ? (
+                          <span className="spinner sm" />
+                        ) : (
+                          <span className={`pill-thumb ${path.isAccessible ? "on" : "off"}`} />
+                        )}
+                      </button>
                     </div>
-                  </div>
-                  <button
-                    className={`toggle-btn ${path.isAccessible ? "on" : "off"}`}
-                    onClick={(e) => { e.stopPropagation(); togglePath(path); }}
-                    disabled={togglingId === path.id}
-                    title={path.isAccessible ? "Click to block" : "Click to unblock"}>
-                    {togglingId === path.id ? <span className="spinner sm" /> : path.isAccessible ? "Open" : "Blocked"}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </>
+            )}
 
-          {/* Room list when indoor */}
-          {mode === "indoor" && rooms.length > 0 && (
-            <>
-              <div className="sidebar-header" style={{ borderTop: "1px solid var(--border)" }}>
-                <div className="sidebar-title">Rooms</div>
-                <span className="badge" style={{ background: "#f5a563", color: "#fff" }}>{rooms.length}</span>
-              </div>
-              <div className="room-list">
+            {activeTab === "rooms" && mode === "indoor" && (
+              <>
+                {rooms.length === 0 && (
+                  <div className="panel-empty">No rooms found</div>
+                )}
                 {rooms.map((room) => {
                   const { fill } = roomColor(room.category, room.isAccessible);
                   return (
-                    <div key={room.id}
-                      className={`room-row ${hoveredRoomId === room.id ? "hovered" : ""}`}
+                    <div
+                      key={room.id}
+                      className={`panel-item ${hoveredRoomId === room.id ? "selected" : ""}`}
                       onMouseEnter={() => setHoveredRoomId(room.id)}
-                      onMouseLeave={() => setHoveredRoomId(null)}>
-                      <span className="room-dot" style={{ background: fill }} />
-                      <div>
-                        <div className="room-name">{room.name || room.roomNo}</div>
-                        <div className="room-meta">{room.category} {!room.isAccessible && "· ⛔"}</div>
+                      onMouseLeave={() => setHoveredRoomId(null)}
+                    >
+                      <div className="panel-item-left">
+                        <span className="path-dot" style={{ background: fill, border: "1px solid #ccc" }} />
+                        <div className="panel-item-info">
+                          <div className="panel-item-name">{room.name || room.roomNo}</div>
+                          <div className="panel-item-meta">{room.category}{!room.isAccessible ? " · ⛔" : ""}</div>
+                        </div>
                       </div>
                     </div>
                   );
                 })}
+              </>
+            )}
+          </div>
+
+          {/* Footer stats */}
+          <div className="panel-footer">
+            <div className="footer-stat">
+              <span className="footer-stat-val">{displayPaths.length}</span>
+              <span className="footer-stat-label">PATHS</span>
+            </div>
+            {mode === "indoor" && (
+              <div className="footer-stat">
+                <span className="footer-stat-val">{rooms.length}</span>
+                <span className="footer-stat-label">ROOMS</span>
               </div>
-            </>
-          )}
+            )}
+            <div className="footer-stat">
+              <span className="footer-stat-val">{displayPaths.filter(p => p.isAccessible).length}</span>
+              <span className="footer-stat-label">OPEN</span>
+            </div>
+            <button
+              className="add-btn"
+              onClick={() => mode === "outdoor" ? setShowAddOutdoor(true) : setShowAddIndoor(true)}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Add
+            </button>
+          </div>
         </aside>
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
-
-
-        .paths-root {
-          --bg: #f5f1ed;
-          --surface: #ffffff;
-          --surface2: #fafaf8;
-          --border: #e8e4df;
-          --text: #2c2620;
-          --muted: #8b8680;
-          --accent: #4a7ba7;
-          --accent2: #f5a563;
-          --on: #6ba882;
-          --off: #d97563;
-          font-family: 'IBM Plex Sans', sans-serif;
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+        html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: #F8FAFC !important;
+}
+        .atlas-root {
+          --navy: #1a2d4a;
+          --navy-dark: #142239;
+          --navy-light: #243d60;
+          --gold: #e8a838;
+          --gold-light: #f5c46a;
+          --bg: #F8FAFC;
+          --surface: transparent;
+          --border: #e2e6ec;
+          --text: #1a2d4a;
+          --muted: #7a8aa0;
+          --red: #c0392b;
+          --green: #27ae60;
+          font-family: 'DM Sans', sans-serif;
           background: var(--bg);
           color: var(--text);
           height: 100%;
@@ -907,326 +851,375 @@ export default function PathsPage() {
           overflow: hidden;
         }
 
-        /* ── Topbar ── */
-        .topbar {
+        /* ── Page header ── */
+        .page-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 16px;
-          height: 52px;
-          background: var(--surface);
+          padding: 14px 20px 10px;
+          background: transparent;
           border-bottom: 1px solid var(--border);
           flex-shrink: 0;
-          gap: 12px;
+          gap: 16px;
         }
-        .topbar-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-        .brand-icon {
-          width: 32px; height: 32px;
-          background: var(--accent);
-          border-radius: 8px;
-          display: flex; align-items: center; justify-content: center;
-          color: #fff; flex-shrink: 0;
+        .page-title {
+          font-size: 20px;
+          font-weight: 600;
+          color: var(--text);
+          margin: 0;
+          line-height: 1.2;
         }
-        .topbar-title {
-          font-family: 'IBM Plex Mono', monospace;
-          font-size: 11px; font-weight: 600;
-          letter-spacing: 0.15em; color: var(--accent);
-        }
-        .topbar-sub { font-size: 10px; color: var(--muted); margin-top: 1px; }
-        .topbar-center { display: flex; align-items: center; }
-        .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-
-        /* ── Mode toggle ── */
-        .mode-toggle {
-          display: flex;
-          background: var(--bg);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          padding: 3px;
-          gap: 2px;
-        }
-        .mode-btn {
-          display: flex; align-items: center; gap: 6px;
-          padding: 5px 14px; font-size: 12px; font-weight: 500;
-          background: transparent; border: none; color: var(--muted);
-          cursor: pointer; border-radius: 6px; transition: all 0.15s;
-          font-family: 'IBM Plex Sans', sans-serif;
-        }
-        .mode-btn.active { background: var(--accent); color: #fff; }
-        .mode-btn:hover:not(.active) { color: var(--text); background: var(--surface2); }
-
-        /* ── Building dropdown ── */
-        .bld-selector { position: relative; }
-        .bld-trigger {
-          display: flex; align-items: center; gap: 8px;
-          background: var(--bg); border: 1px solid var(--border);
-          color: var(--text); border-radius: 8px; padding: 5px 10px;
-          font-size: 12px; font-family: 'IBM Plex Sans', sans-serif;
-          cursor: pointer; transition: border-color 0.15s; white-space: nowrap;
-          min-width: 160px; max-width: 220px;
-        }
-        .bld-trigger:hover { border-color: var(--accent); }
-        .bld-name { font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; }
-        .bld-meta { font-size: 10px; color: var(--muted); flex-shrink: 0; }
-        .bld-chevron { color: var(--muted); flex-shrink: 0; transition: transform 0.2s; }
-        .bld-chevron.open { transform: rotate(180deg); }
-        .bld-dropdown {
-          position: absolute; top: calc(100% + 6px); left: 0; right: 0;
-          background: var(--surface); border: 1px solid var(--border);
-          border-radius: 10px; z-index: 9999; overflow: hidden;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-          min-width: 220px;
-        }
-        .bld-option {
-          display: flex; align-items: center; gap: 10px;
-          width: 100%; padding: 10px 12px;
-          background: transparent; border: none; border-bottom: 1px solid var(--border);
-          color: var(--text); cursor: pointer; text-align: left;
-          font-family: 'IBM Plex Sans', sans-serif; transition: background 0.1s;
-        }
-        .bld-option:last-child { border-bottom: none; }
-        .bld-option:hover, .bld-option.active { background: var(--surface2); }
-        .bld-opt-icon { color: var(--muted); flex-shrink: 0; }
-        .bld-opt-info { flex: 1; min-width: 0; }
-        .bld-opt-name { font-size: 13px; font-weight: 500; }
-        .bld-opt-meta { font-size: 10px; color: var(--muted); margin-top: 1px; font-family: 'IBM Plex Mono', monospace; }
-        .bld-accessible-badge { font-size: 12px; flex-shrink: 0; }
-
-        /* ── Add path button ── */
-        .add-path-btn {
-          display: flex; align-items: center; gap: 6px;
-          padding: 6px 14px;
-          background: var(--accent); color: #fff;
-          border: none; border-radius: 8px; font-size: 12px; font-weight: 600;
-          cursor: pointer; transition: opacity 0.15s; white-space: nowrap;
-          font-family: 'IBM Plex Sans', sans-serif;
-        }
-        .add-path-btn:hover { opacity: 0.85; }
-
-        /* ── Indoor subbar ── */
-        .indoor-subbar {
-          display: flex; align-items: center; gap: 12px;
-          padding: 8px 16px;
-          background: var(--surface2);
-          border-bottom: 1px solid var(--border);
-          flex-shrink: 0;
-          overflow-x: auto;
-        }
-
-        /* Building card */
-        .building-card {
-          display: flex; align-items: center; gap: 12px;
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: 10px;
-          padding: 8px 14px;
-          flex-shrink: 0;
-          border-left: 3px solid var(--accent);
-        }
-        .building-card-icon {
-          width: 36px; height: 36px;
-          background: rgba(74, 123, 167, 0.1);
-          border-radius: 8px;
-          display: flex; align-items: center; justify-content: center;
-          color: var(--accent); flex-shrink: 0;
-        }
-        .building-card-info { min-width: 0; }
-        .building-card-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
-        .building-card-meta {
-          display: flex; align-items: center; gap: 6px;
-          font-size: 10px; color: var(--muted); margin-top: 2px;
-          font-family: 'IBM Plex Mono', monospace;
-        }
-        .dot { width: 3px; height: 3px; background: var(--muted); border-radius: 50%; }
-        .accessible-tag { color: var(--on); }
-        .blocked-tag { color: var(--off); }
-        .building-card-stats { display: flex; gap: 16px; margin-left: 8px; }
-        .bc-stat { text-align: center; }
-        .bc-stat-val { font-size: 18px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; color: var(--accent); line-height: 1; }
-        .bc-stat-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
-
-        /* Floor strip */
-        .floor-strip { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .floor-strip-label { font-size: 9px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.1em; font-weight: 600; }
-        .floor-tabs { display: flex; gap: 4px; }
-        .floor-tab {
-          width: 34px; height: 34px;
-          border-radius: 8px;
-          background: var(--bg);
-          border: 1px solid var(--border);
+        .page-subtitle {
+          font-size: 11px;
           color: var(--muted);
-          font-family: 'IBM Plex Mono', monospace;
-          font-size: 12px; font-weight: 600;
-          cursor: pointer; transition: all 0.15s;
-          display: flex; align-items: center; justify-content: center;
+          margin: 2px 0 0;
         }
-        .floor-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-        .floor-tab:hover:not(.active) { border-color: var(--accent); color: var(--text); }
-        .floor-num {}
+        .page-header-controls {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        /* ── Atlas dropdown ── */
+        .atlas-dropdown { position: relative; }
+        .atlas-dropdown-trigger {
+          display: flex; align-items: center; gap: 7px;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          padding: 6px 12px;
+          font-size: 12px;
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 500;
+          color: var(--text);
+          cursor: pointer;
+          white-space: nowrap;
+          transition: border-color 0.15s;
+        }
+        .atlas-dropdown-trigger:hover { border-color: var(--navy); }
+        .atlas-dropdown-trigger .chevron { color: var(--muted); transition: transform 0.2s; }
+        .atlas-dropdown-trigger .chevron.open { transform: rotate(180deg); }
+        .atlas-dropdown-menu {
+          position: absolute; top: calc(100% + 4px); left: 0;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+          z-index: 9999;
+          min-width: 200px;
+          overflow: hidden;
+        }
+        .atlas-dropdown-item {
+          display: flex; align-items: center; justify-content: space-between;
+          width: 100%; padding: 9px 14px;
+          background: transparent; border: none;
+          font-family: 'DM Sans', sans-serif; font-size: 12px;
+          color: var(--text); cursor: pointer; text-align: left;
+          border-bottom: 1px solid var(--border); transition: background 0.1s;
+        }
+        .atlas-dropdown-item:last-child { border-bottom: none; }
+        .atlas-dropdown-item:hover, .atlas-dropdown-item.active { background: #f7f9fc; }
+        .item-meta { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+        /* ── Level tabs ── */
+        .level-tabs {
+          display: flex; gap: 2px;
+          background: #f0f2f5;
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          padding: 2px;
+        }
+        .level-tab {
+          padding: 4px 10px;
+          background: transparent; border: none;
+          font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+          color: var(--muted); cursor: pointer; border-radius: 4px;
+          transition: all 0.15s;
+        }
+        .level-tab.active {
+          background: var(--navy);
+          color: #fff;
+        }
+        .level-tab:hover:not(.active) { color: var(--text); background: var(--border); }
+
+        /* ── Mode tabs ── */
+        .mode-tabs {
+          display: flex;
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          overflow: hidden;
+        }
+        .mode-tab {
+          padding: 5px 14px;
+          background: var(--surface); border: none;
+          font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+          color: var(--muted); cursor: pointer;
+          transition: all 0.15s;
+          border-right: 1px solid var(--border);
+        }
+        .mode-tab:last-child { border-right: none; }
+        .mode-tab.active { background: var(--gold); color: #fff; font-weight: 600; }
+        .mode-tab:hover:not(.active) { background: #f7f9fc; color: var(--text); }
 
         /* ── Body ── */
-        .body { flex: 1; display: flex; overflow: hidden; }
+        .atlas-body {
+          flex: 1;
+          display: flex;
+          overflow: hidden;
+        }
 
-        /* ── Map ── */
-        .map-wrapper { flex: 1; position: relative; }
-        .map-wrapper.indoor-mode .the-map { filter: none; }
-        .the-map { width: 100%; height: 100%; background: #f5f1ed; }
-
+        /* ── Map area ── */
+        .map-area {
+          flex: 1;
+          position: relative;
+          overflow: hidden;
+        }
+        .the-map {
+          width: 100%;
+          height: 100%;
+          background: #e8edf3;
+        }
+        .map-breadcrumb {
+          position: absolute; top: 12px; left: 12px; z-index: 999;
+          background: rgba(255,255,255,0.92);
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          padding: 6px 14px;
+          font-size: 11px;
+          font-family: 'DM Mono', monospace;
+          font-weight: 500;
+          color: var(--navy);
+          backdrop-filter: blur(8px);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
         .map-loading {
           position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
-          z-index: 1000; background: var(--surface); border: 1px solid var(--border);
-          padding: 7px 14px; border-radius: 8px; font-size: 12px;
+          z-index: 1000;
+          background: var(--surface); border: 1px solid var(--border);
+          padding: 7px 14px; border-radius: 6px;
+          font-size: 12px;
           display: flex; align-items: center; gap: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-
-        /* Map mode badge */
-        .map-mode-badge {
-          position: absolute; top: 12px; left: 12px; z-index: 999;
-          background: rgba(255, 255, 255, 0.85); border: 1px solid var(--border);
-          padding: 5px 12px; border-radius: 20px;
-          font-size: 11px; font-family: 'IBM Plex Mono', monospace;
-          display: flex; align-items: center; gap: 7px;
-          backdrop-filter: blur(8px);
-        }
-        .badge-dot { width: 7px; height: 7px; border-radius: 50%; }
-        .badge-dot.indoor { background: #4a7ba7; box-shadow: 0 0 6px rgba(74, 123, 167, 0.3); }
-        .badge-dot.outdoor { background: #f5a563; box-shadow: 0 0 6px rgba(245, 165, 99, 0.3); }
 
         /* Legend */
-        .legend {
+        .atlas-legend {
           position: absolute; bottom: 16px; left: 12px; z-index: 999;
-          background: rgba(255, 255, 255, 0.92); border: 1px solid var(--border);
-          border-radius: 10px; padding: 10px 12px;
-          display: flex; flex-direction: column; gap: 5px;
-          backdrop-filter: blur(8px); max-height: 300px; overflow-y: auto;
+          background: rgba(255,255,255,0.95);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          padding: 12px 14px;
+          min-width: 130px;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+          backdrop-filter: blur(8px);
         }
-        .legend-title { font-size: 9px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.1em; font-weight: 600; margin-bottom: 2px; }
-        .legend-divider { height: 1px; background: var(--border); margin: 4px 0; }
-        .legend-row { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--text); }
-        .legend-hint { font-size: 9px; color: var(--muted); margin-top: 3px; font-style: italic; }
-        .swatch { width: 16px; height: 4px; border-radius: 2px; flex-shrink: 0; }
-        .swatch-box { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
-
-        /* ── Sidebar ── */
-        .sidebar {
-          width: 290px; background: var(--surface);
-          border-left: 1px solid var(--border);
-          display: flex; flex-direction: column; overflow: hidden;
+        .legend-title {
+          font-size: 9px; font-weight: 600;
+          font-family: 'DM Mono', monospace;
+          color: var(--muted); letter-spacing: 0.12em;
+          margin-bottom: 8px;
         }
-        .sidebar-header {
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 12px 14px; border-bottom: 1px solid var(--border);
+        .legend-row {
+          display: flex; align-items: center; gap: 9px;
+          font-size: 11px; color: var(--text);
+          margin-bottom: 5px;
+        }
+        .legend-row:last-child { margin-bottom: 0; }
+        .leg-line {
+          display: inline-block;
+          width: 22px; height: 3px;
+          border-radius: 2px;
           flex-shrink: 0;
         }
-        .sidebar-title { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
-        .sidebar-subtitle { font-size: 10px; color: var(--muted); margin-top: 1px; font-family: 'IBM Plex Mono', monospace; }
-        .badge {
-          background: var(--accent); color: #fff;
-          font-size: 10px; font-family: 'IBM Plex Mono', monospace;
-          border-radius: 999px; padding: 2px 8px;
+        .leg-line.leg-dashed {
+          background: transparent !important;
+          border-bottom: 2px dashed;
+          height: 0;
+          border-radius: 0;
         }
 
-        .selected-banner {
-          display: flex; align-items: center; gap: 6px;
-          padding: 6px 14px;
-          background: rgba(74, 123, 167, 0.06);
+        /* ── Right panel ── */
+        .right-panel {
+          width: 260px;
+           background: transparent;
+          border-left: 1px solid var(--border);
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+        }
+
+        /* Tab bar */
+        .panel-tabs {
+          display: flex;
           border-bottom: 1px solid var(--border);
-          font-size: 11px; color: var(--accent); flex-shrink: 0;
-          font-family: 'IBM Plex Mono', monospace;
+          flex-shrink: 0;
         }
-        .clear-sel {
-          margin-left: auto; background: transparent; border: none;
-          color: var(--muted); cursor: pointer; font-size: 11px;
-          padding: 2px 5px; border-radius: 3px;
+        .panel-tab {
+          flex: 1; padding: 11px 0;
+          background: transparent; border: none;
+          font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+          color: var(--muted); cursor: pointer;
+          border-bottom: 2px solid transparent;
+          transition: all 0.15s;
+          letter-spacing: 0.06em;
         }
-        .clear-sel:hover { color: var(--text); background: var(--border); }
-
-        .path-list { flex: 1; overflow-y: auto; padding: 5px; }
-        .path-list::-webkit-scrollbar { width: 3px; }
-        .path-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-        .empty-state {
-          display: flex; flex-direction: column; align-items: center; gap: 8px;
-          text-align: center; color: var(--muted);
-          padding: 36px 20px; font-size: 12px;
+        .panel-tab.active {
+          color: var(--navy);
+          border-bottom-color: var(--gold);
+          font-weight: 600;
         }
+        .panel-tab:hover:not(.active) { color: var(--text); }
 
-        .path-row {
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 8px 10px; border-radius: 8px; margin-bottom: 2px;
-          background: transparent; border: 1px solid transparent;
-          transition: all 0.1s; cursor: pointer;
-        }
-        .path-row:hover { background: var(--surface2); border-color: var(--border); }
-        .path-row.inaccessible { opacity: 0.6; }
-        .path-row.selected { background: rgba(74, 123, 167, 0.08) !important; border-color: rgba(74, 123, 167, 0.2) !important; }
-
-        .path-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
-        .road-swatch { width: 4px; height: 32px; border-radius: 2px; flex-shrink: 0; }
-        .path-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
-        .path-meta { font-size: 10px; color: var(--muted); margin-top: 1px; font-family: 'IBM Plex Mono', monospace; }
-
-        /* Toggle button */
-        .toggle-btn {
-          flex-shrink: 0; padding: 4px 10px; border-radius: 5px;
-          font-size: 10px; font-weight: 600;
-          font-family: 'IBM Plex Mono', monospace;
-          border: none; cursor: pointer; transition: all 0.15s;
-          min-width: 54px; display: flex; align-items: center; justify-content: center;
-        }
-        .toggle-btn.on { background: rgba(107, 168, 130, 0.12); color: var(--on); border: 1px solid rgba(107, 168, 130, 0.25); }
-        .toggle-btn.on:hover { background: rgba(107, 168, 130, 0.22); }
-        .toggle-btn.off { background: rgba(217, 117, 99, 0.12); color: var(--off); border: 1px solid rgba(217, 117, 99, 0.25); }
-        .toggle-btn.off:hover { background: rgba(217, 117, 99, 0.22); }
-        .toggle-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* Room list */
-        .room-list { overflow-y: auto; max-height: 180px; padding: 5px; flex-shrink: 0; }
-        .room-list::-webkit-scrollbar { width: 3px; }
-        .room-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-        .room-row {
+        /* Section header */
+        .panel-section-header {
           display: flex; align-items: center; gap: 8px;
-          padding: 6px 10px; border-radius: 6px; margin-bottom: 2px;
-          cursor: default; border: 1px solid transparent; transition: all 0.1s;
+          padding: 10px 14px;
+          border-bottom: 1px solid var(--border);
+          flex-shrink: 0;
         }
-        .room-row.hovered { background: var(--surface2); border-color: var(--border); }
-        .room-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
-        .room-name { font-size: 11px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
-        .room-meta { font-size: 10px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; margin-top: 1px; }
+        .panel-section-icon {
+          width: 24px; height: 24px;
+          background: #f0f4f9;
+          border-radius: 5px;
+          display: flex; align-items: center; justify-content: center;
+          color: var(--navy); flex-shrink: 0;
+        }
+        .panel-section-title {
+          flex: 1;
+          font-family: 'DM Mono', monospace; font-size: 10px;
+          font-weight: 600; letter-spacing: 0.1em;
+          color: var(--muted);
+        }
+        .panel-count {
+          font-family: 'DM Mono', monospace; font-size: 11px;
+          font-weight: 600; color: var(--muted);
+          background: #f0f2f5; border-radius: 10px;
+          padding: 1px 8px;
+        }
+
+        /* List */
+        .panel-list {
+          flex: 1; overflow-y: auto; padding: 4px 0;
+        }
+        .panel-list::-webkit-scrollbar { width: 3px; }
+        .panel-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .panel-empty {
+          text-align: center; color: var(--muted);
+          padding: 32px 20px; font-size: 12px;
+        }
+
+        .panel-item {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 9px 14px;
+          border-bottom: 1px solid #f5f5f7;
+          cursor: pointer; transition: background 0.1s;
+        }
+        .panel-item:hover { background: #f7f9fc; }
+        .panel-item.selected { background: #f0f5fb; }
+        .panel-item.inaccessible { opacity: 0.55; }
+
+        .panel-item-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+        .path-dot {
+          width: 10px; height: 10px; border-radius: 50%;
+          flex-shrink: 0;
+        }
+        .panel-item-info { min-width: 0; }
+        .panel-item-name {
+          font-size: 12px; font-weight: 500;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+          max-width: 130px; color: var(--text);
+        }
+        .panel-item-meta {
+          font-size: 10px; color: var(--muted);
+          font-family: 'DM Mono', monospace; margin-top: 1px;
+        }
+
+        /* Toggle pill */
+        .toggle-pill {
+          flex-shrink: 0;
+          width: 36px; height: 20px;
+          border-radius: 10px;
+          border: none; cursor: pointer;
+          display: flex; align-items: center; padding: 0 3px;
+          transition: background 0.2s;
+          position: relative;
+        }
+        .toggle-pill.on { background: rgba(39, 174, 96, 0.15); border: 1.5px solid rgba(39,174,96,0.3); }
+        .toggle-pill.off { background: rgba(192, 57, 43, 0.1); border: 1.5px solid rgba(192,57,43,0.25); }
+        .toggle-pill:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pill-thumb {
+          width: 14px; height: 14px; border-radius: 50%;
+          transition: transform 0.2s;
+          flex-shrink: 0;
+        }
+        .pill-thumb.on { background: #27ae60; transform: translateX(16px); }
+        .pill-thumb.off { background: #c0392b; transform: translateX(0); }
+
+        /* Footer */
+        .panel-footer {
+          display: flex; align-items: center;
+          padding: 10px 14px;
+          border-top: 1px solid var(--border);
+          gap: 12px;
+          flex-shrink: 0;
+          background: transparent;
+        }
+        .footer-stat { display: flex; flex-direction: column; align-items: center; }
+        .footer-stat-val {
+          font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 600;
+          color: var(--navy); line-height: 1;
+        }
+        .footer-stat-label {
+          font-size: 8px; color: var(--muted);
+          letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-top: 2px;
+        }
+        .add-btn {
+          margin-left: auto;
+          display: flex; align-items: center; gap: 5px;
+          padding: 6px 12px;
+          background: var(--gold); color: #fff;
+          border: none; border-radius: 6px;
+          font-size: 11px; font-weight: 600;
+          font-family: 'DM Sans', sans-serif;
+          cursor: pointer; transition: opacity 0.15s;
+        }
+        .add-btn:hover { opacity: 0.85; }
 
         /* Spinner */
         @keyframes spin { to { transform: rotate(360deg); } }
         .spinner {
           display: inline-block; width: 16px; height: 16px;
-          border: 2px solid var(--border); border-top-color: var(--accent);
+          border: 2px solid var(--border); border-top-color: var(--navy);
           border-radius: 50%; animation: spin 0.6s linear infinite;
         }
-        .spinner.sm { width: 11px; height: 11px; }
+        .spinner.sm { width: 10px; height: 10px; }
 
         /* ── Modal ── */
         .modal-overlay {
-          position: fixed; inset: 0; background: rgba(0,0,0,0.3);
+          position: fixed; inset: 0; background: rgba(26,45,74,0.35);
           z-index: 10000; display: flex; align-items: center; justify-content: center;
+          backdrop-filter: blur(2px);
         }
         .modal {
           background: var(--surface); border: 1px solid var(--border);
-          border-radius: 12px; width: 480px; max-width: 95vw;
+          border-radius: 10px; width: 480px; max-width: 95vw;
           display: flex; flex-direction: column;
-          box-shadow: 0 16px 48px rgba(0,0,0,0.1);
+          box-shadow: 0 20px 60px rgba(26,45,74,0.18);
         }
         .modal-header {
           display: flex; align-items: center; justify-content: space-between;
           padding: 16px 20px; border-bottom: 1px solid var(--border);
         }
         .modal-title {
-          font-size: 13px; font-weight: 600; color: var(--accent);
-          font-family: 'IBM Plex Mono', monospace;
+          font-size: 14px; font-weight: 600; color: var(--navy);
         }
         .modal-close {
           background: transparent; border: none; color: var(--muted);
           font-size: 14px; cursor: pointer; padding: 4px 8px; border-radius: 4px;
         }
-        .modal-close:hover { background: var(--surface2); color: var(--text); }
+        .modal-close:hover { background: var(--bg); color: var(--text); }
         .modal-body {
           padding: 20px; display: flex; flex-direction: column; gap: 10px;
           max-height: 60vh; overflow-y: auto;
@@ -1237,65 +1230,85 @@ export default function PathsPage() {
         }
         .field-label {
           font-size: 10px; font-weight: 600; color: var(--muted);
-          letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 2px; display: block;
-          font-family: 'IBM Plex Mono', monospace;
+          letter-spacing: 0.08em; text-transform: uppercase;
+          margin-bottom: 2px; display: block;
+          font-family: 'DM Mono', monospace;
         }
         .field-check {
           display: flex; align-items: center; gap: 8px; cursor: pointer;
           text-transform: none; letter-spacing: 0; font-size: 12px; color: var(--text);
-          font-family: 'IBM Plex Sans', sans-serif;
+          font-family: 'DM Sans', sans-serif;
         }
         .field-row-info {
           display: flex; gap: 16px; font-size: 12px; color: var(--muted);
-          padding: 8px 10px; background: var(--surface2); border-radius: 6px; border: 1px solid var(--border);
-          font-family: 'IBM Plex Mono', monospace;
+          padding: 8px 10px; background: #f7f9fc; border-radius: 6px;
+          border: 1px solid var(--border); font-family: 'DM Mono', monospace;
         }
-        .field-row-info b { color: var(--accent); }
+        .field-row-info b { color: var(--navy); }
         .field-input {
-          width: 100%; background: var(--surface2); border: 1px solid var(--border);
+          width: 100%; background: #fafbfc; border: 1px solid var(--border);
           color: var(--text); border-radius: 6px; padding: 8px 10px;
-          font-size: 12px; font-family: 'IBM Plex Sans', sans-serif;
-          outline: none; transition: border-color 0.15s;
+          font-size: 12px; font-family: 'DM Sans', sans-serif;
+          outline: none; transition: border-color 0.15s; box-sizing: border-box;
         }
-        .field-input:focus { border-color: var(--accent); }
+        .field-input:focus { border-color: var(--navy); }
         .field-textarea {
           min-height: 88px; resize: vertical;
-          font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.5;
+          font-family: 'DM Mono', monospace; font-size: 11px; line-height: 1.5;
         }
         .field-error {
-          font-size: 11px; color: var(--off); padding: 6px 10px;
-          background: rgba(217, 117, 99, 0.08); border: 1px solid rgba(217, 117, 99, 0.2); border-radius: 5px;
+          font-size: 11px; color: var(--red); padding: 6px 10px;
+          background: rgba(192,57,43,0.07); border: 1px solid rgba(192,57,43,0.2); border-radius: 5px;
         }
         .optional { font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 10px; }
-        .required { color: var(--off); }
+        .required { color: var(--red); }
         .btn-cancel {
           background: transparent; border: 1px solid var(--border); color: var(--muted);
           border-radius: 6px; padding: 7px 16px; font-size: 12px; cursor: pointer;
-          font-family: 'IBM Plex Sans', sans-serif; transition: all 0.15s;
+          font-family: 'DM Sans', sans-serif; transition: all 0.15s;
         }
         .btn-cancel:hover { color: var(--text); border-color: var(--muted); }
         .btn-save {
-          background: var(--accent); color: #fff; border: none;
+          background: var(--navy); color: #fff; border: none;
           border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 600;
-          cursor: pointer; font-family: 'IBM Plex Sans', sans-serif;
-          display: flex; align-items: center; gap: 6px; min-width: 88px; justify-content: center;
+          cursor: pointer; font-family: 'DM Sans', sans-serif;
+          display: flex; align-items: center; gap: 6px;
+          min-width: 88px; justify-content: center;
           transition: opacity 0.15s;
         }
         .btn-save:hover:not(:disabled) { opacity: 0.85; }
         .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Leaflet tooltip override for light theme */
+        /* Leaflet tooltip override */
         .leaflet-tooltip {
           background: var(--surface) !important;
           border: 1px solid var(--border) !important;
           color: var(--text) !important;
-          font-family: 'IBM Plex Sans', sans-serif !important;
+          font-family: 'DM Sans', sans-serif !important;
           font-size: 12px !important;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
           border-radius: 6px !important;
           padding: 6px 10px !important;
         }
         .leaflet-tooltip-top::before { border-top-color: var(--border) !important; }
+
+        /* Leaflet zoom control */
+        .leaflet-control-zoom {
+          border: 1px solid var(--border) !important;
+          border-radius: 6px !important;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+        }
+        .leaflet-control-zoom a {
+          background: var(--surface) !important;
+          color: var(--navy) !important;
+          border-bottom: 1px solid var(--border) !important;
+          font-weight: 600 !important;
+          width: 28px !important; height: 28px !important;
+          line-height: 28px !important;
+          font-size: 15px !important;
+        }
+        .leaflet-control-zoom a:hover { background: #f0f4f9 !important; }
       `}</style>
     </div>
   );
