@@ -1,4 +1,6 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import Report from "./Report";
 
 const ArrowSVG = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 120 120" fill="currentColor">
@@ -26,6 +28,7 @@ const CompassLarge = ({ size }: { size: number }) => (
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [showReport, setShowReport] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#E8E2DB] font-[Outfit] flex flex-col relative overflow-hidden">
@@ -71,13 +74,67 @@ const Dashboard = () => {
         <div className="flex items-center gap-4 md:gap-9">
           <CompassSmall />
           {/* Nav links: hidden on mobile */}
-          <div className="flex items-center gap-8">
-            {["About", "Help", "Team"].map(label => (
-              <button key={label} className="text-[15px] font-medium text-[#E8E2DB] bg-none border-none font-[Outfit] cursor-pointer transition-colors duration-200 hover:text-[#9DBAD0] tracking-[0.01em]">
-                {label}
-              </button>
-            ))}
-          </div>
+         <div className="flex items-center gap-8">
+  {["About", "Report", "Team"].map(label => (
+    <button
+      key={label}
+      onClick={() => {
+        if (label === "Report") setShowReport(prev => !prev);
+      }}
+      className="text-[15px] font-medium text-[#E8E2DB] bg-none border-none font-[Outfit] cursor-pointer transition-colors duration-200 hover:text-[#9DBAD0] tracking-[0.01em]"
+    >
+      {label}
+    </button>
+  ))}
+</div>
+{showReport && (
+  <div
+    onClick={() => setShowReport(false)} // click outside closes
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      background: "rgba(0,0,0,0.25)",
+      backdropFilter: "blur(6px)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1000,
+    }}
+  >
+    {/* STOP click propagation */}
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        position: "relative",
+      }}
+    >
+      {/* Close button */}
+      <button
+        onClick={() => setShowReport(false)}
+        style={{
+          position: "absolute",
+          top: -12,
+          right: -12,
+          background: "#fff",
+          borderRadius: "50%",
+          border: "none",
+          width: 32,
+          height: 32,
+          cursor: "pointer",
+          fontWeight: "bold",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
+        }}
+      >
+        ✕
+      </button>
+
+      <Report />
+    </div>
+  </div>
+)}
         </div>
         <button
           onClick={() => navigate("/admin-login")}

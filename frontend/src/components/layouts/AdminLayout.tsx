@@ -11,7 +11,8 @@ import {
   User,
   Users,
   ChevronLeft,
-  Menu
+  Menu,
+   AlertCircle
 } from 'lucide-react';
 
 const navItems = [
@@ -22,6 +23,7 @@ const navItems = [
   { label: 'Path',         icon: Map,             to: '/admin/Path' },
   { label: 'Logs',         icon: ScrollText,      to: '/admin/logs' },
   { label: 'Profile',      icon: User,            to: '/admin/profile' },
+  { label: 'Report',       icon:  AlertCircle,            to: '/admin/report'}
 ];
 
 export default function AdminLayout() {

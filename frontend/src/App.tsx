@@ -19,6 +19,7 @@ import Scanner from "./components/searchcomponents/Scanner";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminLayout from "./components/layouts/AdminLayout";
 import Profile from "./pages/admin/Profile";
+import Reports from "./pages/admin/Report";
 
 export default function App() {
   return (
@@ -48,6 +49,7 @@ export default function App() {
           <Route path="add-location" element={<AddLocations />} />
           <Route path="logs" element={<Logs />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="report" element={<Reports/>}/>
         </Route>
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/login" replace />} />
