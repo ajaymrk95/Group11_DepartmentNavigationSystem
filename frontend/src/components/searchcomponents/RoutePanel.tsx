@@ -103,6 +103,7 @@ export default function RoutePanel({ selectedLocation, onSelectLocation }: Props
       <SearchBar
         onSelect={onSelectLocation}
         onFocusSearch={clearSelectedLocation}
+        selectedLoc={selectedLocation}
       />
 
       {/* Frequently Visited — independent scrollable area */}
