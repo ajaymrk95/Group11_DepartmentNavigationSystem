@@ -385,10 +385,18 @@ export default function SearchBar({
             {[...(showMyLocation && myLocation ? [myLocation] : []), ...results].map((loc, index) => (
               <div
                 key={index}
-                className="px-5 py-3 text-base text-[#1a305b] cursor-pointer hover:bg-[#e9e4d9] transition-colors border-b border-gray-100 last:border-0"
+                className="px-5 py-3 text-base text-[#1a305b] cursor-pointer hover:bg-[#e9e4d9] transition-colors border-b border-gray-100 last:border-0 flex items-center justify-between gap-2"
                 onClick={() => handleSelect(loc)}
               >
-                {loc.name}
+                <span className="truncate">{loc.name}</span>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {loc.category && (
+                    <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-[#FAB95B]/15 text-[#1a305b] border border-[#FAB95B]/30">{loc.category}</span>
+                  )}
+                  {loc.floor != null && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#547792]/10 text-[#547792] border border-[#547792]/20">F{loc.floor}</span>
+                  )}
+                </div>
               </div>
             ))}
             {results.length === 0 && !(showMyLocation && myLocation) && (

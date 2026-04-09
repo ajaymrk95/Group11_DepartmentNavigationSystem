@@ -102,31 +102,22 @@ export default function OutdoorNav() {
         <div className="h-full flex flex-col bg-[#0B2D72] shadow-[12px_0_40px_rgba(0,0,0,0.4)] overflow-y-auto">
 
           {/* Panel Header */}
-          <div className="px-6 pt-6 pb-4 shrink-0">
+          <div className="px-8 pt-10 pb-8 shrink-0">
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[rgba(250,185,91,0.15)] border border-[rgba(250,185,91,0.25)] flex items-center justify-center">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FAB95B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="3 11 22 2 13 21 11 13 3 11" />
-                  </svg>
-                </div>
                 <div>
-                  <h2 className="text-[#F6E7BC] text-base font-extrabold tracking-tight leading-none">Navigation</h2>
-                  <p className="text-[rgba(246,231,188,0.45)] text-[10px] mt-0.5 tracking-widest uppercase">Outdoor routing</p>
+                  <h2 className="text-[#FAB95B] text-[28px] font-extrabold tracking-tight leading-none">Navigation</h2>
+                  <p className="text-[rgba(246,231,188,0.55)] text-[12px] mt-1.5 tracking-[0.2em] font-semibold uppercase">Outdoor routing</p>
                 </div>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 <button onClick={() => navigate("/")} title="Home"
-                  className="w-8 h-8 rounded-full bg-[rgba(255,255,255,0.06)] text-[rgba(246,231,188,0.5)] flex items-center justify-center border-none cursor-pointer transition-colors duration-150 hover:bg-[rgba(250,185,91,0.2)] hover:text-[#FAB95B]">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" /></svg>
-                </button>
-                <button onClick={() => navigate("/search-location")} title="Search"
-                  className="w-8 h-8 rounded-full bg-[rgba(255,255,255,0.06)] text-[rgba(246,231,188,0.5)] flex items-center justify-center border-none cursor-pointer transition-colors duration-150 hover:bg-[rgba(250,185,91,0.2)] hover:text-[#FAB95B]">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.3-4.3" /></svg>
+                  className="w-10 h-10 rounded-full bg-[rgba(255,255,255,0.06)] text-[rgba(246,231,188,0.5)] flex items-center justify-center border-none cursor-pointer transition-colors duration-150 hover:bg-[rgba(250,185,91,0.2)] hover:text-[#FAB95B]">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" /></svg>
                 </button>
                 <button onClick={() => setIsPanelOpen(false)}
-                  className="md:hidden w-8 h-8 rounded-full bg-[rgba(255,255,255,0.06)] text-[rgba(246,231,188,0.5)] flex items-center justify-center border-none cursor-pointer transition-colors duration-150 hover:bg-[rgba(255,255,255,0.12)] hover:text-[#F6E7BC]">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                  className="md:hidden w-10 h-10 rounded-full bg-[rgba(255,255,255,0.06)] text-[rgba(246,231,188,0.5)] flex items-center justify-center border-none cursor-pointer transition-colors duration-150 hover:bg-[rgba(255,255,255,0.12)] hover:text-[#F6E7BC]">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
                 </button>
               </div>
             </div>
@@ -156,6 +147,24 @@ export default function OutdoorNav() {
                 {routeError}
               </div>
             )}
+
+            {/* Clear All */}
+            {(start || end) && (
+              <button onClick={() => {
+                setStart(null)
+                setEnd(null)
+                setRouteCoords([])
+                setDistanceText("")
+                setRouteDistanceMeters(null)
+                setRouteError("")
+                setIsNavigating(false)
+                setClickedDestination(null)
+              }}
+                className="w-full flex items-center justify-center gap-2 py-2 rounded-full bg-transparent text-[#ff6b7a] text-[12px] font-semibold cursor-pointer transition-all duration-200 hover:text-[#ff4d5e]">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+                Clear All
+              </button>
+            )}
           </div>
 
           <DestinationInfo
@@ -164,6 +173,43 @@ export default function OutdoorNav() {
             distanceMeters={routeDistanceMeters}
             isLoadingRoute={isLoadingRoute}
           />
+
+          {/* Tips Card — only show when no destination is selected */}
+          {!end && (
+            <div className="mx-6 mt-6 rounded-2xl border border-white/10 bg-white/5 p-5 flex flex-col gap-4">
+              <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-[rgba(246,231,188,0.4)]">How it works</p>
+
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-[#FAB95B]/15 flex items-center justify-center shrink-0 mt-0.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FAB95B" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
+                </div>
+                <div>
+                  <p className="text-[13px] font-semibold text-[#F6E7BC] leading-tight">Set your start & end</p>
+                  <p className="text-[11px] text-[rgba(246,231,188,0.5)] mt-1 leading-relaxed">Search for locations or tap the map to pick your destination.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-[#FAB95B]/15 flex items-center justify-center shrink-0 mt-0.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FAB95B" strokeWidth="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                </div>
+                <div>
+                  <p className="text-[13px] font-semibold text-[#F6E7BC] leading-tight">Get directions</p>
+                  <p className="text-[11px] text-[rgba(246,231,188,0.5)] mt-1 leading-relaxed">Hit "Find Route" and we'll calculate the fastest walking path for you.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-[#FAB95B]/15 flex items-center justify-center shrink-0 mt-0.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FAB95B" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18M3 15h18"/></svg>
+                </div>
+                <div>
+                  <p className="text-[13px] font-semibold text-[#F6E7BC] leading-tight">Go indoors</p>
+                  <p className="text-[11px] text-[rgba(246,231,188,0.5)] mt-1 leading-relaxed">If your destination is inside a building, seamlessly switch to indoor navigation.</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Spacer */}
           <div className="flex-1" />

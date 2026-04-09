@@ -216,7 +216,7 @@ export default function MobileLocationSheet({ selectedLocation, onSelectLocation
         <div
           className="
             relative flex items-center
-            px-6 pt-2.5 pb-3.5
+            px-6 pt-6 pb-6
             touch-none cursor-grab
             flex-shrink-0 select-none
           "
@@ -225,20 +225,37 @@ export default function MobileLocationSheet({ selectedLocation, onSelectLocation
           onClick={handlePeekClick}
         >
           <div className="absolute top-2 left-1/2 -translate-x-1/2 w-9 h-1 rounded-full bg-[rgba(246,231,188,0.2)]" />
-          <div className="mt-2">
-            <div className="text-[24px] font-black text-[#F6E7BC] tracking-[-0.03em] leading-tight">
-              View Map
+          <div className="mt-2 flex items-center justify-between w-full">
+            <div>
+              <div className="text-[28px] font-extrabold text-[#FAB95B] tracking-tight leading-none">
+                View Map
+              </div>
+              <div className="text-[12px] text-[rgba(246,231,188,0.55)] font-semibold mt-1.5 tracking-[0.2em] uppercase truncate max-w-[260px]">
+                {!isExpanded ? "Tap to expand!" : "Search or tap a location"}
+              </div>
             </div>
-            <div className="text-[15px] text-[rgba(246,231,188,0.55)] font-normal mt-0.5 truncate max-w-[260px]">
-              {!isExpanded ? "Tap to expand!" : "Search or tap a location"}
-            </div>
+            {isExpanded && (
+              <div className="flex items-center gap-2">
+                <button onClick={(e) => { e.stopPropagation(); navigate("/") }} title="Home"
+                  className="w-10 h-10 rounded-full bg-[rgba(255,255,255,0.06)] text-[rgba(246,231,188,0.5)] flex items-center justify-center border-none cursor-pointer transition-colors duration-150 hover:bg-[rgba(250,185,91,0.2)] hover:text-[#FAB95B]">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" /></svg>
+                </button>
+                <button onClick={(e) => { e.stopPropagation(); snapTo(PEEK) }} title="Close"
+                  className="w-10 h-10 rounded-full bg-[rgba(255,255,255,0.06)] text-[rgba(246,231,188,0.5)] flex items-center justify-center border-none cursor-pointer transition-colors duration-150 hover:bg-[rgba(255,255,255,0.12)] hover:text-[#F6E7BC]">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                </button>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Divider */}
+        {isExpanded && <div className="mx-6 h-px bg-[rgba(255,255,255,0.07)] shrink-0" />}
 
         {/* Body — only visible when expanded */}
         {isExpanded && (
           <div className="
-            flex-1 overflow-y-auto px-5 pb-[100px] pt-1
+            flex-1 overflow-y-auto px-5 pb-[100px] pt-4
             flex flex-col gap-4
             [scrollbar-width:thin]
             [scrollbar-color:rgba(246,231,188,0.15)_transparent]

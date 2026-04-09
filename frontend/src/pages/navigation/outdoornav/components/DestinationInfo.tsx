@@ -135,12 +135,6 @@ export default function DestinationInfo({
             </div>
           </div>
 
-          {/* Right arrow */}
-          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-white/10 border border-white/20 group-hover:bg-white/20 transition-all">
-        <span className="text-white text-base font-bold leading-none">
-          ➜
-        </span>
-      </div>
 
   </div>
   )}
