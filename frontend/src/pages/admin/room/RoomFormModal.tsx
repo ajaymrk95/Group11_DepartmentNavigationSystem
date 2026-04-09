@@ -35,8 +35,8 @@ export default function RoomFormModal({
   });
 
   const [customCategory, setCustomCategory] = useState(false);
-  const [geomFile,       setGeomFile]       = useState<File | null>(null);
-  const [entriesFile,    setEntriesFile]    = useState<File | null>(null);
+  const [geomText, setGeomText] = useState("");
+const [entriesText, setEntriesText] = useState("");
   const [geomError,      setGeomError]      = useState("");
   const [entriesError,   setEntriesError]   = useState("");
   const [manualPoints,   setManualPoints]   = useState<{ lng: string; lat: string }[]>([]);
@@ -74,10 +74,21 @@ export default function RoomFormModal({
     setSaving(true); setError("");
     try {
       let geoJson = null, entries = null;
-      if (geomFile) geoJson = await readAndValidateJson(geomFile, true);
-      if (entriesFile) {
-        entries = await readAndValidateJson(entriesFile, false);
-      } else if (manualPoints.length > 0) {
+      if (geomText.trim()) {
+  try {
+    geoJson = JSON.parse(geomText);
+  } catch {
+    throw new Error("Invalid Geometry JSON format");
+  }
+}
+
+if (entriesText.trim()) {
+  try {
+    entries = JSON.parse(entriesText);
+  } catch {
+    throw new Error("Invalid Entry Points JSON format");
+  }
+}else if (manualPoints.length > 0) {
         if (!manualPoints.every(p => p.lng !== "" && p.lat !== ""))
           throw new Error("All entry points must have both longitude and latitude.");
         entries = manualPoints.map(p => [parseFloat(p.lng), parseFloat(p.lat)]);
@@ -220,26 +231,24 @@ export default function RoomFormModal({
           </div>
 
           {/* Geometry file */}
-          <FileUploadBox
-            label={`Room Geometry (.geojson)${isEdit ? "" : " *"}`}
-            hint={isEdit ? "Click to replace existing geometry (optional)" : "Click to upload .geojson file"}
-            accept=".geojson,.json"
-            file={geomFile}
-            error={geomError}
-            onChange={handleGeomFile}
-          />
-
+      <FileUploadBox
+  label="GEOMETRY (GEOJSON) — leave empty to keep existing"
+  value={geomText}
+  error={geomError}
+  onChange={setGeomText}
+  example={`{
+  "type": "MultiPolygon",
+  "coordinates": [...]
+}`}
+/>
           {/* Entry points */}
-          <EntriesInput
-            isEdit={isEdit}
-            entriesFile={entriesFile}
-            entriesError={entriesError}
-            onFileChange={handleEntriesFile}
-            manualPoints={manualPoints}
-            onAddPoint={addPoint}
-            onRemovePoint={removePoint}
-            onPointChange={changePoint}
-          />
+          <FileUploadBox
+  label="GEOMETRY (GEOJSON) — leave empty to keep existing"
+  value={entriesText}
+  error={entriesError}
+  onChange={setEntriesText}
+  example={`[[75.93403068321887, 11.322341832594367]]`}
+/>
 
         </div>
 
