@@ -115,21 +115,21 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
                     className="w-full sm:w-56 lg:w-64 px-5 py-[10px] rounded-full border-none bg-white/10 text-white font-[Outfit] text-[14px] outline-none transition-all duration-[180ms] placeholder-white/50 focus:bg-white/20 focus:shadow-[0_0_0_2px_#FAB95B] tracking-wide"
                 />
                 {open && options.length > 0 && (
-                    <ul className="absolute top-full left-0 mt-2 w-[110%] min-w-[240px] bg-[#1A3263] border border-white/10 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] z-[9999] max-h-64 overflow-y-auto overflow-hidden divide-y divide-white/5 custom-scrollbar">
+                    <ul className="absolute top-full left-0 mt-2 w-[110%] min-w-[240px] bg-[#0B2D72] border border-white/10 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.45)] z-[9999] max-h-64 overflow-y-auto overflow-hidden divide-y divide-white/[0.06] custom-scrollbar">
                         {options.map((o) => (
                             <li
                                 key={o.value}
                                 onClick={() => {
-                                    setIsSelecting(true); // Tell the effect NOT to fetch
+                                    setIsSelecting(true);
                                     setQuery(o.label);
-                                    onChange(o.value, o.coordinates, o.floor);  // ← pass coordinates
+                                    onChange(o.value, o.coordinates, o.floor);
                                     setOpen(false);
-
                                     const inputElement = ref.current?.querySelector("input");
                                     inputElement?.blur();
                                 }}
-                                className="px-4 py-3 text-[14px] text-white/90 hover:bg-white/10 hover:text-[#FAB95B] cursor-pointer transition-colors duration-150 break-words"
+                                className="px-5 py-3 text-[13px] text-[#F6E7BC] hover:bg-[rgba(250,185,91,0.08)] hover:text-[#FAB95B] cursor-pointer transition-colors duration-150 break-words flex items-center gap-2"
                             >
+                                <svg className="shrink-0 text-[rgba(250,185,91,0.5)]" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /></svg>
                                 {o.label}
                             </li>
                         ))}
