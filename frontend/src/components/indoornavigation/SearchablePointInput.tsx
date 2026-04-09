@@ -95,11 +95,11 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
     }, [query, buildingId]);
 
     return (
-        <div className="relative flex items-center gap-3" ref={ref}>
-            <label className="text-sm text-[#E8E2DB] font-semibold w-9 sm:w-auto shrink-0">
+        <div className="relative flex items-center gap-3 w-full" ref={ref}>
+            <label className="text-[15px] text-[#FAB95B] font-semibold min-w-10 shrink-0 tracking-wide text-left">
                 {label}
             </label>
-            <div className="relative">
+            <div className="relative w-full">
                 <input
                     type="text"
                     value={query}
@@ -112,14 +112,13 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
                         setTimeout(() => setOpen(false), 200);
                     }}
                     placeholder="Search room..."
-                    className="border border-gray-300 rounded-md px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
+                    className="w-full sm:w-56 lg:w-64 px-5 py-[10px] rounded-full border-none bg-white/10 text-white font-[Outfit] text-[14px] outline-none transition-all duration-[180ms] placeholder-white/50 focus:bg-white/20 focus:shadow-[0_0_0_2px_#FAB95B] tracking-wide"
                 />
                 {open && options.length > 0 && (
-                    <ul className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-[9999] max-h-48 overflow-y-auto">
+                    <ul className="absolute top-full left-0 mt-2 w-[110%] min-w-[240px] bg-[#1A3263] border border-white/10 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] z-[9999] max-h-64 overflow-y-auto overflow-hidden divide-y divide-white/5 custom-scrollbar">
                         {options.map((o) => (
                             <li
                                 key={o.value}
-                                // onMouseDown={(e) => e.preventDefault()} // prevent blur before click
                                 onClick={() => {
                                     setIsSelecting(true); // Tell the effect NOT to fetch
                                     setQuery(o.label);
@@ -129,7 +128,7 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
                                     const inputElement = ref.current?.querySelector("input");
                                     inputElement?.blur();
                                 }}
-                                className="px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"
+                                className="px-4 py-3 text-[14px] text-white/90 hover:bg-white/10 hover:text-[#FAB95B] cursor-pointer transition-colors duration-150 break-words"
                             >
                                 {o.label}
                             </li>

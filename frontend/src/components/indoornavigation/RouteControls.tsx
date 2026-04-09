@@ -9,7 +9,7 @@ export function RouteControls({ from, to, noRouteFound, setFrom, setTo, onFindPa
     const [toFloor, setToFloor] = useState<number>(1);
 
     return (
-        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <div className="flex flex-col lg:flex-row gap-3 lg:gap-4 items-stretch lg:items-center w-full justify-center">
             <SearchablePointInput
                 label="From"
                 value={from}
@@ -21,7 +21,9 @@ export function RouteControls({ from, to, noRouteFound, setFrom, setTo, onFindPa
                     setFromFloor(fromfloor);
                 }}
             />
-            <span className="hidden sm:block text-gray-400">→</span>
+            <svg className="hidden lg:block text-[#FAB95B] w-5 h-5 opacity-80 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
             <SearchablePointInput
                 label="To"
                 value={to}
@@ -33,16 +35,20 @@ export function RouteControls({ from, to, noRouteFound, setFrom, setTo, onFindPa
                     setToFloor(tofloor);
                 }}
             />
-            <button
-                onClick={() => fromCoords && toCoords && onFindPath(fromCoords, toCoords, fromFloor, toFloor)}
-                disabled={!fromCoords || !toCoords}
-                className="border border-[#E8E2DB] text-[#E8E2DB] hover:bg-[#E8E2DB] hover:text-[#1A3263] font-semibold text-sm px-4 py-1.5 rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-                Find Path
-            </button>
-            {noRouteFound && (
-                <span className="text-sm text-red-400">No route found</span>
-            )}
+            <div className="flex items-center justify-between lg:justify-start gap-3 mt-1 lg:mt-0 lg:ml-2">
+                <button
+                    onClick={() => fromCoords && toCoords && onFindPath(fromCoords, toCoords, fromFloor, toFloor)}
+                    disabled={!fromCoords || !toCoords}
+                    className="bg-[#FAB95B] text-[#1A3263] hover:bg-[#e6a850] font-bold text-[14px] px-6 py-[10px] rounded-full transition-all duration-[220ms] disabled:opacity-50 disabled:bg-[#ccc] disabled:text-gray-600 disabled:cursor-not-allowed shadow-sm hover:shadow-md shrink-0 w-full sm:w-auto"
+                >
+                    Find Path
+                </button>
+                {noRouteFound && (
+                    <span className="text-[13px] font-semibold text-[#ff4d5e] bg-[rgba(220,53,69,0.1)] px-3 py-1.5 rounded-full border border-[rgba(220,53,69,0.35)] whitespace-nowrap shrink-0">
+                        No route found
+                    </span>
+                )}
+            </div>
         </div>
     );
 }

@@ -39,21 +39,29 @@ function NavigationContent({
     }, [buildingData, urlFromCoords, urlToCoords]);
 
     return (
-        <div className="w-full h-screen flex flex-col bg-gray-100">
-            <header className="bg-[#1A3263] shadow-md px-4 py-3 z-[2000] flex items-center justify-between gap-4 flex-wrap shrink-0">
-                <div className="flex items-center gap-3 shrink-0">
+        <div className="w-full h-screen flex flex-col font-[Outfit] bg-[#1A3263] overflow-hidden">
+            <header className="bg-[#1A3263] border-b border-white/10 shadow-lg px-4 sm:px-6 py-4 z-[2000] flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-6 shrink-0 w-full overflow-y-auto max-h-[50vh] lg:max-h-none lg:overflow-visible custom-scrollbar">
+                <div className="flex items-center justify-between w-full lg:w-auto gap-4 shrink-0">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => navigate("/")}
+                            className="text-[#9DBAD0] hover:text-white transition-colors duration-[180ms]"
+                            aria-label="Go to home"
+                        >
+                            <HomeIcon className="w-8 h-8 sm:w-9 sm:h-9" />
+                        </button>
+                        <h1 className="text-[clamp(20px,2vw,30px)] font-bold text-[#FAB95B] tracking-tight truncate">
+                            {buildingData?.name ?? building}
+                        </h1>
+                    </div>
                     <button
-                        onClick={() => navigate("/")}
-                        className="text-[#9DBAD0] hover:text-[#E8E2DB] transition-colors duration-200"
-                        aria-label="Go to home"
+                        onClick={() => navigate("/outdoor-navigation")}
+                        className="lg:hidden shrink-0 bg-[#FAB95B] text-[#1A3263] hover:bg-[#e6a850] font-bold text-[13px] px-4 py-2 rounded-full shadow-md transition-all duration-[220ms]"
                     >
-                        <HomeIcon className="w-10 h-10" />
+                        Outdoor View
                     </button>
-                    <h1 className="text-3xl font-bold text-[#E8E2DB]">
-                        {buildingData?.name ?? building}
-                    </h1>
                 </div>
-                <div className="flex-1">
+                <div className="w-full lg:flex-1 flex justify-center max-w-max lg:max-w-4xl mx-auto">
                     <RouteControls
                         from={from}
                         to={to}
@@ -67,12 +75,12 @@ function NavigationContent({
                 </div>
                 <button
                     onClick={() => navigate("/outdoor-navigation")}
-                    className="shrink-0 border border-[#E8E2DB] text-[#E8E2DB] hover:bg-[#E8E2DB] hover:text-[#1A3263] font-semibold text-sm px-3 py-1.5 rounded-md transition-colors duration-200"
+                    className="hidden lg:block shrink-0 bg-[#FAB95B] text-[#1A3263] hover:bg-[#e6a850] font-bold text-[14px] px-6 py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-[220ms] tracking-wide"
                 >
                     Outdoor View
                 </button>
             </header>
-            <div className="flex-1 min-h-0 min-w-0">
+            <div className="flex-1 min-h-0 min-w-0 bg-[#f4f7f6]">
                 <IndoorMap
                     building={building}
                     route={route}

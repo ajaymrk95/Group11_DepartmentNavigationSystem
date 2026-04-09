@@ -6,3 +6,18 @@
   --color-cream: #F8FAFC;
   --color-amber: #F59E0B;
 }
+
+/* Premium Leaflet Popup Overrides */
+.premium-popup .leaflet-popup-content-wrapper {
+  padding: 0 !important;
+  border-radius: 0.75rem !important; /* rounded-xl */
+  overflow: hidden !important;
+}
+.premium-popup .leaflet-popup-content {
+  margin: 0 !important;
+  width: auto !important;
+}
+.premium-popup .leaflet-popup-tip {
+  /* Ensure the tip matches the white background of the content area */
+  background: white;
+}

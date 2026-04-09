@@ -32,15 +32,16 @@ export function FloorToggle({ currentFloor, onChange, floors }: FloorToggleProps
     if (!mountNode) return null;
 
     return createPortal(
-        <div className="flex flex-col items-center border-2 border-[#1A3263] rounded overflow-hidden shadow-md bg-white">
+        <div className="flex flex-col items-center border border-white/20 rounded-2xl overflow-hidden shadow-2xl bg-[#1A3263]/90 backdrop-blur-md m-4">
             {FLOORS.map((floor) => (
                 <button
                     key={floor}
                     onClick={() => onChange(floor)}
                     aria-pressed={currentFloor === floor}
-                    className={`w-8 h-8 text-sm font-bold transition-colors duration-200 border-b-2 border-[#1A3263] last:border-b-0 ${currentFloor === floor
-                            ? "bg-[#1A3263] text-white"
-                            : "bg-white text-[#1A3263] hover:bg-gray-100"
+                    className={`w-11 h-11 text-[16px] font-[Outfit] font-extrabold transition-all duration-[180ms] border-b border-white/10 last:border-b-0 ${
+                        currentFloor === floor
+                            ? "bg-[#FAB95B] text-[#1A3263]"
+                            : "bg-transparent text-[#E8E2DB] hover:bg-white/10 hover:text-[#FAB95B]"
                         }`}
                 >
                     {floor}
