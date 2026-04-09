@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import type { Location } from "../types/types"
 import MapView from "../components/navcomponents/MapView"
-import LocateButton from "../components/navcomponents/LocateButton"
 import { useCurrentLocation } from "../hooks/useCurrentLocation"
 import { getDistanceAlongRoute, getNextTurn } from "./navigation/outdoornav/utils/navigationUtils"
 import type { TurnInfo } from "./navigation/outdoornav/types/navigationTypes"
@@ -244,8 +243,6 @@ export default function OutdoorNav() {
           }}
           tileType={tileType}
         />
-
-        <LocateButton onClick={() => { if (currentLocation) setCenter(currentLocation) }} />
       </div>
     </div>
   )

@@ -15,10 +15,22 @@ import com.atlas.backend.repository.AdminRepository;
 public class AdminService {
 
     private final AdminRepository adminRepository;
-    private final JavaMailSender mailSender;
+    private final JavaMailSender mailSender; // (We will leave this injected to avoid breaking constructor, though unused now)
 
     @Value("${app.frontend.url:https://group11-department-navigation-syste.vercel.app}")
     private String frontendUrl;
+
+    @Value("${EMAILJS_SERVICE_ID}")
+    private String emailjsServiceId;
+
+    @Value("${EMAILJS_TEMPLATE_ID}")
+    private String emailjsTemplateId;
+    
+    @Value("${EMAILJS_PUBLIC_KEY}")
+    private String emailjsPublicKey;
+
+    @Value("${EMAILJS_PRIVATE_KEY}")
+    private String emailjsPrivateKey;
 
     public AdminService(AdminRepository adminRepository, JavaMailSender mailSender){
         this.adminRepository = adminRepository;
@@ -66,19 +78,29 @@ public class AdminService {
 
     private void sendResetEmail(String toEmail, String token) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            // Match this with your property in application.properties
-            message.setFrom("atlasnavteam@gmail.com"); 
-            message.setTo(toEmail);
-            message.setSubject("Password Reset Request - Atlas Admin");
-            
             String resetUrl = frontendUrl + "/admin/reset-password?token=" + token;
-            message.setText("Hello,\n\nTo reset your admin password, please click the link below:\n\n" 
-                            + resetUrl 
-                            + "\n\nIf you did not request a password reset, please ignore this email.");
-                            
-            mailSender.send(message);
-            System.out.println("Reset email sent successfully to " + toEmail);
+
+            String jsonBody = String.format(
+                "{\"service_id\":\"%s\",\"template_id\":\"%s\",\"user_id\":\"%s\",\"accessToken\":\"%s\",\"template_params\":{\"to_email\":\"%s\",\"reset_link\":\"%s\"}}",
+                emailjsServiceId, emailjsTemplateId, emailjsPublicKey, emailjsPrivateKey, toEmail, resetUrl
+            );
+
+            // Execute POST request to EmailJS
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create("https://api.emailjs.com/api/v1.0/email/send"))
+                    .header("Content-Type", "application/json")
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
+
+            java.net.http.HttpResponse<String> response = java.net.http.HttpClient.newHttpClient()
+                    .send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+            // EmailJS often returns 'OK' instead of empty body on 200
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                System.out.println("Reset email sent successfully to " + toEmail + " via EmailJS.");
+            } else {
+                System.err.println("EmailJS API Error: " + response.body());
+            }
         } catch (Exception e) {
             System.err.println("Failed to send reset email: " + e.getMessage());
         }
