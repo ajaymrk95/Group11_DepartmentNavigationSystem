@@ -95,8 +95,8 @@ export function SearchablePointInput({ label, value, buildingId, buildingEntries
     }, [query, buildingId]);
 
     return (
-        <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full" ref={ref}>
-            <label className="text-[15px] text-[#FAB95B] font-semibold sm:w-auto shrink-0 tracking-wide text-left pl-1 sm:pl-0">
+        <div className="relative flex items-center gap-3 w-full" ref={ref}>
+            <label className="text-[15px] text-[#FAB95B] font-semibold min-w-10 shrink-0 tracking-wide text-left">
                 {label}
             </label>
             <div className="relative w-full">
