@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.atlas.backend.dto.LocationDTO;
+import com.atlas.backend.dto.SearchLocationDTO;
 import com.atlas.backend.service.LocationService;
 
 @RestController
@@ -24,7 +25,7 @@ public class LocationController {
     }
 
     @GetMapping("/search")
-    public List<LocationDTO> searchLocations(@RequestParam String q) {
+    public List<SearchLocationDTO> searchLocations(@RequestParam String q) {
         return service.searchLocations(q);
     }
 

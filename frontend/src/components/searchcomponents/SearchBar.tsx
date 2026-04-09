@@ -120,6 +120,12 @@ export default function SearchBar({
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/locations/search?q=${encodeURIComponent(value)}`)
       const data = await res.json()
+
+      if (!Array.isArray(data)) {
+           console.error("Expected an array but got:", data);
+           setResults([]);
+           return;
+      }
       const mapped = data.map((loc: any) => ({
         id: loc.id,
         name: loc.name,
@@ -135,6 +141,7 @@ export default function SearchBar({
         buildingEntranceLat: loc.buildingEntranceLat ?? null,
         buildingEntranceLng: loc.buildingEntranceLng ?? null,
       }))
+      console.log(mapped)
       setResults(mapped)
     } catch (err) {
       console.error("Search failed:", err)
