@@ -95,7 +95,7 @@ function BuildingSwitcher({ current, buildings }: { current: string; buildings: 
 function NavigationContent({
     building,
     urlFromCoords, urlToCoords, urlFromFloor, urlToFloor,
-    nextOutdoor
+    nextOutdoor, tileType
 }: any) {
     const navigate = useNavigate();
     const { data: buildingData } = useBuildingData(building);
@@ -148,6 +148,7 @@ function NavigationContent({
             if (nextOutdoor.entranceLat != null) url += `&continueEndEntranceLat=${nextOutdoor.entranceLat}`
             if (nextOutdoor.entranceLng != null) url += `&continueEndEntranceLng=${nextOutdoor.entranceLng}`
         }
+        if (tileType) url += `&tileType=${encodeURIComponent(tileType)}`
         return url
     })() : null
 
@@ -284,6 +285,9 @@ export function NavigationPage() {
         floor: searchParams.get("nextOutdoorEndFloor") ? Number(searchParams.get("nextOutdoorEndFloor")) : 1,
     } : null;
 
+    const rawTileType = searchParams.get("tileType") as "light" | "standard" | "satelite" | null;
+    const tileType = (rawTileType === 'light' || rawTileType === 'standard' || rawTileType === 'satelite') ? rawTileType : undefined;
+
     if (!building) return null;
 
     return (
@@ -295,6 +299,7 @@ export function NavigationPage() {
                 urlFromFloor={urlFromFloor}
                 urlToFloor={urlToFloor}
                 nextOutdoor={nextOutdoor}
+                tileType={tileType}
             />
         </FloorProvider>
     );

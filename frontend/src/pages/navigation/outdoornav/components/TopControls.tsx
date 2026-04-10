@@ -5,7 +5,7 @@ type TileType = "light" | "standard" | "satelite"
 
 type Props = {
   tileType: TileType
-  setTileType: Dispatch<SetStateAction<TileType>>
+  setTileType: (t: TileType) => void
   isPanelOpen: boolean
   setIsPanelOpen: Dispatch<SetStateAction<boolean>>
 }
