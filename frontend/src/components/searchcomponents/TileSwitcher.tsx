@@ -2,18 +2,18 @@ type TileType = "light" | "standard" | "satelite"
 
 type Props = {
   tileType: TileType
-  setTileType: React.Dispatch<React.SetStateAction<TileType>>
+  setTileType: (t: TileType) => void
 }
 
 export default function TileSwitcher({ tileType, setTileType }: Props) {
   return (
     <button
       onClick={() => {
-        setTileType(prev =>
-          prev === "light" ? "standard" :
-          prev === "standard" ? "satelite" :
+        const next: TileType =
+          tileType === "light" ? "standard" :
+          tileType === "standard" ? "satelite" :
           "light"
-        )
+        setTileType(next)
       }}
       className="
         h-10 w-24

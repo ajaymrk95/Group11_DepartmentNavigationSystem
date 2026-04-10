@@ -9,6 +9,7 @@ type Props = {
   start?: Location | null
   end: Location | null
   onEnd: () => void
+  tileType?: "light" | "standard" | "satelite"
 }
 
 export default function NavigationOverlay({
@@ -17,7 +18,8 @@ export default function NavigationOverlay({
   totalDistanceText,
   start: _start,
   end,
-  onEnd
+  onEnd,
+  tileType,
 }: Props) {
   const navigate = useNavigate()
 
@@ -100,6 +102,7 @@ export default function NavigationOverlay({
                     params.set('endLat', String(end.latitude));
                     params.set('endFloor', String(end.floor || 1));
                   }
+                  if (tileType) params.set('tileType', tileType);
                   navigate(`/indoor-navigation/${buildingSlug}?${params.toString()}`);
                 }}
                 className="flex-1 bg-[#FAB95B] text-[#1A3263] text-sm font-bold py-2.5 rounded-xl hover:bg-[#f9aa3d] transition-colors"
@@ -156,6 +159,7 @@ export default function NavigationOverlay({
                       params.set('endLat', String(end.latitude));
                       params.set('endFloor', String(end.floor || 1));
                     }
+                    if (tileType) params.set('tileType', tileType);
                     navigate(`/indoor-navigation/${buildingSlug}?${params.toString()}`);
                   }}
                   className="bg-[#FAB95B] text-[#1A3263] text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-[#f9aa3d] transition-colors"

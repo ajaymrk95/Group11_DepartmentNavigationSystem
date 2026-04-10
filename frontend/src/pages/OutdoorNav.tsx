@@ -20,7 +20,18 @@ export default function OutdoorNav() {
   const [end, setEnd] = useState<Location | null>(null)
   const [routeCoords, setRouteCoords] = useState<[number, number][]>([])
   const [distanceText, setDistanceText] = useState("")
-  const [tileType, setTileType] = useState<"light" | "standard" | "satelite">("light")
+  const [tileType, setTileTypeRaw] = useState<"light" | "standard" | "satelite">(
+    () => {
+      const stored = localStorage.getItem('preferredTileType') as "light" | "standard" | "satelite" | null
+      if (stored === 'light' || stored === 'standard' || stored === 'satelite') return stored
+      const t = searchParams.get('tileType') as "light" | "standard" | "satelite" | null
+      return (t === 'light' || t === 'standard' || t === 'satelite') ? t : 'light'
+    }
+  )
+  const setTileType = (t: "light" | "standard" | "satelite") => {
+    localStorage.setItem('preferredTileType', t)
+    setTileTypeRaw(t)
+  }
   const [clickedDestination, setClickedDestination] = useState<Location | null>(null)
   const [isPanelOpen, setIsPanelOpen] = useState(true)
   const [isNavigating, setIsNavigating] = useState(false)
@@ -176,6 +187,7 @@ export default function OutdoorNav() {
         params.set('endLng', String(end.longitude))
         params.set('endFloor', String(end.floor || 1))
       }
+      params.set('tileType', tileType)
       navigate(`/indoor-navigation/${buildingSlug}?${params.toString()}`)
       return
     }
@@ -204,6 +216,7 @@ export default function OutdoorNav() {
           params.set('nextOutdoorEndFloor', String(end.floor || 1))
         }
       }
+      params.set('tileType', tileType)
       navigate(`/indoor-navigation/${buildingSlug}?${params.toString()}`)
       return
     }
@@ -378,6 +391,7 @@ export default function OutdoorNav() {
             totalDistanceText={distanceText}
             start={start}
             end={end}
+            tileType={tileType}
             onEnd={() => {
               setIsNavigating(false)
               setRouteCoords([])
