@@ -83,6 +83,15 @@ public class PathService {
         return pathRepository.save(path);
     }
 
+    public Path delete(Long id) {
+    return pathRepository.findById(id)
+        .map(p -> {
+            pathRepository.delete(p);
+            return p;
+        })
+        .orElseThrow(() -> new RuntimeException("Path not found: " + id));
+}
+
     private Geometry parseGeom(Object geomJson) throws Exception {
         String geomStr = geomJson instanceof String
                 ? (String) geomJson
