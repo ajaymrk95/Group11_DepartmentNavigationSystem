@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Building2, Plus, Search, X, Layers, MapPin, Pencil } from "lucide-react";
+import { Building2, Plus, Search, X, Layers, MapPin, Pencil, Trash2 } from "lucide-react";
 
 interface Building {
   id: number;
@@ -41,6 +41,11 @@ const btnSecondary: React.CSSProperties = {
   color: "#547792", fontSize: 13, fontWeight: 600, cursor: "pointer",
   fontFamily: "'Outfit', sans-serif",
 };
+const btnDanger: React.CSSProperties = {
+  padding: "10px 24px", borderRadius: 100, border: "none",
+  background: "#dc3545", color: "#fff", fontSize: 13, fontWeight: 700,
+  cursor: "pointer", fontFamily: "'Outfit', sans-serif",
+};
 
 // ── Toggle ────────────────────────────────────────────────────────────────────
 function Toggle({ checked, onChange, loading }: {
@@ -64,6 +69,36 @@ function Toggle({ checked, onChange, loading }: {
         boxShadow: "0 1px 3px rgba(0,0,0,0.2)", transition: "left 0.25s",
       }} />
     </button>
+  );
+}
+
+// ── Confirmation Dialog ───────────────────────────────────────────────────────
+function ConfirmDialog({ title, message, onConfirm, onCancel, isDanger = false }: {
+  title: string; message: string; onConfirm: () => void; onCancel: () => void; isDanger?: boolean;
+}) {
+  return (
+    <div
+      style={{ position: "fixed", inset: 0, background: "rgba(11,45,114,0.45)", zIndex: 110, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, backdropFilter: "blur(3px)" }}
+      onClick={e => e.target === e.currentTarget && onCancel()}
+    >
+      <div style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 400, boxShadow: "0 24px 64px rgba(11,45,114,0.25)" }}>
+        <div style={{ background: isDanger ? "#dc3545" : "#0B2D72", padding: "22px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <h3 style={{ fontSize: 16, fontWeight: 800, color: "#F6E7BC", margin: 0 }}>{title}</h3>
+          <button onClick={onCancel} style={{ width: 30, height: 30, borderRadius: "50%", border: "none", background: "rgba(246,231,188,0.12)", color: "#F6E7BC", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+            <X size={16} />
+          </button>
+        </div>
+        <div style={{ padding: 24 }}>
+          <p style={{ fontSize: 14, color: "#547792", margin: 0, marginBottom: 20 }}>{message}</p>
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+            <button style={btnSecondary} onClick={onCancel}>Cancel</button>
+            <button style={{ ...btnDanger, opacity: 1 }} onClick={onConfirm}>
+              {isDanger ? "Delete" : "Confirm"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -237,6 +272,8 @@ export default function Buildings() {
   const [editTarget, setEditTarget] = useState<Building | null>(null);
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const [fetchError, setFetchError] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<Building | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   async function fetchAll() {
     setLoading(true);
@@ -266,6 +303,24 @@ export default function Buildings() {
       console.error("Toggle failed:", e instanceof Error ? e.message : String(e));
     } finally {
       setTogglingId(null);
+    }
+  }
+
+  async function handleDeleteBuilding() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`${API}/${deleteTarget.id}`, {
+        method: "DELETE",
+        headers: authH(),
+      });
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      setBuildings(prev => prev.filter(b => b.id !== deleteTarget.id));
+      setDeleteTarget(null);
+    } catch (e: unknown) {
+      console.error("Delete failed:", e instanceof Error ? e.message : String(e));
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -400,14 +455,26 @@ export default function Buildings() {
                   </td>
 
                   <td style={{ padding: "13px 16px" }}>
-                    <button
-                      onClick={() => setEditTarget(b)}
-                      style={{ width: 32, height: 32, borderRadius: 8, border: "none", background: "#eef2ff", color: "#4361ee", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
-                      onMouseEnter={e => (e.currentTarget.style.background = "#dde4ff")}
-                      onMouseLeave={e => (e.currentTarget.style.background = "#eef2ff")}
-                    >
-                      <Pencil size={14} />
-                    </button>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <button
+                        onClick={() => setEditTarget(b)}
+                        style={{ width: 32, height: 32, borderRadius: 8, border: "none", background: "#eef2ff", color: "#4361ee", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "#dde4ff")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "#eef2ff")}
+                        title="Edit building"
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        onClick={() => setDeleteTarget(b)}
+                        style={{ width: 32, height: 32, borderRadius: 8, border: "none", background: "#ffe0e0", color: "#dc3545", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "#ffcccc")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "#ffe0e0")}
+                        title="Delete building"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -418,6 +485,15 @@ export default function Buildings() {
 
       {showAdd    && <BuildingModal onClose={() => setShowAdd(false)} onSaved={fetchAll} />}
       {editTarget && <BuildingModal building={editTarget} onClose={() => setEditTarget(null)} onSaved={fetchAll} />}
+      {deleteTarget && (
+        <ConfirmDialog
+          title="Delete Building"
+          message={`Are you sure you want to delete "${deleteTarget.name}"? This action cannot be undone.`}
+          isDanger={true}
+          onConfirm={handleDeleteBuilding}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      )}
     </div>
   );
 }

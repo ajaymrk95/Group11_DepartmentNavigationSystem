@@ -79,6 +79,16 @@ public Map<String, Object> updateAccess(@PathVariable Long id,
     return toMap(b);
 }
 
+ @DeleteMapping("/{id}")
+    public Map<String, Object> delete(@PathVariable Long id) {
+        buildingService.delete(id);
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Building deleted successfully");
+        response.put("id", id);
+        return response;
+    }
+ 
     private Map<String, Object> toMap(Building b) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", b.getId());
