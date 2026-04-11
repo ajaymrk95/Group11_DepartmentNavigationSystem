@@ -123,6 +123,14 @@ public class PathController {
         );
     }
 
+        @DeleteMapping("/{id}")
+public ResponseEntity<Map<String, Object>> delete(@PathVariable Long id) {
+
+    Path deleted = pathService.delete(id);
+
+    return ResponseEntity.ok(toMap(deleted));
+}
+
     private Map<String, Object> toMap(Path p) {
         Map<String, Object> map = new HashMap<>();
 

@@ -103,7 +103,10 @@ export default function RoutePanel({ selectedLocation, onSelectLocation }: Props
       {/* Footer — pinned to bottom */}
       <div className="absolute bottom-0 left-0 right-0 px-6 pb-7 pt-4 bg-gradient-to-t from-[#0B2D72] via-[#0B2D72]/95 to-transparent z-10">
         <button
-          onClick={() => navigate("/outdoor-navigation")}
+                  onClick={() => {
+                      navigate("/outdoor-navigation", {
+                          state: { end: selectedLocation }
+                  })}}
           className="
             pointer-events-auto w-full
             flex items-center justify-between

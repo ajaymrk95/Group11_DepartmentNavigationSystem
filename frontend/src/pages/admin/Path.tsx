@@ -158,6 +158,82 @@ function polygonCoords(geom: GeoJSON.Geometry): [number, number][][] {
   return [];
 }
 
+// ─── Delete Confirm Modal ─────────────────────────────────────────────────────
+
+function DeleteConfirmModal({
+  path,
+  onClose,
+  onDeleted,
+}: {
+  path: PathFeature;
+  onClose: () => void;
+  onDeleted: (id: number) => void;
+}) {
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    setError("");
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/paths/${path.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Server error");
+      onDeleted(path.id);
+      onClose();
+    } catch {
+      setError("Failed to delete. Please try again.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal modal-sm" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <span className="modal-title">Delete Path</span>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="modal-body">
+          <div className="delete-warning-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="1.8">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+              <path d="M10 11v6M14 11v6" />
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+            </svg>
+          </div>
+          <p className="delete-confirm-text">
+            Are you sure you want to delete <strong>"{path.name || `Path ${path.id}`}"</strong>?
+          </p>
+          <p className="delete-confirm-sub">This action cannot be undone.</p>
+          {error && <div className="field-error">{error}</div>}
+        </div>
+        <div className="modal-footer">
+          <button className="btn-cancel" onClick={onClose} disabled={deleting}>
+            Cancel
+          </button>
+          <button className="btn-delete" onClick={handleDelete} disabled={deleting}>
+            {deleting ? <span className="spinner sm" /> : (
+              <>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                </svg>
+                Delete
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Add Outdoor Modal ────────────────────────────────────────────────────────
 
 function AddOutdoorModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
@@ -369,6 +445,7 @@ export default function PathsPage() {
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const [showAddOutdoor, setShowAddOutdoor] = useState(false);
   const [showAddIndoor, setShowAddIndoor] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<PathFeature | null>(null);
   const [activeTab, setActiveTab] = useState<"paths" | "rooms">("paths");
 
   const listItemRefs = useRef<Record<number, HTMLDivElement | null>>({});
@@ -447,6 +524,16 @@ export default function PathsPage() {
     }
   }, [mode]);
 
+  // ── Delete path ───────────────────────────────────────────────────────────
+  const handleDeleted = useCallback((id: number) => {
+    if (mode === "outdoor") {
+      setOutdoorPaths((prev) => prev.filter((p) => p.id !== id));
+    } else {
+      setIndoorPaths((prev) => prev.filter((p) => p.id !== id));
+    }
+    if (selectedPathId === id) setSelectedPathId(null);
+  }, [mode, selectedPathId]);
+
   const handlePathClick = useCallback((id: number) => {
     setSelectedPathId(id);
     setTimeout(() => {
@@ -467,6 +554,13 @@ export default function PathsPage() {
       {showAddIndoor && selectedBuilding && (
         <AddIndoorModal buildingId={selectedBuilding.id} floor={selectedFloor}
           onClose={() => setShowAddIndoor(false)} onSaved={fetchIndoor} />
+      )}
+      {deleteTarget && (
+        <DeleteConfirmModal
+          path={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onDeleted={handleDeleted}
+        />
       )}
 
       {/* ── Page header ──────────────────────────────────────────────────── */}
@@ -541,8 +635,6 @@ export default function PathsPage() {
               ? `${selectedBuilding.name} · LEVEL ${selectedFloor} — ${selectedFloor === 1 ? "GROUND FLOOR" : `FLOOR ${selectedFloor}`}`
               : "OUTDOOR · CAMPUS MAP"}
           </div>
-
-          {/* Zoom controls are provided by Leaflet */}
 
           {loading && (
             <div className="map-loading">
@@ -746,18 +838,32 @@ export default function PathsPage() {
                           </div>
                         </div>
                       </div>
-                      <button
-                        className={`toggle-pill ${path.isAccessible ? "on" : "off"}`}
-                        onClick={(e) => { e.stopPropagation(); togglePath(path); }}
-                        disabled={togglingId === path.id}
-                        title={path.isAccessible ? "Click to block" : "Click to unblock"}
-                      >
-                        {togglingId === path.id ? (
-                          <span className="spinner sm" />
-                        ) : (
-                          <span className={`pill-thumb ${path.isAccessible ? "on" : "off"}`} />
-                        )}
-                      </button>
+                      <div className="panel-item-actions">
+                        <button
+                          className={`toggle-pill ${path.isAccessible ? "on" : "off"}`}
+                          onClick={(e) => { e.stopPropagation(); togglePath(path); }}
+                          disabled={togglingId === path.id}
+                          title={path.isAccessible ? "Click to block" : "Click to unblock"}
+                        >
+                          {togglingId === path.id ? (
+                            <span className="spinner sm" />
+                          ) : (
+                            <span className={`pill-thumb ${path.isAccessible ? "on" : "off"}`} />
+                          )}
+                        </button>
+                        <button
+                          className="delete-icon-btn"
+                          onClick={(e) => { e.stopPropagation(); setDeleteTarget(path); }}
+                          title="Delete path"
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            <path d="M10 11v6M14 11v6" />
+                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
@@ -1117,6 +1223,7 @@ export default function PathsPage() {
           cursor: pointer; transition: background 0.1s;
         }
         .panel-item:hover { background: #f7f9fc; }
+        .panel-item:hover .delete-icon-btn { opacity: 1; }
         .panel-item.selected { background: #f0f5fb; }
         .panel-item.inaccessible { opacity: 0.55; }
 
@@ -1129,11 +1236,35 @@ export default function PathsPage() {
         .panel-item-name {
           font-size: 12px; font-weight: 500;
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-          max-width: 130px; color: var(--text);
+          max-width: 110px; color: var(--text);
         }
         .panel-item-meta {
           font-size: 10px; color: var(--muted);
           font-family: 'DM Mono', monospace; margin-top: 1px;
+        }
+
+        /* Panel item actions group */
+        .panel-item-actions {
+          display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+        }
+
+        /* Delete icon button */
+        .delete-icon-btn {
+          width: 26px; height: 26px;
+          display: flex; align-items: center; justify-content: center;
+          background: transparent;
+          border: 1px solid transparent;
+          border-radius: 5px;
+          cursor: pointer;
+          color: var(--muted);
+          opacity: 0;
+          transition: opacity 0.15s, background 0.15s, color 0.15s, border-color 0.15s;
+          flex-shrink: 0;
+        }
+        .delete-icon-btn:hover {
+          background: rgba(192,57,43,0.08);
+          border-color: rgba(192,57,43,0.25);
+          color: var(--red);
         }
 
         /* Toggle pill */
@@ -1203,10 +1334,13 @@ export default function PathsPage() {
           backdrop-filter: blur(2px);
         }
         .modal {
-          background: var(--surface); border: 1px solid var(--border);
+          background: #fff; border: 1px solid var(--border);
           border-radius: 10px; width: 480px; max-width: 95vw;
           display: flex; flex-direction: column;
           box-shadow: 0 20px 60px rgba(26,45,74,0.18);
+        }
+        .modal.modal-sm {
+          width: 380px;
         }
         .modal-header {
           display: flex; align-items: center; justify-content: space-between;
@@ -1228,6 +1362,20 @@ export default function PathsPage() {
           display: flex; justify-content: flex-end; gap: 10px;
           padding: 14px 20px; border-top: 1px solid var(--border);
         }
+
+        /* Delete modal specifics */
+        .delete-warning-icon {
+          display: flex; justify-content: center;
+          padding: 8px 0 4px;
+        }
+        .delete-confirm-text {
+          font-size: 13px; color: var(--text); text-align: center; margin: 0;
+          line-height: 1.5;
+        }
+        .delete-confirm-sub {
+          font-size: 11px; color: var(--muted); text-align: center; margin: 2px 0 0;
+        }
+
         .field-label {
           font-size: 10px; font-weight: 600; color: var(--muted);
           letter-spacing: 0.08em; text-transform: uppercase;
@@ -1267,7 +1415,8 @@ export default function PathsPage() {
           border-radius: 6px; padding: 7px 16px; font-size: 12px; cursor: pointer;
           font-family: 'DM Sans', sans-serif; transition: all 0.15s;
         }
-        .btn-cancel:hover { color: var(--text); border-color: var(--muted); }
+        .btn-cancel:hover:not(:disabled) { color: var(--text); border-color: var(--muted); }
+        .btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-save {
           background: var(--navy); color: #fff; border: none;
           border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 600;
@@ -1278,6 +1427,16 @@ export default function PathsPage() {
         }
         .btn-save:hover:not(:disabled) { opacity: 0.85; }
         .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-delete {
+          background: var(--red); color: #fff; border: none;
+          border-radius: 6px; padding: 7px 18px; font-size: 12px; font-weight: 600;
+          cursor: pointer; font-family: 'DM Sans', sans-serif;
+          display: flex; align-items: center; gap: 6px;
+          min-width: 88px; justify-content: center;
+          transition: opacity 0.15s;
+        }
+        .btn-delete:hover:not(:disabled) { opacity: 0.85; }
+        .btn-delete:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* Leaflet tooltip override */
         .leaflet-tooltip {

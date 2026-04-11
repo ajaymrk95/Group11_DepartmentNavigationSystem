@@ -51,29 +51,33 @@ public class LocationService {
     /**
      * Returns the top N most visited locations across both rooms and buildings.
      */
-    public List<LocationDTO> getTrending(int limit) {
+    // In LocationService.java
+
+    public List<SearchLocationDTO> getTrending(int limit) {
         return mapRowsWithType(repository.findTrending(limit));
     }
 
-    // Maps rows that already have a location_type column (used for trending)
-    private List<LocationDTO> mapRowsWithType(List<Object[]> rows) {
+    private List<SearchLocationDTO> mapRowsWithType(List<Object[]> rows) {
         return rows.stream().map(row -> {
             List<String> tags = row[6] instanceof String[] arr
                     ? Arrays.asList(arr)
                     : List.of();
-            return new LocationDTO(
-                    ((Number) row[0]).longValue(),
-                    (String) row[1],
-                    safeParseCategory((String) row[3]),
-                    (String) row[2],
-                    row[7] != null ? ((Number) row[7]).doubleValue() : null,
-                    row[8] != null ? ((Number) row[8]).doubleValue() : null,
-                    tags,
-                    row[4] != null ? ((Number) row[4]).intValue() : null,
-                    (String) row[5],
-                    (String) row[10], // location_type: "ROOM" or "BUILDING"
-                    row[9] != null ? ((Number) row[9]).intValue() : null,  // visit_count
-                    (String) row[11] // building_name
+
+            return new SearchLocationDTO(
+                    ((Number) row[0]).longValue(), // id
+                    (String) row[1], // name
+                    safeParseCategory((String) row[3]), // category
+                    (String) row[2], // room (room_no)
+                    row[7] != null ? ((Number) row[7]).doubleValue() : null, // latitude
+                    row[8] != null ? ((Number) row[8]).doubleValue() : null, // longitude
+                    tags, // tag
+                    row[4] != null ? ((Number) row[4]).intValue() : null, // floor
+                    (String) row[5], // description
+                    (String) row[10], // locationType
+                    row[9] != null ? ((Number) row[9]).intValue() : null, // visitCount
+                    (String) row[11], // buildingName
+                    row[12] != null ? ((Number) row[12]).doubleValue() : null, // buildingEntranceLat
+                    row[13] != null ? ((Number) row[13]).doubleValue() : null // buildingEntranceLng
             );
         }).toList();
     }
