@@ -30,9 +30,10 @@ public interface BuildingRepository extends JpaRepository<Building, Long> {
             OR LOWER(:query) = ANY(SELECT LOWER(t) FROM unnest(tags) t)
             """, nativeQuery = true)
     List<Building> search(@Param("query") String query);
+
     @Modifying
-@Transactional
-@Query("UPDATE Room r SET r.isAccessible = :accessible WHERE r.building.id = :buildingId")
-void updateAccessibilityByBuildingId(@Param("buildingId") Long buildingId, 
-                                      @Param("accessible") Boolean accessible);
+    @Transactional
+    @Query("UPDATE Room r SET r.isAccessible = :accessible WHERE r.building.id = :buildingId")
+    void updateAccessibilityByBuildingId(@Param("buildingId") Long buildingId, 
+                                          @Param("accessible") Boolean accessible);
 }

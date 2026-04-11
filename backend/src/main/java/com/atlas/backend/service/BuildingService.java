@@ -1,5 +1,6 @@
 package com.atlas.backend.service;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.atlas.backend.annotation.Auditable;
 import com.atlas.backend.entity.Building;
 import com.atlas.backend.repository.BuildingRepository;
@@ -13,6 +14,8 @@ import java.util.List;
 
 @Service
 public class BuildingService {
+
+    
 
     @Autowired
     private BuildingRepository buildingRepository;
@@ -78,4 +81,26 @@ public Building update(Long id, String name, String description, Integer floors,
     return buildingRepository.save(b);
 }
 
+
+private static final Logger logger = LoggerFactory.getLogger(BuildingService.class);
+
+    @Auditable(action = "DELETE", entityType = "Building")
+    @Transactional
+    public Building delete(Long id) {
+        Building b = buildingRepository.findById(id)
+            .orElseThrow(() -> {
+                logger.warn("Attempted to delete non-existent building: id={}", id);
+                return new RuntimeException("Building not found: " + id);
+            });
+
+        logger.info("Deleted building: id={}, name={}, floors={}, tags={}", 
+            b.getId(),
+            b.getName(),
+            b.getFloors(),
+            String.join(",", b.getTags() != null ? b.getTags() : new String[]{}));
+
+        buildingRepository.delete(b);
+
+        return b;
+    }
 }
