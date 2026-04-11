@@ -95,7 +95,10 @@ export default function Faculty() {
   }
 
   function openEdit(f: Faculty) {
-    setEditTarget(f); setForm({ ...f }); setTagInput("");
+    setEditTarget(f); setForm({
+  ...f,
+  tags: f.tags || [], // ✅ FIX
+}); setTagInput("");
     setFormError(""); setRoomSearch("");
     setSelectedRoomLabel(f.roomName ? `${f.roomNo} — ${f.roomName}` : f.roomNo || "");
     setShowRoomDrop(false); setShowModal(true);
@@ -130,7 +133,7 @@ export default function Faculty() {
 
   function addTag() {
     const t = tagInput.trim();
-    if (t && !form.tags.includes(t)) setForm(f => ({ ...f, tags: [...f.tags, t] }));
+    if (t && !(form.tags || []).includes(t)) setForm(f => ({ ...f, tags: [...(f.tags || []), t] }));
     setTagInput("");
   }
   function removeTag(t: string) { setForm(f => ({ ...f, tags: f.tags.filter(x => x !== t) })); }
@@ -437,7 +440,7 @@ export default function Faculty() {
                     Add
                   </button>
                 </div>
-                {form.tags.length > 0 && (
+                {form.tags?.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-1">
                     {form.tags.map(t => (
                       <span
