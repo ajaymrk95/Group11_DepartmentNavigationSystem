@@ -103,7 +103,10 @@ export default function MobileLocationSheet({ selectedLocation, onSelectLocation
   }
 
   function openSearch() { snapTo(FULL); onSelectLocation(null) }
-  function goToNavigate() { navigate("/outdoor-navigation") }
+    function goToNavigate() {
+        navigate("/outdoor-navigation", {
+            state: { end: selectedLocation }
+        }) }
 
   // ── Drag logic ──
   function startDrag(clientY: number) {

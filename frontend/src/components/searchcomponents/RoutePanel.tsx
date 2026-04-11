@@ -124,7 +124,10 @@ export default function RoutePanel({ selectedLocation, onSelectLocation }: Props
       {/* Footer — main's UI */}
       <div className="px-6 pb-7 pt-5 flex-shrink-0 sticky bottom-0 z-10 pointer-events-none">
         <button
-          onClick={() => navigate("/outdoor-navigation")}
+                  onClick={() => {
+                      navigate("/outdoor-navigation", {
+                          state: { end: selectedLocation }
+                  })}}
           className="
             pointer-events-auto w-full
             flex items-center justify-between

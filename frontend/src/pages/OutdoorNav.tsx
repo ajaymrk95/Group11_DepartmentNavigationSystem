@@ -9,6 +9,7 @@ import RouteInputs from "./navigation/outdoornav/components/RouteInputs"
 import NavigationOverlay from "./navigation/outdoornav/components/NavigationOverlay"
 import TopControls from "./navigation/outdoornav/components/TopControls"
 import DestinationInfo from "./navigation/outdoornav/components/DestinationInfo"
+import { useLocation } from "react-router-dom";
 
 const DEFAULT_CENTER: [number, number] = [11.3210, 75.9346]
 
@@ -30,6 +31,18 @@ export default function OutdoorNav() {
   const [routeDistanceMeters, setRouteDistanceMeters] = useState<number | null>(null)
   const { location: currentLocation } = useCurrentLocation()
   const [center, setCenter] = useState<[number, number]>(DEFAULT_CENTER)
+
+  const routerLocation = useLocation();
+
+  useEffect(() => {
+      const state = routerLocation.state as { end?: any } | null;  
+      if (state?.end) {
+          setEnd(state.end);  
+          if (state.end.latitude && state.end.longitude) {
+              setCenter([state.end.latitude, state.end.longitude]);
+          }
+      }
+  }, [routerLocation.state]);
 
   useEffect(() => {
     if (clickedDestination) setEnd(clickedDestination)
