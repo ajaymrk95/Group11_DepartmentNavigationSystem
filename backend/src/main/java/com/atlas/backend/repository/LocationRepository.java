@@ -75,43 +75,47 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     void incrementBuildingVisitCount(@Param("id") Long id);
 
     @Query(value = """
-        SELECT * FROM (
-            SELECT
-                r.id,
-                r.name,
-                r.room_no,
-                r.category,
-                r.floor,
-                r.description,
-                r.tags,
-                ST_Y(ST_GeometryN(r.entries, 1)) AS lat,
-                ST_X(ST_GeometryN(r.entries, 1)) AS lng,
-                r.visit_count,
-                'ROOM' AS location_type,
-                b.name AS building_name
-            FROM rooms r
-            LEFT JOIN buildings b ON b.id = r.building_id
-            WHERE r.visit_count > 0
-            UNION ALL
-            SELECT
-                b.id,
-                b.name,
-                NULL AS room_no,
-                NULL AS category,
-                b.floors,
-                b.description,
-                b.tags,
-                ST_Y(ST_GeometryN(b.entries, 1)) AS lat,
-                ST_X(ST_GeometryN(b.entries, 1)) AS lng,
-                b.visit_count,
-                'BUILDING' AS location_type,
-                b.name AS building_name
-            FROM buildings b
-            WHERE b.visit_count > 0
-        ) combined
-        ORDER BY visit_count DESC
-        LIMIT :limit
-        """, nativeQuery = true)
+            SELECT * FROM (
+                SELECT
+                    r.id,
+                    r.name,
+                    r.room_no,
+                    r.category,
+                    r.floor,
+                    r.description,
+                    r.tags,
+                    ST_Y(ST_GeometryN(r.entries, 1)) AS lat,
+                    ST_X(ST_GeometryN(r.entries, 1)) AS lng,
+                    r.visit_count,
+                    'ROOM' AS location_type,
+                    b.name AS building_name,
+                    ST_Y(ST_GeometryN(b.entries, 1)) AS b_ent_lat,
+                    ST_X(ST_GeometryN(b.entries, 1)) AS b_ent_lng 
+                FROM rooms r
+                LEFT JOIN buildings b ON b.id = r.building_id
+                WHERE r.visit_count > 0
+                UNION ALL
+                SELECT
+                    b.id,
+                    b.name,
+                    NULL AS room_no,
+                    NULL AS category,
+                    b.floors,
+                    b.description,
+                    b.tags,
+                    ST_Y(ST_GeometryN(b.entries, 1)) AS lat,
+                    ST_X(ST_GeometryN(b.entries, 1)) AS lng,
+                    b.visit_count,
+                    'BUILDING' AS location_type,
+                    b.name AS building_name,
+                    ST_Y(ST_GeometryN(b.entries, 1)) AS b_ent_lat,
+                    ST_X(ST_GeometryN(b.entries, 1)) AS b_ent_lng 
+                FROM buildings b
+                WHERE b.visit_count > 0
+            ) combined
+            ORDER BY visit_count DESC
+            LIMIT :limit
+            """, nativeQuery = true)
     List<Object[]> findTrending(@Param("limit") int limit);
 
     @Query(value = """
