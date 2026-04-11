@@ -25,9 +25,9 @@ public class LocationService {
     public List<SearchLocationDTO> searchLocations(String query) {
         if (query == null || query.trim().isEmpty()) return List.of();
         String q = query.trim();
-        List<SearchLocationDTO> rooms = mapRows(repository.searchRooms(q), "ROOM");
         List<SearchLocationDTO> buildings = mapRows(repository.searchBuildings(q), "BUILDING");
-        return Stream.concat(rooms.stream(), buildings.stream()).toList();
+        List<SearchLocationDTO> rooms = mapRows(repository.searchRooms(q), "ROOM");
+        return Stream.concat(buildings.stream(), rooms.stream()).toList();
     }
 
     public List<SearchLocationDTO> getAllBuildings() {
