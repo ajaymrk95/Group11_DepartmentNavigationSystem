@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from "react-router-dom"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import type { Location } from "../types/types"
 import MapView from "../components/navcomponents/MapView"
 import { useCurrentLocation } from "../hooks/useCurrentLocation"
@@ -9,6 +9,7 @@ import RouteInputs from "./navigation/outdoornav/components/RouteInputs"
 import NavigationOverlay from "./navigation/outdoornav/components/NavigationOverlay"
 import TopControls from "./navigation/outdoornav/components/TopControls"
 import DestinationInfo from "./navigation/outdoornav/components/DestinationInfo"
+import { useRouteTracker } from "./navigation/outdoornav/hooks/useRouteTracker"
 import { useLocation } from "react-router-dom";
 
 const DEFAULT_CENTER: [number, number] = [11.3210, 75.9346]
@@ -43,7 +44,7 @@ export default function OutdoorNav() {
   const [routeDistanceMeters, setRouteDistanceMeters] = useState<number | null>(null)
   const { location: currentLocation } = useCurrentLocation()
   const [center, setCenter] = useState<[number, number]>(DEFAULT_CENTER)
-  const [autoStart, setAutoStart] = useState(false) // true when coming from indoor nav continue flow
+  const [autoStart, setAutoStart] = useState(false)
 
   const routerLocation = useLocation();
 
@@ -61,95 +62,14 @@ export default function OutdoorNav() {
     if (clickedDestination) setEnd(clickedDestination)
   }, [clickedDestination])
 
-  // ── Pre-fill start+end from continueStart/End* params (coming from indoor nav "Go Outdoor") ──
-  useEffect(() => {
-    const startLat = searchParams.get('continueStartLat')
-    const startLng = searchParams.get('continueStartLng')
-    const endLat = searchParams.get('continueEndLat')
-    const endLng = searchParams.get('continueEndLng')
-    if (!endLat || !endLng) return
-
-    // Pre-fill end
-    const name = searchParams.get('continueEndName') ?? 'Destination'
-    const type = searchParams.get('continueEndType') as 'ROOM' | 'BUILDING' | null
-    const buildingName = searchParams.get('continueEndBuilding')
-    const floor = searchParams.get('continueEndFloor')
-    const entranceLat = searchParams.get('continueEndEntranceLat')
-    const entranceLng = searchParams.get('continueEndEntranceLng')
-    const endLoc: Location = {
-      id: -1,
-      name,
-      category: null,
-      room: null,
-      latitude: Number(endLat),
-      longitude: Number(endLng),
-      tag: [],
-      floor: floor ? Number(floor) : null,
-      description: null,
-      locationType: type ?? undefined,
-      buildingName: buildingName ?? null,
-      buildingEntranceLat: entranceLat ? Number(entranceLat) : null,
-      buildingEntranceLng: entranceLng ? Number(entranceLng) : null,
-    }
-    setEnd(endLoc)
-
-    // Pre-fill start (building entrance from the indoor leg)
-    if (startLat && startLng) {
-      const startLoc: Location = {
-        id: -2,
-        name: 'Building Entrance',
-        category: null,
-        room: null,
-        latitude: Number(startLat),
-        longitude: Number(startLng),
-        tag: [],
-        floor: 1,
-        description: null,
-      }
-      setStart(startLoc)
-      setAutoStart(true) // mark for auto-starting navigation once route loads
-      fetchRoute(startLoc, endLoc)
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // ── Auto-start navigation when route loads in continue flow ──
-  useEffect(() => {
-    if (autoStart && routeCoords.length > 0) {
-      setIsNavigating(true)
-      setIsPanelOpen(false)
-      setAutoStart(false) // consume the flag
-    }
-  }, [autoStart, routeCoords])
-
-  useEffect(() => {
-    if (isNavigating && currentLocation) {
-      setCenter(currentLocation)
-      if (routeCoords.length > 0) {
-        const info = getNextTurn(routeCoords, currentLocation)
-        setTurnInfo(info)
-
-        let closest = 0, minD = Infinity
-        for (let i = 0; i < routeCoords.length; i++) {
-          const d = Math.hypot(currentLocation[0] - routeCoords[i][0], currentLocation[1] - routeCoords[i][1])
-          if (d < minD) { minD = d; closest = i }
-        }
-
-        const distToTurn = getDistanceAlongRoute(routeCoords, closest, info.turnIndex)
-        setActiveDistanceMeters(distToTurn)
-      }
-    }
-  }, [currentLocation, isNavigating, end, routeCoords])
-
-  const handleSwap = () => { const t = start; setStart(end); setEnd(t) }
-
-  async function fetchRoute(s: Location, e: Location) {
+  // ── fetchRoute — declared FIRST so callbacks below can reference it ────────
+  const fetchRoute = useCallback(async (s: Location, e: Location) => {
     setIsLoadingRoute(true)
     setRouteError("")
     setDistanceText("Calculating…")
 
-    // When start is a ROOM (with entrance still available), use entrance —
-    // but in the continue flow start.locationType is undefined (plain entrance), so just use coords directly
+    // When start is a ROOM (with entrance still available), route from entrance.
+    // In the continue flow start.locationType is undefined, so use coords directly.
     const startLat = s.locationType === "ROOM" && s.buildingEntranceLat != null
       ? s.buildingEntranceLat
       : s.latitude
@@ -176,12 +96,128 @@ export default function OutdoorNav() {
     } finally {
       setIsLoadingRoute(false)
     }
-  }
+  }, [])
+
+  // ── Pre-fill start+end from continueStart/End* params (indoor nav → outdoor) ──
+  useEffect(() => {
+    const startLat = searchParams.get('continueStartLat')
+    const startLng = searchParams.get('continueStartLng')
+    const endLat = searchParams.get('continueEndLat')
+    const endLng = searchParams.get('continueEndLng')
+    if (!endLat || !endLng) return
+
+    const name = searchParams.get('continueEndName') ?? 'Destination'
+    const type = searchParams.get('continueEndType') as 'ROOM' | 'BUILDING' | null
+    const buildingName = searchParams.get('continueEndBuilding')
+    const floor = searchParams.get('continueEndFloor')
+    const entranceLat = searchParams.get('continueEndEntranceLat')
+    const entranceLng = searchParams.get('continueEndEntranceLng')
+    const endLoc: Location = {
+      id: -1,
+      name,
+      category: null,
+      room: null,
+      latitude: Number(endLat),
+      longitude: Number(endLng),
+      tag: [],
+      floor: floor ? Number(floor) : null,
+      description: null,
+      locationType: type ?? undefined,
+      buildingName: buildingName ?? null,
+      buildingEntranceLat: entranceLat ? Number(entranceLat) : null,
+      buildingEntranceLng: entranceLng ? Number(entranceLng) : null,
+    }
+    setEnd(endLoc)
+
+    if (startLat && startLng) {
+      const startLoc: Location = {
+        id: -2,
+        name: 'Building Entrance',
+        category: null,
+        room: null,
+        latitude: Number(startLat),
+        longitude: Number(startLng),
+        tag: [],
+        floor: 1,
+        description: null,
+      }
+      setStart(startLoc)
+      setAutoStart(true)
+      fetchRoute(startLoc, endLoc)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // ── Auto-start navigation when route loads in continue flow ──
+  useEffect(() => {
+    if (autoStart && routeCoords.length > 0) {
+      setIsNavigating(true)
+      setIsPanelOpen(false)
+      setAutoStart(false)
+    }
+  }, [autoStart, routeCoords])
+
+  // ── Arrive handler ────────────────────────────────────────────────────────
+  const handleArrive = useCallback(() => {
+    setIsNavigating(false)
+    setRouteCoords([])
+    setStart(null)
+    setEnd(null)
+    setDistanceText("")
+    setRouteDistanceMeters(null)
+  }, [])
+
+  // ── Reroute callback — declared after fetchRoute so it can call it ────────
+  const handleReroute = useCallback(async (pos: [number, number]) => {
+    if (!end) return
+    const rerouteStart: Location = {
+      id: -99,
+      name: 'Current Position',
+      category: null,
+      room: null,
+      latitude: pos[0],
+      longitude: pos[1],
+      tag: [],
+      floor: null,
+      description: null,
+    }
+    await fetchRoute(rerouteStart, end)
+  }, [end, fetchRoute])
+
+  // ── Dynamic route tracker ─────────────────────────────────────────────────
+  const {
+    displayedRoute,
+    isRerouting,
+    remainingDistanceMeters,
+  } = useRouteTracker({
+    fullRoute: routeCoords,
+    currentLocation,
+    isNavigating,
+    destination: end,
+    onReroute: handleReroute,
+    onArrive: handleArrive,
+  })
+
+  // ── Map centering + turn-by-turn (uses trimmed displayedRoute) ────────────
+  useEffect(() => {
+    if (isNavigating && currentLocation) {
+      setCenter(currentLocation)
+      if (displayedRoute.length > 0) {
+        const info = getNextTurn(displayedRoute, currentLocation)
+        setTurnInfo(info)
+        // displayedRoute already starts at user's projected position, so index 0 = here
+        const distToTurn = getDistanceAlongRoute(displayedRoute, 0, info.turnIndex)
+        setActiveDistanceMeters(distToTurn)
+      }
+    }
+  }, [currentLocation, isNavigating, displayedRoute])
+
+  const handleSwap = () => { const t = start; setStart(end); setEnd(t) }
 
   async function handleRoute() {
     if (!start || !end) return
 
-    // ── Case: both are rooms in the SAME building → go directly to indoor nav ──
+    // Both rooms in the SAME building → go directly to indoor nav
     if (
       start.locationType === "ROOM" &&
       end.locationType === "ROOM" &&
@@ -205,7 +241,7 @@ export default function OutdoorNav() {
       return
     }
 
-    // ── Case: start is a ROOM going to a different building/location ──
+    // Start is a ROOM going to a different building/location → go to indoor nav first
     if (start.locationType === "ROOM" && start.buildingName && start.buildingEntranceLat != null && start.buildingEntranceLng != null) {
       const buildingSlug = start.buildingName.toLowerCase()
       const params = new URLSearchParams()
@@ -249,7 +285,7 @@ export default function OutdoorNav() {
         setIsPanelOpen={setIsPanelOpen}
       />
 
-      {/* SIDEBAR: 30% width on Desktop, Full screen slide-over on Mobile */}
+      {/* SIDEBAR */}
       <div className={`
         absolute md:relative top-0 left-0 h-full z-[3000] md:z-10
         w-full md:w-[380px] md:min-w-[380px] shrink-0
@@ -332,7 +368,7 @@ export default function OutdoorNav() {
             isLoadingRoute={isLoadingRoute}
           />
 
-          {/* Tips Card — only show when no destination is selected */}
+          {/* Tips Card */}
           {!end && (
             <div className="mx-6 mt-6 rounded-2xl border border-white/10 bg-white/5 p-5 flex flex-col gap-4">
               <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-[rgba(246,231,188,0.4)]">How it works</p>
@@ -396,30 +432,45 @@ export default function OutdoorNav() {
 
       {/* ── Map area ── */}
       <div className="flex-1 relative h-full">
-        {/* ── Compact navigation bar ── */}
+
+        {/* Navigation overlay */}
         {isNavigating && (
           <NavigationOverlay
             turnInfo={turnInfo}
             distance={activeDistanceMeters}
-            totalDistanceText={distanceText}
+            totalDistanceText={
+              remainingDistanceMeters != null
+                ? remainingDistanceMeters < 1000
+                  ? Math.round(remainingDistanceMeters) + " m remaining"
+                  : (remainingDistanceMeters / 1000).toFixed(2) + " km remaining"
+                : distanceText
+            }
             start={start}
             end={end}
             tileType={tileType}
-            onEnd={() => {
-              setIsNavigating(false)
-              setRouteCoords([])
-              setStart(null)
-              setEnd(null)
-              setDistanceText("")
-            }}
+            onEnd={handleArrive}
           />
         )}
 
+        {/* Rerouting toast */}
+        {isRerouting && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[5000]
+            bg-[#1A3263] text-[#FAB95B] text-sm font-bold px-5 py-2.5
+            rounded-full shadow-xl flex items-center gap-2 animate-pulse">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+            Recalculating route…
+          </div>
+        )}
+
+        {/* Map — receives trimmed route during navigation */}
         <MapView
           center={center}
           start={start}
           destination={end}
-          routeCoords={routeCoords}
+          routeCoords={displayedRoute}
           currentLocation={currentLocation}
           onSetMapDestination={(loc) => {
             setClickedDestination(loc)
