@@ -25,14 +25,14 @@ export function MapLayers({ buildingOutline, units, paths, floor }: MapLayersPro
                 />
             )}
 
-            {paths && (
+            {/* {paths && (
                 <GeoJSON
                     key={`paths-${floor}`}
                     data={paths}
                     style={(f) => getPathStyle(f as Feature)}
                     onEachFeature={onEachPath}
                 />
-            )}
+            )} */}
 {/* 
             {pois && (
                 <GeoJSON
