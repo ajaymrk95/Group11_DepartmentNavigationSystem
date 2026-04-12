@@ -64,42 +64,43 @@ export function createRoomLabelIcon(
 }
 
 export function stairIcon(direction: "up" | "down") {
-    const arrow = direction === "up" ? "▲" : "▼";
-    const animDir = direction === "up" ? "-4px" : "4px";
+    const isUp = direction === "up";
+    const bounceAnim = isUp ? "-5px" : "5px";
+    const chevron = isUp
+        ? `<path d="M5 15l7-7 7 7" stroke="#FAB95B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`
+        : `<path d="M5 9l7 7 7-7" stroke="#FAB95B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
 
     return L.divIcon({
         className: "",
         html: `
             <style>
-                @keyframes stair-pulse-${direction} {
-                    0%   { transform: translateY(0);           opacity: 1; }
-                    50%  { transform: translateY(${animDir});  opacity: 0.6; }
-                    100% { transform: translateY(0);           opacity: 1; }
+                @keyframes stair-arrow-${direction} {
+                    0%, 100% { transform: translateY(0); opacity: 1; }
+                    50%       { transform: translateY(${bounceAnim}); opacity: 0.5; }
+                }
+                @keyframes stair-ring-${direction} {
+                    0%, 100% { box-shadow: 0 0 0 0 rgba(250,185,91,0.5), 0 3px 12px rgba(0,0,0,0.5); }
+                    60%      { box-shadow: 0 0 0 6px rgba(250,185,91,0), 0 3px 12px rgba(0,0,0,0.5); }
                 }
             </style>
             <div style="
-                background: rgba(41, 26, 0, 0.85);
-                border: 2px solid #f59e0b;
-                border-radius: 10px;
-                padding: 8px 10px;
-                box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+                width: 42px; height: 42px;
+                background: rgba(10,22,60,0.92);
+                border: 2px solid #FAB95B;
+                border-radius: 50%;
                 display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 36px;
-                height: 36px;
+                align-items: center; justify-content: center;
+                cursor: pointer;
+                animation: stair-ring-${direction} 1.8s ease-out infinite;
             ">
-                <span style="
-                    font-size: 22px;
-                    color: #f59e0b;
-                    display: inline-block;
-                    animation: stair-pulse-${direction} 1s ease-in-out infinite;
-                    line-height: 1;
-                ">${arrow}</span>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+                    style="animation: stair-arrow-${direction} 1s ease-in-out infinite;">
+                    ${chevron}
+                </svg>
             </div>
         `,
-        iconAnchor: [20, 20],
-        iconSize: [36, 36],
+        iconAnchor: [21, 21],
+        iconSize: [42, 42],
     });
 }
 
