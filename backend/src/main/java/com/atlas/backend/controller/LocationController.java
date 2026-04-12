@@ -60,7 +60,7 @@ public class LocationController {
      * GET /locations/trending?limit=10 → returns top 10
      */
     @GetMapping("/trending")
-    public List<LocationDTO> getTrending(
+    public List<SearchLocationDTO> getTrending(
             @RequestParam(defaultValue = "5") int limit) {
         return service.getTrending(limit);
     }
