@@ -149,16 +149,18 @@ function getAtDist(path: PathPoint[], totalDist: number, d: number): { lat: numb
 function makeArrowheadIcon(): L.DivIcon {
     return L.divIcon({
         className: "",
-        html: `<div class="arrow-rotator" style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;">
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="11,2 20,19 11,14 2,19"
-                    fill="#3b82f6" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+        html: `<div class="arrow-rotator" style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.45));">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="12,2 21,20 12,15 3,20"
+                    fill="#FAB95B" stroke="#1A3263" stroke-width="2" stroke-linejoin="round"/>
             </svg>
         </div>`,
-        iconSize: [22, 22],
-        iconAnchor: [11, 11],
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
     });
 }
+
+
 
 export function AnimatedPolyline({ positions }: AnimatedPolylineProps) {
     const map = useMap();
@@ -172,10 +174,18 @@ export function AnimatedPolyline({ positions }: AnimatedPolylineProps) {
         const { path, totalDist } = buildPath(pts);
         if (totalDist === 0) return;
 
-        // N arrowheads evenly staggered along the full path
-        const N = 6;
-        const spacing = totalDist / N;
-        const dists: number[] = Array.from({ length: N }, (_, i) => i * spacing);
+        // Highlighted path line
+        const routeLine = L.polyline(positions, {
+            color: "#3b82f6",
+            weight: 5,
+            opacity: 0.55,
+            lineCap: "round",
+            lineJoin: "round",
+        }).addTo(map);
+
+        // Single arrow marker
+        const N = 1;
+        const dists: number[] = [0];
         const markers: L.Marker[] = [];
 
         for (let i = 0; i < N; i++) {
@@ -187,15 +197,13 @@ export function AnimatedPolyline({ positions }: AnimatedPolylineProps) {
             }).addTo(map);
             markers.push(m);
 
-            // Set initial rotation
             const el = (m as any)._icon as HTMLElement | null;
             const rotator = el?.querySelector(".arrow-rotator") as HTMLElement | null;
             if (rotator) rotator.style.transform = `rotate(${p.bearing}deg)`;
         }
         markersRef.current = markers;
 
-        // Speed: traverse full path in ~240 frames (~4 s at 60 fps)
-        const SPEED = totalDist / 240;
+        const SPEED = totalDist / 130;
 
         function animate() {
             for (let i = 0; i < N; i++) {
@@ -204,7 +212,6 @@ export function AnimatedPolyline({ positions }: AnimatedPolylineProps) {
 
                 markers[i].setLatLng([p.lat, p.lng]);
 
-                // Rotate only via CSS — no icon recreation
                 const el = (markers[i] as any)._icon as HTMLElement | null;
                 const rotator = el?.querySelector(".arrow-rotator") as HTMLElement | null;
                 if (rotator) rotator.style.transform = `rotate(${p.bearing}deg)`;
@@ -217,6 +224,7 @@ export function AnimatedPolyline({ positions }: AnimatedPolylineProps) {
         return () => {
             if (animRef.current) cancelAnimationFrame(animRef.current);
             markers.forEach(m => map.removeLayer(m));
+            map.removeLayer(routeLine);
             markersRef.current = [];
         };
     }, [map, positions]);
