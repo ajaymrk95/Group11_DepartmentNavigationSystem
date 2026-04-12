@@ -1223,7 +1223,7 @@ export default function PathsPage() {
           cursor: pointer; transition: background 0.1s;
         }
         .panel-item:hover { background: #f7f9fc; }
-        .panel-item:hover .delete-icon-btn { opacity: 1; }
+
         .panel-item.selected { background: #f0f5fb; }
         .panel-item.inaccessible { opacity: 0.55; }
 
@@ -1257,7 +1257,7 @@ export default function PathsPage() {
           border-radius: 5px;
           cursor: pointer;
           color: var(--muted);
-          opacity: 0;
+          opacity: 1;
           transition: opacity 0.15s, background 0.15s, color 0.15s, border-color 0.15s;
           flex-shrink: 0;
         }
