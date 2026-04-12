@@ -1,5 +1,9 @@
 package com.atlas.backend.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.HashMap;
+import java.util.Map;
 import com.atlas.backend.annotation.Auditable;
 import com.atlas.backend.dto.FacultyRequest;
 import com.atlas.backend.entity.Faculty;
@@ -7,6 +11,7 @@ import com.atlas.backend.entity.Room;
 import com.atlas.backend.repository.FacultyRepository;
 import com.atlas.backend.repository.RoomRepository;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +21,9 @@ public class FacultyService {
 
     private final FacultyRepository facultyRepository;
     private final RoomRepository roomRepository;
+     
+// ADD THIS FIELD IN THE CLASS (after constructor)
+private static final Logger logger = LoggerFactory.getLogger(FacultyService.class);
 
     public FacultyService(FacultyRepository facultyRepository, RoomRepository roomRepository) {
         this.facultyRepository = facultyRepository;
@@ -91,6 +99,37 @@ public class FacultyService {
         return mapEntityToDto(facultyRepository.save(faculty));
     }
 
+    // REPLACE THE EXISTING delete() METHOD WITH THIS:
+@Auditable(action = "DELETE", entityType = "Faculty")
+public Map<String, Object> delete(Long id) {
+    Faculty faculty = facultyRepository.findById(id)
+            .orElseThrow(() -> {
+                logger.warn("Attempted to delete non-existent faculty: id={}", id);
+                return new RuntimeException("Faculty not found: " + id);
+            });
+    
+    String facultyName = faculty.getName();
+    String designation = faculty.getDesignation();
+    String department = faculty.getDepartment();
+    Long roomId = faculty.getRoom() != null ? faculty.getRoom().getId() : null;
+    
+    // unlink room before deleting
+    faculty.setRoom(null);
+    facultyRepository.save(faculty);
+    facultyRepository.delete(faculty);
+    
+    logger.info("Deleted faculty: id={}, name={}, designation={}, department={}, roomId={}", 
+        id, facultyName, designation, department, roomId);
+    
+    Map<String, Object> response = new HashMap<>();
+    response.put("success", true);
+    response.put("message", "Faculty deleted successfully");
+    response.put("id", id);
+    response.put("name", facultyName);
+    response.put("designation", designation);
+    return response;
+}
+
     // --- Helpers ---
 
     private void mapDtoToEntity(FacultyRequest dto, Faculty faculty) {
@@ -133,6 +172,7 @@ public class FacultyService {
                 dto.setBuildingName(faculty.getRoom().getBuilding().getName());
             }
         }
+
 
         return dto;
     }

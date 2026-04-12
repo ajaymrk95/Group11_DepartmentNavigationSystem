@@ -35,6 +35,15 @@ const EMPTY_FORM: Faculty = {
 
 const API = `${import.meta.env.VITE_API_URL}/api/faculties`;
 
+// ── Helper: Get Auth Headers ──
+const getAuthHeaders = (): Record<string, string> => {
+  const token = localStorage.getItem("token") ?? "";
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+};
+
 // ── Reusable input class ─────────────────────────────────────────────────────
 const inputCls = "w-full px-3.5 py-2.5 rounded-xl text-sm border-[1.5px] border-[rgba(26,50,99,0.12)] outline-none font-[Outfit] text-[#1A3263] bg-white focus:border-[#0AC4E0] transition-colors duration-150";
 
@@ -73,7 +82,9 @@ export default function Faculty() {
 
   async function fetchRooms() {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/rooms/all`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/rooms/all`, {
+        headers: getAuthHeaders(),
+      });
       if (res.ok) setRooms(await res.json());
     } catch { setError("Could not load rooms."); }
   }
@@ -81,7 +92,7 @@ export default function Faculty() {
   async function fetchAll() {
     setLoading(true);
     try {
-      const res = await fetch(API);
+      const res = await fetch(API, { headers: getAuthHeaders() });
       if (!res.ok) throw new Error("Failed to fetch");
       setFaculty(await res.json());
     } catch { setError("Could not load faculty records."); }
@@ -96,9 +107,9 @@ export default function Faculty() {
 
   function openEdit(f: Faculty) {
     setEditTarget(f); setForm({
-  ...f,
-  tags: f.tags || [], // ✅ FIX
-}); setTagInput("");
+      ...f,
+      tags: f.tags || [],
+    }); setTagInput("");
     setFormError(""); setRoomSearch("");
     setSelectedRoomLabel(f.roomName ? `${f.roomNo} — ${f.roomName}` : f.roomNo || "");
     setShowRoomDrop(false); setShowModal(true);
@@ -111,7 +122,8 @@ export default function Faculty() {
       const method = editTarget ? "PUT" : "POST";
       const url = editTarget ? `${API}/${editTarget.id}` : API;
       const res = await fetch(url, {
-        method, headers: { "Content-Type": "application/json" },
+        method,
+        headers: getAuthHeaders(),
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error(await res.text());
@@ -125,10 +137,18 @@ export default function Faculty() {
     if (!deleteTarget?.id) return;
     setDeleting(true);
     try {
-      await fetch(`${API}/${deleteTarget.id}`, { method: "DELETE" });
-      await fetchAll(); setDeleteTarget(null);
-    } catch { setFormError("Delete failed."); }
-    finally { setDeleting(false); }
+      const res = await fetch(`${API}/${deleteTarget.id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      setFaculty(prev => prev.filter(f => f.id !== deleteTarget.id));
+      setDeleteTarget(null);
+    } catch (e: unknown) {
+      setFormError(e instanceof Error ? e.message : "Delete failed.");
+    } finally {
+      setDeleting(false);
+    }
   }
 
   function addTag() {
@@ -483,11 +503,11 @@ export default function Faculty() {
           onClick={e => e.target === e.currentTarget && setDeleteTarget(null)}
         >
           <div className="bg-white rounded-2xl w-full max-w-[400px] overflow-hidden flex flex-col shadow-[0_24px_64px_rgba(11,45,114,0.25)]">
-            <div className="bg-[#0B2D72] px-6 py-[22px] flex items-center justify-between">
-              <h2 className="text-lg font-extrabold text-[#F6E7BC] m-0 tracking-tight">Delete Faculty</h2>
+            <div className="bg-[#dc3545] px-6 py-[22px] flex items-center justify-between">
+              <h2 className="text-lg font-extrabold text-white m-0 tracking-tight">Delete Faculty</h2>
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="w-7 h-7 rounded-full border-none bg-[rgba(246,231,188,0.12)] text-[#F6E7BC] flex items-center justify-center cursor-pointer"
+                className="w-7 h-7 rounded-full border-none bg-[rgba(255,255,255,0.2)] text-white flex items-center justify-center cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -505,7 +525,7 @@ export default function Faculty() {
               <button
                 onClick={handleDelete}
                 disabled={deleting}
-                className="px-6 py-2.5 rounded-full border-none bg-[rgba(220,53,69,0.1)] text-[#dc3545] text-[13px] font-bold cursor-pointer font-[Outfit] disabled:opacity-50 hover:bg-[rgba(220,53,69,0.2)] transition-colors duration-150"
+                className="px-6 py-2.5 rounded-full border-none bg-[#dc3545] text-white text-[13px] font-bold cursor-pointer font-[Outfit] disabled:opacity-50 hover:bg-[#c82333] transition-colors duration-150"
               >
                 {deleting ? "Deleting…" : "Delete"}
               </button>
