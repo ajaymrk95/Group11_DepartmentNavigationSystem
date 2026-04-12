@@ -432,7 +432,7 @@ export default function SearchBar({
       ) : (
         open && (query || activeFilter) && results.length > 0 && (  // ← fix: gate on open + results
           <div className="relative z-10">
-            <SearchResults results={results} onSelect={handleSelect} />
+            <SearchResults results={results} onSelect={handleSelect} searchQuery={activeFilter || query} />
           </div>
         )
       )}
