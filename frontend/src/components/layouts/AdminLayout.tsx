@@ -7,8 +7,6 @@ import {
   Map,
   ScrollText,
   LogOut,
-  Bell,
-  User,
   Users,
   ChevronLeft,
   Menu,
@@ -22,7 +20,7 @@ const navItems = [
   { label: 'Faculty',      icon: Users,           to: '/admin/faculty' },
   { label: 'Path',         icon: Map,             to: '/admin/Path' },
   { label: 'Logs',         icon: ScrollText,      to: '/admin/logs' },
-  { label: 'Profile',      icon: User,            to: '/admin/profile' },
+  { label: 'Profile',      icon: Users,           to: '/admin/profile' },
   { label: 'Report',       icon:  AlertCircle,            to: '/admin/report'}
 ];
 
@@ -114,15 +112,6 @@ export default function AdminLayout() {
             isCollapsed ? 'flex-col items-center gap-3 px-2' : 'flex-col gap-2 px-[8px]'
           }`}>
             
-            {/* Action Buttons (Bell/User) */}
-            <div className={`flex ${isCollapsed ? 'flex-col gap-3' : 'items-center justify-around px-2 mb-1'}`}>
-              <button title="Notifications" className="flex h-[34px] w-[34px] shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/[.05] text-white/50 transition-colors duration-150 hover:bg-white/[.12] hover:text-white/[.85]">
-                <Bell size={16} strokeWidth={1.8} />
-              </button>
-              <button title="Profile" className="flex h-[34px] w-[34px] shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/[.05] text-white/50 transition-colors duration-150 hover:bg-white/[.12] hover:text-white/[.85]">
-                <User size={16} strokeWidth={1.8} />
-              </button>
-            </div>
 
             {/* Sign Out */}
             <button
