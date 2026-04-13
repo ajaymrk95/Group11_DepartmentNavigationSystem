@@ -7,6 +7,21 @@ import TileSwitcher from "../components/searchcomponents/TileSwitcher"
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 import MapRecenter from "../components/searchcomponents/MapRecenter"
 import "leaflet/dist/leaflet.css"
+import L from "leaflet"
+
+/** Gold pulsing pin for the selected location */
+const selectedLocationIcon = L.divIcon({
+  className: "",
+  html: `
+    <div style="position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center;">
+      <span style="position:absolute;inset:0;border-radius:50%;background:rgba(250,185,91,0.25);animation:locPulse 1.8s ease-out infinite;"></span>
+      <div style="width:20px;height:20px;border-radius:50%;background:#FAB95B;border:3px solid #1A3263;box-shadow:0 2px 10px rgba(250,185,91,0.6);position:relative;z-index:1;"></div>
+    </div>
+  `,
+  iconSize: [36, 36],
+  iconAnchor: [18, 18],
+  popupAnchor: [0, -20],
+})
 
 export default function SearchLocation() {
 
@@ -106,6 +121,12 @@ export default function SearchLocation() {
           border-radius: 8px 0 0 0 !important;
           padding: 3px 8px !important;
         }
+
+        @keyframes locPulse {
+          0%   { transform: scale(0.6); opacity: 0.9; }
+          70%  { transform: scale(2.2); opacity: 0; }
+          100% { transform: scale(2.2); opacity: 0; }
+        }
       `}</style>
 
       <div className="sl-root">
@@ -128,7 +149,7 @@ export default function SearchLocation() {
           <MapRecenter location={selectedLocation} />
 
           {selectedLocation && selectedLocation.latitude != null && selectedLocation.longitude != null && (
-            <Marker position={[selectedLocation.latitude, selectedLocation.longitude]}>
+            <Marker position={[selectedLocation.latitude, selectedLocation.longitude]} icon={selectedLocationIcon}>
               <Popup>{selectedLocation.name}</Popup>
             </Marker>
           )}
