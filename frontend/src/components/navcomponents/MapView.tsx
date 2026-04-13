@@ -98,27 +98,46 @@ function MapView({ center, start, destination, routeCoords, currentLocation, onS
 
   const [locations, setLocations] = useState<Location[]>([])
   
-  useEffect(() => {
+useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/locations`)
       .then(res => res.json())
       .then(data => {
-        const mapped: Location[] = data
-        .filter((loc: any) => loc.latitude != null && loc.longitude != null)
-        .map((loc: any) => ({
-            id: loc.id,
-            name: loc.name,
-            room: loc.room ?? null,
-            category: loc.category ?? null,
-            description: loc.description ?? null,
-            latitude: loc.latitude,
-            longitude: loc.longitude,
-            tag: loc.tag || [],
-            floor: loc.floor ?? null,
-        }))
+        // 1. Figure out where the array actually lives
+        let locationsArray = [];
+        
+        if (Array.isArray(data)) {
+            locationsArray = data; // It was an array all along
+        } else if (data && Array.isArray(data.data)) {
+            locationsArray = data.data; // Commonly wrapped in a "data" property
+        } else if (data && Array.isArray(data.buildings)) {
+            locationsArray = data.buildings; // Or maybe a "buildings" property
+        } else if (data && Array.isArray(data.locations)) {
+            locationsArray = data.locations; // Or a "locations" property
+        } else {
+            console.error("Unrecognized data format:", data);
+            return; // Exit early if we still can't find an array
+        }
+
+        // 2. Now it's safe to map and filter
+        const mapped: Location[] = locationsArray
+          .filter((loc: any) => loc.latitude != null && loc.longitude != null)
+          .map((loc: any) => ({
+              id: loc.id,
+              name: loc.name,
+              room: loc.room ?? null,
+              category: loc.category ?? null,
+              description: loc.description ?? null,
+              latitude: loc.latitude,
+              longitude: loc.longitude,
+              tag: loc.tag || [],
+              floor: loc.floor ?? null,
+          }))
+          
         setLocations(mapped)
       })
       .catch(err => console.error("Failed to load locations:", err))
   }, [])
+
 
   return (
     <div className="relative h-full w-full">

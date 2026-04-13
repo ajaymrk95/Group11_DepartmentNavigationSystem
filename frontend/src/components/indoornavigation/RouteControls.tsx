@@ -17,6 +17,7 @@ export function RouteControls({ from, to, noRouteFound, setFrom, setTo, onFindPa
                 value={from}
                 buildingId={buildingId}
                 buildingEntries={buildingEntries}
+                showQr={true}
                 onChange={(value, coords, fromfloor) => {
                     setFrom(value);
                     setFromCoords(coords);
